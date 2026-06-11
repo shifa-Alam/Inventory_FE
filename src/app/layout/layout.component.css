@@ -1,0 +1,51 @@
+.layout {
+    display: flex;
+    height: 100vh;
+    font-family: Arial;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 240px;
+    background: #1e3c72;
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar h2 {
+    margin-bottom: 30px;
+}
+
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 6px;
+}
+
+.sidebar a:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* MAIN */
+.main {
+    flex: 1;
+    background: #f4f6f9;
+    display: flex;
+    flex-direction: column;
+}
+
+/* TOPBAR */
+.topbar {
+    background: white;
+    padding: 15px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* CONTENT */
+.content {
+    padding: 20px;
+}

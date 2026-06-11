@@ -1,0 +1,49 @@
+<div class="container">
+
+    <h2>Product Management</h2>
+
+    <!-- ADD PRODUCT FORM -->
+    <div class="form-box">
+
+        <input placeholder="Product Name" [(ngModel)]="newProduct.name">
+        <input placeholder="SKU" [(ngModel)]="newProduct.sku">
+
+        <select [(ngModel)]="newProduct.category_id">
+            <option value="0">Select Category</option>
+
+            <option *ngFor="let c of categories" [value]="c.id">
+                {{c.name}}
+            </option>
+        </select>
+
+        <input type="number" placeholder="Purchase Price" [(ngModel)]="newProduct.purchase_price">
+        <input type="number" placeholder="Sale Price" [(ngModel)]="newProduct.sale_price">
+
+        <input type="number" placeholder="Opening Stock" [(ngModel)]="newProduct.current_stock">
+
+        <button (click)="save()">Save Product</button>
+
+    </div>
+
+    <!-- PRODUCT TABLE -->
+    <table>
+
+        <tr>
+            <th>Name</th>
+            <th>SKU</th>
+            <th>Purchase</th>
+            <th>Sale</th>
+            <th>Stock</th>
+        </tr>
+
+        <tr *ngFor="let p of products">
+            <td>{{p.name}}</td>
+            <td>{{p.sku}}</td>
+            <td>{{p.purchase_price}}</td>
+            <td>{{p.sale_price}}</td>
+            <td>{{p.current_stock}}</td>
+        </tr>
+
+    </table>
+
+</div>

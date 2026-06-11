@@ -1,0 +1,27 @@
+<div class="container">
+
+    <h2>Category Management</h2>
+
+    <div class="form-box">
+
+        <input placeholder="Category Name" [(ngModel)]="newCategory.name">
+
+        <button (click)="save()">Save Category</button>
+
+    </div>
+
+    <table>
+
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+        </tr>
+
+        <tr *ngFor="let c of categories">
+            <td>{{c.id}}</td>
+            <td>{{c.name}}</td>
+        </tr>
+
+    </table>
+
+</div>

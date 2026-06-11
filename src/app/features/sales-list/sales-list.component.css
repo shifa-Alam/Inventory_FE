@@ -1,0 +1,25 @@
+.container {
+    padding: 20px;
+    font-family: Arial;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+button {
+    padding: 6px 10px;
+    background: #1e3c72;
+    color: white;
+    border: none;
+    cursor: pointer;
+}

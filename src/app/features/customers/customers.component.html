@@ -1,0 +1,40 @@
+<div class="container">
+
+    <h2>Customer Management</h2>
+
+    <!-- FORM -->
+    <div class="form-box">
+
+        <input placeholder="Customer Name" [(ngModel)]="newCustomer.name">
+        <input placeholder="Phone" [(ngModel)]="newCustomer.phone">
+        <input placeholder="Address" [(ngModel)]="newCustomer.address">
+
+        <input type="number" placeholder="Credit Limit" [(ngModel)]="newCustomer.credit_limit">
+        <input type="number" placeholder="Opening Due" [(ngModel)]="newCustomer.current_due">
+
+        <button (click)="save()">Save Customer</button>
+
+    </div>
+
+    <!-- TABLE -->
+    <table>
+
+        <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Address</th>
+            <th>Credit Limit</th>
+            <th>Due</th>
+        </tr>
+
+        <tr *ngFor="let c of customers">
+            <td>{{c.name}}</td>
+            <td>{{c.phone}}</td>
+            <td>{{c.address}}</td>
+            <td>{{c.credit_limit}}</td>
+            <td>{{c.current_due}}</td>
+        </tr>
+
+    </table>
+
+</div>

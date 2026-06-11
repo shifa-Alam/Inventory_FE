@@ -1,0 +1,104 @@
+<div class="page">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h2>Sales Invoice</h2>
+
+        <div class="customer-box">
+            <label>Customer</label>
+            <select [(ngModel)]="customer_id">
+                <option value="0">Select Customer</option>
+                <option *ngFor="let c of customers" [value]="c.id">
+                    {{c.name}}
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <div class="body">
+
+        <!-- LEFT: ITEMS -->
+        <div class="items">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Stock</th>
+                        <th width="100">Qty</th>
+                        <th width="120">Rate</th>
+                        <th>Total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr *ngFor="let item of items; let i = index">
+
+                        <td>
+                            <select [(ngModel)]="item.product_id" (change)="onProductChange(item)">
+                                <option value="0">Select</option>
+                                <option *ngFor="let p of products" [value]="p.id">
+                                    {{p.name}}
+                                </option>
+                            </select>
+                        </td>
+
+                        <td>{{item.stock}}</td>
+
+                        <td>
+                            <input type="number" [(ngModel)]="item.quantity">
+                        </td>
+
+                        <td>
+                            <input type="number" [(ngModel)]="item.rate">
+                        </td>
+
+                        <td>
+                            {{ item.quantity * item.rate }}
+                        </td>
+
+                        <td>
+                            <button (click)="removeRow(i)">✕</button>
+                        </td>
+
+                    </tr>
+                </tbody>
+            </table>
+
+            <button class="add" (click)="addRow()">+ Add Item</button>
+
+        </div>
+
+        <!-- RIGHT: SUMMARY -->
+        <div class="summary">
+
+            <div class="card">
+                <h3>Invoice Summary</h3>
+
+                <div class="row">
+                    <span>Total</span>
+                    <b>{{ getTotal() }}</b>
+                </div>
+
+                <div class="row">
+                    <span>Paid</span>
+                    <input type="number" [(ngModel)]="paid_amount">
+                </div>
+
+                <div class="row">
+                    <span>Due</span>
+                    <b>{{ getTotal() - paid_amount }}</b>
+                </div>
+
+                <button class="save" (click)="submit()">
+                    Complete Sale
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

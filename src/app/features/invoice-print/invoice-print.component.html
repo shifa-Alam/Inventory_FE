@@ -1,0 +1,81 @@
+<div id="invoice-print-area" class="invoice">
+
+    <div class="header">
+        <div>
+            <h1>Amira Traders</h1>
+            <p>Wholesale Distribution System</p>
+            <p>Dhaka, Bangladesh</p>
+        </div>
+
+        <div class="invoice-info">
+            <h2>INVOICE</h2>
+            <p>Invoice #: INV-{{invoice?.id}}</p>
+            <p>Date: {{invoice?.created_at | date:'dd MMM yyyy'}}</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="customer">
+        <strong>Bill To:</strong>
+        <p>{{invoice?.customer_name}}</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>SL</th>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Rate</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr *ngFor="let item of invoice?.items; let i = index">
+                <td>{{i + 1}}</td>
+                <td>{{item.product_name}}</td>
+                <td>{{item.quantity}}</td>
+                <td>{{item.rate}}</td>
+                <td>{{item.quantity * item.rate}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="summary">
+        <table>
+            <tr>
+                <td>Total</td>
+                <td>{{invoice?.total_amount}}</td>
+            </tr>
+            <tr>
+                <td>Paid</td>
+                <td>{{invoice?.paid_amount}}</td>
+            </tr>
+            <tr>
+                <td><strong>Due</strong></td>
+                <td><strong>{{invoice?.due_amount}}</strong></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="footer">
+        <div>
+            ______________________
+            <br>
+            Prepared By
+        </div>
+
+        <div>
+            ______________________
+            <br>
+            Customer Signature
+        </div>
+    </div>
+
+</div>
+
+<button class="no-print" (click)="print()">
+    Print Invoice
+</button>

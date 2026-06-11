@@ -1,0 +1,34 @@
+<div class="container">
+
+    <h2>Supplier Management</h2>
+
+    <!-- ADD FORM -->
+    <div class="form-box">
+
+        <input placeholder="Supplier Name" [(ngModel)]="newSupplier.name">
+        <input placeholder="Phone" [(ngModel)]="newSupplier.phone">
+        <input placeholder="Address" [(ngModel)]="newSupplier.address">
+        <input type="number" placeholder="Opening Due" [(ngModel)]="newSupplier.opening_due">
+
+        <button (click)="save()">Save Supplier</button>
+
+    </div>
+
+    <!-- LIST -->
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Address</th>
+            <th>Due</th>
+        </tr>
+
+        <tr *ngFor="let s of suppliers">
+            <td>{{s.name}}</td>
+            <td>{{s.phone}}</td>
+            <td>{{s.address}}</td>
+            <td>{{s.opening_due}}</td>
+        </tr>
+    </table>
+
+</div>

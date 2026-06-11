@@ -1,0 +1,32 @@
+<div class="container">
+
+    <h2>Sales History</h2>
+
+    <table>
+
+        <tr>
+            <th>Invoice</th>
+            <th>Customer</th>
+            <th>Total</th>
+            <th>Paid</th>
+            <th>Due</th>
+            <th>Action</th>
+        </tr>
+
+        <tr *ngFor="let s of sales">
+
+            <td>#{{s.id}}</td>
+            <td>{{s.customer_name || 'Walk-in'}}</td>
+            <td>{{s.total_amount}}</td>
+            <td>{{s.paid_amount}}</td>
+            <td>{{s.due_amount}}</td>
+
+            <td>
+                <button (click)="viewInvoice(s)">View / Print</button>
+            </td>
+
+        </tr>
+
+    </table>
+
+</div>

@@ -1,0 +1,22 @@
+.container {
+    padding: 20px;
+}
+
+.form-box {
+    background: white;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+input {
+    padding: 10px;
+    width: 300px;
+    margin-right: 10px;
+}
+
+button {
+    padding: 10px;
+    background: #1e3c72;
+    color: white;
+    border: none;
+}

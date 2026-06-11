@@ -1,0 +1,34 @@
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+        <h2>ERP</h2>
+
+        <a routerLink="/dashboard">Dashboard</a>
+        <a routerLink="/categories">Categories</a>
+        <a routerLink="/products">Products</a>
+        <a routerLink="/customers">Customers</a>
+        <a routerLink="/suppliers">Suppliers</a>
+        <a routerLink="/purchase">Purchase</a>
+        <a routerLink="/sales">Sales</a>
+        <a routerLink="/billing">Billing</a>
+
+    </div>
+
+    <!-- MAIN AREA -->
+    <div class="main">
+
+        <!-- TOP BAR -->
+        <!-- <div class="topbar">
+            <h3>Inventory Dashboard</h3>
+        </div> -->
+
+        <!-- PAGE CONTENT -->
+        <div class="content">
+            <router-outlet></router-outlet>
+        </div>
+
+    </div>
+
+</div>
