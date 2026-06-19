@@ -21,7 +21,7 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.loading = true;
-    this.api.get('/dashboard').subscribe({
+    this.api.get('/dashboard/').subscribe({
       next: (res: any) => { this.data = res; this.loading = false; },
       error: () => { this.loading = false; }
     });
