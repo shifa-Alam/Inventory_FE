@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'REPLACE_WITH_BACKEND_URL'
+  apiUrl: 'https://inventorybe-production.up.railway.app'
 };
