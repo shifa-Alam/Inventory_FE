@@ -1,81 +1,144 @@
-<div id="invoice-print-area" class="invoice">
+<div class="page">
 
-    <div class="header">
-        <div>
-            <h1>Amira Traders</h1>
-            <p>Wholesale Distribution System</p>
-            <p>Dhaka, Bangladesh</p>
-        </div>
+  <!-- Toolbar (screen only) -->
+  <div class="no-print toolbar">
+    <div>
+      <h2>{{ 'invoice.page_title' | translate }}</h2>
+      <p class="sub">{{ 'invoice.page_subtitle' | translate }}</p>
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn btn-ghost" (click)="goBack()">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        {{ 'invoice.back' | translate }}
+      </button>
+      <button class="btn btn-ghost" (click)="print()">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        {{ 'invoice.print' | translate }}
+      </button>
+      <button class="btn btn-primary" (click)="downloadPDF()">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        {{ 'invoice.download_pdf' | translate }}
+      </button>
+    </div>
+  </div>
 
-        <div class="invoice-info">
-            <h2>INVOICE</h2>
-            <p>Invoice #: INV-{{invoice?.id}}</p>
-            <p>Date: {{invoice?.created_at | date:'dd MMM yyyy'}}</p>
+  <!-- ══ Invoice Document ══ -->
+  <div class="invoice-doc" #invoiceBox>
+
+    <!-- Top stripe -->
+    <div class="accent-bar"></div>
+
+    <!-- ── Head ── -->
+    <div class="inv-head">
+
+      <!-- Company -->
+      <div class="company-block">
+        <div class="company-logo">
+          <div class="logo-mark">A</div>
         </div>
+        <div class="company-info">
+          <div class="company-name">{{ 'invoice.company' | translate }}</div>
+          <div class="company-sub">{{ 'invoice.company_sub' | translate }}</div>
+          <div class="company-sub">{{ 'invoice.company_location' | translate }}</div>
+        </div>
+      </div>
+
+      <!-- Invoice meta -->
+      <div class="inv-label-block">
+        <div class="inv-word">INVOICE</div>
+        <div class="inv-meta-row">
+          <span class="inv-meta-label">{{ 'invoice.invoice_no' | translate }}</span>
+          <span class="inv-meta-val">{{ invoice?.invoice_no }}</span>
+        </div>
+        <div class="inv-meta-row">
+          <span class="inv-meta-label">{{ 'invoice.date' | translate }}</span>
+          <span class="inv-meta-val">{{ invoice?.created_at | date:'dd MMM yyyy' }}</span>
+        </div>
+        <div class="inv-status-row">
+          <span class="status-pill" [class.paid]="(invoice?.due_amount ?? 1) <= 0">
+            {{ (invoice?.due_amount ?? 1) <= 0 ? ('invoice.status_paid' | translate) : ('invoice.status_due' | translate) }}
+          </span>
+        </div>
+      </div>
+
     </div>
 
-    <hr>
-
-    <div class="customer">
-        <strong>Bill To:</strong>
-        <p>{{invoice?.customer_name}}</p>
+    <!-- ── Bill Info ── -->
+    <div class="bill-section">
+      <div class="bill-block">
+        <div class="bill-label">{{ 'invoice.from' | translate }}</div>
+        <div class="bill-name">{{ 'invoice.company' | translate }}</div>
+        <div class="bill-line">{{ 'invoice.company_location' | translate }}</div>
+      </div>
+      <div class="bill-block bill-block-right">
+        <div class="bill-label">{{ 'invoice.bill_to' | translate }}</div>
+        <div class="bill-name">{{ invoice?.customer_name || ('invoice.walk_in' | translate) }}</div>
+      </div>
     </div>
 
-    <table>
+    <!-- ── Items Table ── -->
+    <div class="table-section">
+      <table class="inv-table">
         <thead>
-            <tr>
-                <th>SL</th>
-                <th>Product</th>
-                <th>Qty</th>
-                <th>Rate</th>
-                <th>Amount</th>
-            </tr>
+          <tr>
+            <th class="th-no">#</th>
+            <th class="th-desc">{{ 'invoice.col_product' | translate }}</th>
+            <th class="th-center">{{ 'invoice.col_qty' | translate }}</th>
+            <th class="th-right">{{ 'invoice.col_rate' | translate }}</th>
+            <th class="th-right">{{ 'invoice.col_amount' | translate }}</th>
+          </tr>
         </thead>
-
         <tbody>
-            <tr *ngFor="let item of invoice?.items; let i = index">
-                <td>{{i + 1}}</td>
-                <td>{{item.product_name}}</td>
-                <td>{{item.quantity}}</td>
-                <td>{{item.rate}}</td>
-                <td>{{item.quantity * item.rate}}</td>
-            </tr>
+          <tr *ngFor="let item of invoice?.items; let i = index" [class.row-alt]="i % 2 === 1">
+            <td class="td-no">{{ i + 1 }}</td>
+            <td class="td-desc">{{ item.product_name }}</td>
+            <td class="td-center">{{ item.quantity }}</td>
+            <td class="td-right">৳&thinsp;{{ item.rate | number }}</td>
+            <td class="td-right td-amount">৳&thinsp;{{ item.quantity * item.rate | number }}</td>
+          </tr>
         </tbody>
-    </table>
-
-    <div class="summary">
-        <table>
-            <tr>
-                <td>Total</td>
-                <td>{{invoice?.total_amount}}</td>
-            </tr>
-            <tr>
-                <td>Paid</td>
-                <td>{{invoice?.paid_amount}}</td>
-            </tr>
-            <tr>
-                <td><strong>Due</strong></td>
-                <td><strong>{{invoice?.due_amount}}</strong></td>
-            </tr>
-        </table>
+      </table>
     </div>
 
-    <div class="footer">
-        <div>
-            ______________________
-            <br>
-            Prepared By
+    <!-- ── Totals ── -->
+    <div class="totals-wrap">
+      <div class="totals-box">
+        <div class="t-row">
+          <span class="t-label">{{ 'invoice.subtotal' | translate }}</span>
+          <span class="t-val">৳&thinsp;{{ invoice?.total_amount | number }}</span>
         </div>
-
-        <div>
-            ______________________
-            <br>
-            Customer Signature
+        <div class="t-row t-paid">
+          <span class="t-label">{{ 'invoice.paid' | translate }}</span>
+          <span class="t-val">−&thinsp;৳&thinsp;{{ invoice?.paid_amount | number }}</span>
         </div>
+        <div class="t-grand">
+          <span class="t-grand-label">{{ 'invoice.balance_due' | translate }}</span>
+          <span class="t-grand-val">৳&thinsp;{{ invoice?.due_amount | number }}</span>
+        </div>
+      </div>
     </div>
 
+    <!-- ── Footer ── -->
+    <div class="inv-footer">
+
+      <div class="sig-row">
+        <div class="sig-block">
+          <div class="sig-space"></div>
+          <div class="sig-line sig-line-dashed"></div>
+          <div class="sig-label">{{ 'invoice.customer_sig' | translate }}</div>
+          <div class="sig-sub">{{ invoice?.customer_name || ('invoice.walk_in' | translate) }}</div>
+        </div>
+      </div>
+
+      <div class="footer-strip">
+        <span class="footer-thanks">{{ 'invoice.thank_you' | translate }}</span>
+        <div class="footer-contact">
+          <span>{{ 'invoice.company_phone' | translate }}</span>
+          <span>{{ 'invoice.company_email' | translate }}</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
 </div>
-
-<button class="no-print" (click)="print()">
-    Print Invoice
-</button>

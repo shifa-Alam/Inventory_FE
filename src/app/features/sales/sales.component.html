@@ -1,104 +1,110 @@
+<div class="scan-toast" *ngIf="scanToast" [class.toast-success]="scanToast.type === 'success'"
+  [class.toast-error]="scanToast.type === 'error'">
+  <span class="toast-icon">{{ scanToast.type === 'success' ? '✓' : '✕' }}</span>
+  {{ scanToast.message }}
+</div>
+
 <div class="page">
 
-    <!-- HEADER -->
-    <div class="header">
-        <h2>Sales Invoice</h2>
+  <!-- HEADER -->
+  <div class="page-header">
+    <div>
+      <h2>{{ 'sales.title' | translate }}</h2>
+      <p class="sub">{{ 'sales.subtitle' | translate }}</p>
+    </div>
+    <div class="header-customer">
+      <label class="field-label">{{ 'sales.customer_label' | translate }}</label>
+      <select [(ngModel)]="customer_id" style="width:220px">
+        <option value="0">{{ 'sales.walk_in' | translate }}</option>
+        <option *ngFor="let c of customers" [value]="c.id">{{ c.name }}</option>
+      </select>
+    </div>
+  </div>
 
-        <div class="customer-box">
-            <label>Customer</label>
-            <select [(ngModel)]="customer_id">
-                <option value="0">Select Customer</option>
-                <option *ngFor="let c of customers" [value]="c.id">
-                    {{c.name}}
-                </option>
-            </select>
+  <!-- BODY -->
+  <div class="sales-layout">
+
+    <!-- LEFT: items -->
+    <div class="left-col">
+
+      <!-- Search -->
+      <div class="card card-body search-wrap" style="margin-bottom:16px">
+        <input #searchInput type="text" [placeholder]="'sales.search_placeholder' | translate"
+          [(ngModel)]="productSearch" (ngModelChange)="onSearchChange($event)" (keydown)="onKeyDown($event)" />
+        <div class="dropdown" *ngIf="filteredProducts.length > 0">
+          <div class="dropdown-item" *ngFor="let p of filteredProducts; let i = index"
+            [class.active]="i === selectedIndex" (click)="selectProduct(p)">
+            <span class="dp-name">{{ p.name }}</span>
+            <span class="dp-stock">{{ 'sales.col_stock' | translate }}: {{ p.current_stock }}</span>
+          </div>
         </div>
+      </div>
+
+      <!-- Items table -->
+      <div class="card">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>{{ 'sales.col_no' | translate }}</th>
+                <th>{{ 'sales.col_product' | translate }}</th>
+                <th>{{ 'sales.col_stock' | translate }}</th>
+                <th style="width:110px">{{ 'sales.col_qty' | translate }}</th>
+                <th style="width:130px">{{ 'sales.col_rate' | translate }}</th>
+                <th>{{ 'sales.col_total' | translate }}</th>
+                <th style="width:50px"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of items; let i = index">
+                <td class="muted">{{ i + 1 }}</td>
+                <td class="bold">{{ item.product_name }}</td>
+                <td><span class="stock-chip">{{ item.stock }}</span></td>
+                <td><input type="number" [(ngModel)]="item.quantity" min="1" [max]="item.stock" (change)="clampQuantity(item)" /></td>
+                <td><input type="number" [(ngModel)]="item.rate" min="0" /></td>
+                <td class="right">{{ item.quantity * item.rate | number }}</td>
+                <td>
+                  <button class="btn btn-danger btn-sm" (click)="removeRow(i)">✕</button>
+                </td>
+              </tr>
+              <tr *ngIf="items.length === 0">
+                <td colspan="7" class="empty-row">{{ 'sales.empty' | translate }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
 
-    <div class="body">
+    <!-- RIGHT: summary -->
+    <div class="right-col">
+      <div class="card card-body summary-card">
+        <p class="card-title">{{ 'sales.summary_title' | translate }}</p>
 
-        <!-- LEFT: ITEMS -->
-        <div class="items">
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Stock</th>
-                        <th width="100">Qty</th>
-                        <th width="120">Rate</th>
-                        <th>Total</th>
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr *ngFor="let item of items; let i = index">
-
-                        <td>
-                            <select [(ngModel)]="item.product_id" (change)="onProductChange(item)">
-                                <option value="0">Select</option>
-                                <option *ngFor="let p of products" [value]="p.id">
-                                    {{p.name}}
-                                </option>
-                            </select>
-                        </td>
-
-                        <td>{{item.stock}}</td>
-
-                        <td>
-                            <input type="number" [(ngModel)]="item.quantity">
-                        </td>
-
-                        <td>
-                            <input type="number" [(ngModel)]="item.rate">
-                        </td>
-
-                        <td>
-                            {{ item.quantity * item.rate }}
-                        </td>
-
-                        <td>
-                            <button (click)="removeRow(i)">✕</button>
-                        </td>
-
-                    </tr>
-                </tbody>
-            </table>
-
-            <button class="add" (click)="addRow()">+ Add Item</button>
-
+        <div class="summary-row">
+          <span class="s-label">{{ 'sales.subtotal' | translate }}</span>
+          <span class="s-value">{{ getTotal() | number }}</span>
         </div>
 
-        <!-- RIGHT: SUMMARY -->
-        <div class="summary">
-
-            <div class="card">
-                <h3>Invoice Summary</h3>
-
-                <div class="row">
-                    <span>Total</span>
-                    <b>{{ getTotal() }}</b>
-                </div>
-
-                <div class="row">
-                    <span>Paid</span>
-                    <input type="number" [(ngModel)]="paid_amount">
-                </div>
-
-                <div class="row">
-                    <span>Due</span>
-                    <b>{{ getTotal() - paid_amount }}</b>
-                </div>
-
-                <button class="save" (click)="submit()">
-                    Complete Sale
-                </button>
-
-            </div>
-
+        <div class="summary-row">
+          <span class="s-label">{{ 'sales.paid_amount' | translate }}</span>
+          <input type="number" [(ngModel)]="paid_amount" placeholder="0" />
         </div>
 
+        <div class="summary-divider"></div>
+
+        <div class="summary-row due-row">
+          <span class="s-label">{{ 'sales.balance_due' | translate }}</span>
+          <span class="due-value">{{ getTotal() - paid_amount | number }}</span>
+        </div>
+
+        <button class="btn btn-primary btn-lg complete-btn" (click)="submit()" [disabled]="items.length === 0">
+          {{ 'sales.complete' | translate }}
+        </button>
+      </div>
     </div>
+
+  </div>
 
 </div>

@@ -1,0 +1,358 @@
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <h2>{{ 'customer_payment.title' | translate }}</h2>
+      <p class="sub">{{ 'customer_payment.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-row">
+    <div class="summary-chip success">
+      <span class="chip-label">{{ 'customer_payment.today_collection' | translate }}</span>
+      <span class="chip-value">{{ summary.today_collection | number:'1.0-2' }}</span>
+    </div>
+    <div class="summary-chip primary">
+      <span class="chip-label">{{ 'customer_payment.total_collection' | translate }}</span>
+      <span class="chip-value">{{ summary.total_collection | number:'1.0-2' }}</span>
+    </div>
+    <div class="summary-chip info">
+      <span class="chip-label">{{ 'customer_payment.total_discount' | translate }}</span>
+      <span class="chip-value">{{ summary.total_discount | number:'1.0-2' }}</span>
+    </div>
+    <div class="summary-chip warn">
+      <span class="chip-label">{{ 'customer_payment.pending_invoices' | translate }}</span>
+      <span class="chip-value">{{ summary.pending_invoices }}</span>
+    </div>
+  </div>
+
+  <!-- ALERTS -->
+  <div class="alert alert-success" *ngIf="successMsg">
+    <span class="alert-icon">✓</span> {{ successMsg }}
+  </div>
+  <div class="alert alert-error" *ngIf="errorMsg">
+    <span class="alert-icon">✕</span> {{ errorMsg }}
+  </div>
+
+  <!-- PENDING INVOICES (DESKTOP) -->
+  <div class="card desktop-table">
+    <div class="card-header-row">
+      <div class="chr-left">
+        <span class="card-title" style="margin-bottom:0">{{ 'customer_payment.pending_invoices_title' | translate }}</span>
+        <span class="count-badge">{{ invoiceTotal }} {{ 'customer_payment.with_due' | translate }}</span>
+      </div>
+      <div class="chr-toolbar">
+        <input [placeholder]="'customer_payment.search_ph' | translate" [(ngModel)]="searchInvoice" (ngModelChange)="onSearch()" />
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ 'customer_payment.col_invoice' | translate }}</th>
+            <th>{{ 'common.date' | translate }}</th>
+            <th>{{ 'customer_payment.col_customer' | translate }}</th>
+            <th class="right">{{ 'customer_payment.col_total' | translate }}</th>
+            <th class="right">{{ 'customer_payment.col_paid' | translate }}</th>
+            <th class="right">{{ 'customer_payment.col_discount' | translate }}</th>
+            <th class="right">{{ 'customer_payment.col_due' | translate }}</th>
+            <th>{{ 'customer_payment.col_action' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let s of invoices">
+            <tr [class.row-selected]="selectedSale?.id === s.id">
+              <td class="bold">{{ s.invoice_no }}</td>
+              <td class="muted">{{ s.created_at | date:'dd MMM yyyy' }}</td>
+              <td>{{ s.customer_name || ('customer_payment.walk_in' | translate) }}</td>
+              <td class="right">৳{{ s.total_amount | number:'1.0-2' }}</td>
+              <td class="right">৳{{ s.paid_amount | number:'1.0-2' }}</td>
+              <td class="right muted">{{ (s.discount_amount || 0) > 0 ? ('৳' + (s.discount_amount | number:'1.0-2')) : '—' }}</td>
+              <td class="right"><span class="due-chip">৳{{ s.due_amount | number:'1.0-2' }}</span></td>
+              <td>
+                <button class="btn btn-sm" [ngClass]="selectedSale?.id === s.id ? 'btn-ghost' : 'btn-success'" (click)="selectInvoice(s)">
+                  {{ selectedSale?.id === s.id ? ('common.cancel' | translate) : ('customer_payment.collect_btn' | translate) }}
+                </button>
+              </td>
+            </tr>
+
+            <!-- INLINE PAYMENT PANEL -->
+            <tr *ngIf="selectedSale?.id === s.id" class="pay-row">
+              <td colspan="8">
+                <div class="pay-panel">
+
+                  <!-- Invoice summary -->
+                  <div class="pay-info">
+                    <div class="pi-row">
+                      <span class="pi-lbl">{{ 'customer_payment.invoice_lbl' | translate }}</span>
+                      <span class="pi-val fw">{{ selectedSale.invoice_no }}</span>
+                    </div>
+                    <div class="pi-row">
+                      <span class="pi-lbl">{{ 'customer_payment.customer_lbl' | translate }}</span>
+                      <span class="pi-val">{{ selectedSale.customer_name || ('customer_payment.walk_in' | translate) }}</span>
+                    </div>
+                    <div class="pi-row">
+                      <span class="pi-lbl">{{ 'customer_payment.outstanding_due' | translate }}</span>
+                      <span class="pi-val due">৳{{ selectedSale.due_amount | number:'1.0-2' }}</span>
+                    </div>
+                    <div class="pi-row" *ngIf="totalReduction > 0 && totalReduction <= maxDue">
+                      <span class="pi-lbl">{{ 'customer_payment.after_entry' | translate }}</span>
+                      <span class="pi-val" [ngClass]="afterPayment === 0 ? 'ok' : 'warn'">৳{{ afterPayment | number:'1.0-2' }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Form fields -->
+                  <div class="pay-form">
+                    <div class="pay-fields">
+                      <div class="form-group">
+                        <label>{{ 'customer_payment.amount_label' | translate }} <span class="hint">({{ 'customer_payment.pay_amount_hint' | translate }})</span></label>
+                        <div class="amount-row">
+                          <input type="number" [(ngModel)]="payAmount" placeholder="0.00" min="0" [max]="maxDue" />
+                          <button class="btn btn-ghost btn-sm" (click)="setFullPay()" [title]="'customer_payment.full_btn' | translate">{{ 'customer_payment.full_btn' | translate }}</button>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label>{{ 'customer_payment.discount_label' | translate }} <span class="hint">({{ 'customer_payment.pay_discount_hint' | translate }})</span></label>
+                        <input type="number" [(ngModel)]="payDiscount" placeholder="0.00" min="0" [max]="maxDue" />
+                      </div>
+                      <div class="form-group">
+                        <label>{{ 'customer_payment.note_label' | translate }} <span class="hint">({{ 'customer_payment.note_hint' | translate }})</span></label>
+                        <input type="text" [(ngModel)]="payNote" [placeholder]="'customer_payment.note_ph' | translate" maxlength="255" />
+                      </div>
+                    </div>
+
+                    <!-- Validation hint -->
+                    <p class="hint hint-error" *ngIf="totalReduction > maxDue">
+                      {{ 'customer_payment.amount_label' | translate }} + {{ 'customer_payment.discount_label' | translate }} (৳{{ totalReduction | number:'1.0-2' }}) exceeds due (৳{{ maxDue | number:'1.0-2' }})
+                    </p>
+
+                    <!-- Breakdown preview -->
+                    <div class="breakdown" *ngIf="totalReduction > 0 && totalReduction <= maxDue">
+                      <span *ngIf="(payAmount || 0) > 0">৳{{ payAmount | number:'1.0-2' }} {{ 'customer_payment.payment_word' | translate }}</span>
+                      <span class="bd-sep" *ngIf="(payAmount || 0) > 0 && (payDiscount || 0) > 0">+</span>
+                      <span class="bd-disc" *ngIf="(payDiscount || 0) > 0">৳{{ payDiscount | number:'1.0-2' }} {{ 'customer_payment.discount_word' | translate }}</span>
+                      <span class="bd-sep">=</span>
+                      <span class="bd-total">৳{{ totalReduction | number:'1.0-2' }} {{ 'customer_payment.total_reduction' | translate }}</span>
+                    </div>
+
+                    <div class="pay-actions">
+                      <button class="btn btn-success" (click)="pay()" [disabled]="!isValid || paying">
+                        <span *ngIf="paying" class="spinner"></span>
+                        {{ paying ? ('customer_payment.processing' | translate) : ('customer_payment.confirm_btn' | translate) }}
+                      </button>
+                      <button class="btn btn-ghost" (click)="clearSelection()">{{ 'customer_payment.cancel_btn' | translate }}</button>
+                    </div>
+                  </div>
+
+                </div>
+
+                <!-- PER-INVOICE PAYMENT HISTORY -->
+                <div class="inv-hist">
+                  <div class="inv-hist-title">
+                    <span>{{ 'customer_payment.history_for' | translate }} {{ selectedSale.invoice_no }}</span>
+                    <span class="count-badge" *ngIf="invoicePayments.length > 0">{{ invoicePayments.length }} {{ 'customer_payment.entries_label' | translate }}</span>
+                  </div>
+                  <div class="inv-hist-loading" *ngIf="loadingInvoicePayments"><div class="loading-spinner"></div></div>
+                  <div class="inv-hist-empty" *ngIf="!loadingInvoicePayments && invoicePayments.length === 0">{{ 'customer_payment.no_payments_yet' | translate }}</div>
+                  <table class="inv-hist-table" *ngIf="!loadingInvoicePayments && invoicePayments.length > 0">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>{{ 'common.date' | translate }}</th>
+                        <th>{{ 'customer_payment.col_ref' | translate }}</th>
+                        <th class="right">{{ 'customer_payment.col_payment' | translate }}</th>
+                        <th class="right">{{ 'customer_payment.col_discount' | translate }}</th>
+                        <th>{{ 'customer_payment.col_note' | translate }}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let ph of invoicePayments; let i = index">
+                        <td class="muted">{{ i + 1 }}</td>
+                        <td class="muted">{{ ph.created_at | date:'dd MMM yyyy, HH:mm' }}</td>
+                        <td><span class="ref-badge small">{{ ph.reference_no }}</span></td>
+                        <td class="right"><span class="amount-paid" *ngIf="ph.amount > 0">৳{{ ph.amount | number:'1.0-2' }}</span><span class="muted" *ngIf="!ph.amount">—</span></td>
+                        <td class="right"><span class="amount-disc" *ngIf="ph.discount_amount > 0">৳{{ ph.discount_amount | number:'1.0-2' }}</span><span class="muted" *ngIf="!ph.discount_amount">—</span></td>
+                        <td class="muted">{{ ph.note || '—' }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+              </td>
+            </tr>
+          </ng-container>
+
+          <tr *ngIf="loadingInvoices" class="loading-row">
+            <td colspan="8"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
+          </tr>
+          <tr *ngIf="!loadingInvoices && invoices.length === 0">
+            <td colspan="8" class="empty-row"><div class="empty-icon">✅</div>{{ 'customer_payment.no_pending' | translate }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <app-paginator [page]="invoicePage" [pages]="invoicePages" [total]="invoiceTotal" [pageSize]="invoicePageSize" (pageChange)="onInvoicePage($event)"></app-paginator>
+  </div>
+
+  <!-- MOBILE: PENDING INVOICES -->
+  <div class="mobile-list">
+    <div class="mobile-meta">
+      <span class="mobile-title">{{ 'customer_payment.pending_invoices_title' | translate }}</span>
+      <span class="count-badge">{{ invoiceTotal }}</span>
+    </div>
+    <div style="margin-bottom:8px">
+      <input [placeholder]="'customer_payment.search_ph_mobile' | translate" [(ngModel)]="searchInvoice" (ngModelChange)="onSearch()" />
+    </div>
+    <div class="mobile-loading" *ngIf="loadingInvoices"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
+    <div class="mobile-empty" *ngIf="!loadingInvoices && invoices.length === 0"><div class="empty-icon">✅</div><p>{{ 'customer_payment.no_pending' | translate }}</p></div>
+    <div class="mobile-card mc-warn" *ngFor="let s of invoices">
+      <div class="mc-top">
+        <div class="mc-name-wrap">
+          <div>
+            <div class="mc-title">{{ s.invoice_no }}</div>
+            <div class="mc-sub">{{ s.created_at | date:'dd MMM yyyy' }} · {{ s.customer_name || ('customer_payment.walk_in' | translate) }}</div>
+          </div>
+        </div>
+        <span class="due-chip">৳{{ s.due_amount | number:'1.0-2' }}</span>
+      </div>
+      <div class="mc-grid">
+        <div class="mc-field">
+          <span class="mc-lbl">{{ 'common.total' | translate }}</span>
+          <span class="mc-val">৳{{ s.total_amount | number:'1.0-2' }}</span>
+        </div>
+        <div class="mc-field">
+          <span class="mc-lbl">{{ 'common.paid' | translate }}</span>
+          <span class="mc-val">৳{{ s.paid_amount | number:'1.0-2' }}</span>
+        </div>
+        <div class="mc-field">
+          <span class="mc-lbl">{{ 'common.due' | translate }}</span>
+          <span class="mc-val danger fw">৳{{ s.due_amount | number:'1.0-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Mobile payment panel -->
+      <div class="mobile-pay-panel" *ngIf="selectedSale?.id === s.id">
+        <div class="pay-fields">
+          <div class="form-group">
+            <label>{{ 'customer_payment.amount_label' | translate }}</label>
+            <div class="amount-row">
+              <input type="number" [(ngModel)]="payAmount" placeholder="0.00" [max]="maxDue" />
+              <button class="btn btn-ghost btn-sm" (click)="setFullPay()">{{ 'customer_payment.full_btn' | translate }}</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>{{ 'customer_payment.discount_label' | translate }}</label>
+            <input type="number" [(ngModel)]="payDiscount" placeholder="0.00" [max]="maxDue" />
+          </div>
+          <div class="form-group">
+            <label>{{ 'customer_payment.note_label' | translate }}</label>
+            <input type="text" [(ngModel)]="payNote" [placeholder]="'customer_payment.note_ph' | translate" />
+          </div>
+        </div>
+        <div class="breakdown" *ngIf="totalReduction > 0 && totalReduction <= maxDue" style="margin:8px 0">
+          <span *ngIf="(payAmount||0)>0">৳{{ payAmount | number:'1.0-2' }} {{ 'customer_payment.payment_word' | translate }}</span>
+          <span class="bd-sep" *ngIf="(payAmount||0)>0 && (payDiscount||0)>0">+</span>
+          <span class="bd-disc" *ngIf="(payDiscount||0)>0">৳{{ payDiscount | number:'1.0-2' }} {{ 'customer_payment.discount_word' | translate }}</span>
+          <span class="bd-sep">=</span>
+          <span class="bd-total">৳{{ totalReduction | number:'1.0-2' }}</span>
+        </div>
+        <div class="pay-actions" style="margin-top:10px">
+          <button class="btn btn-success btn-sm" (click)="pay()" [disabled]="!isValid || paying" style="flex:1;justify-content:center">
+            <span *ngIf="paying" class="spinner"></span>{{ paying ? ('customer_payment.processing' | translate) : ('customer_payment.confirm_btn' | translate) }}
+          </button>
+          <button class="btn btn-ghost btn-sm" (click)="clearSelection()">{{ 'customer_payment.cancel_btn' | translate }}</button>
+        </div>
+      </div>
+
+      <div class="mc-actions">
+        <button class="btn btn-sm" style="flex:1;justify-content:center"
+          [ngClass]="selectedSale?.id === s.id ? 'btn-ghost' : 'btn-success'"
+          (click)="selectInvoice(s)">
+          {{ selectedSale?.id === s.id ? ('common.cancel' | translate) : ('customer_payment.mobile_collect_btn' | translate) }}
+        </button>
+      </div>
+    </div>
+    <app-paginator [page]="invoicePage" [pages]="invoicePages" [total]="invoiceTotal" [pageSize]="invoicePageSize" (pageChange)="onInvoicePage($event)"></app-paginator>
+  </div>
+
+  <!-- PAYMENT HISTORY (DESKTOP) -->
+  <div class="card desktop-table" style="margin-top:6px">
+    <div class="card-header-row">
+      <div class="chr-left">
+        <span class="card-title" style="margin-bottom:0">{{ 'customer_payment.payment_history_title' | translate }}</span>
+        <span class="count-badge">{{ histTotal }} {{ 'customer_payment.records' | translate }}</span>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ 'common.date' | translate }}</th>
+            <th>{{ 'customer_payment.col_ref' | translate }}</th>
+            <th>{{ 'customer_payment.col_invoice' | translate }}</th>
+            <th>{{ 'customer_payment.col_customer' | translate }}</th>
+            <th class="right">{{ 'customer_payment.col_payment' | translate }}</th>
+            <th class="right">{{ 'customer_payment.col_discount' | translate }}</th>
+            <th>{{ 'customer_payment.col_note' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of history">
+            <td class="muted">{{ p.created_at | date:'dd MMM yyyy, HH:mm' }}</td>
+            <td><span class="ref-badge">{{ p.reference_no }}</span></td>
+            <td class="bold">{{ p.invoice_no }}</td>
+            <td>{{ p.customer_name }}</td>
+            <td class="right"><span class="amount-paid" *ngIf="p.amount > 0">৳{{ p.amount | number:'1.0-2' }}</span><span class="muted" *ngIf="!p.amount">—</span></td>
+            <td class="right"><span class="amount-disc" *ngIf="p.discount_amount > 0">৳{{ p.discount_amount | number:'1.0-2' }}</span><span class="muted" *ngIf="!p.discount_amount">—</span></td>
+            <td class="muted">{{ p.note || '—' }}</td>
+          </tr>
+          <tr *ngIf="loadingHistory" class="loading-row">
+            <td colspan="7"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
+          </tr>
+          <tr *ngIf="!loadingHistory && history.length === 0">
+            <td colspan="7" class="empty-row"><div class="empty-icon">💳</div>{{ 'customer_payment.no_records' | translate }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <app-paginator [page]="histPage" [pages]="histPages" [total]="histTotal" [pageSize]="histPageSize" (pageChange)="onHistPage($event)"></app-paginator>
+  </div>
+
+  <!-- HISTORY MOBILE -->
+  <div class="mobile-list" style="margin-top:6px">
+    <div class="mobile-meta">
+      <span class="mobile-title">{{ 'customer_payment.payment_history_title' | translate }}</span>
+      <span class="count-badge">{{ histTotal }}</span>
+    </div>
+    <div class="mobile-loading" *ngIf="loadingHistory"><div class="loading-spinner"></div></div>
+    <div class="mobile-empty" *ngIf="!loadingHistory && history.length === 0"><div class="empty-icon">💳</div><p>{{ 'customer_payment.mobile_no_records' | translate }}</p></div>
+    <div class="mobile-card" *ngFor="let p of history">
+      <div class="mc-top">
+        <div class="mc-name-wrap">
+          <div>
+            <div class="mc-title">{{ p.invoice_no }}</div>
+            <div class="mc-sub">{{ p.created_at | date:'dd MMM yyyy' }} · {{ p.customer_name }}</div>
+          </div>
+        </div>
+        <span class="ref-badge small">{{ p.reference_no }}</span>
+      </div>
+      <div class="mc-grid">
+        <div class="mc-field" *ngIf="p.amount > 0">
+          <span class="mc-lbl">{{ 'customer_payment.col_payment' | translate }}</span>
+          <span class="mc-val amount-paid fw">৳{{ p.amount | number:'1.0-2' }}</span>
+        </div>
+        <div class="mc-field" *ngIf="p.discount_amount > 0">
+          <span class="mc-lbl">{{ 'customer_payment.col_discount' | translate }}</span>
+          <span class="mc-val amount-disc fw">৳{{ p.discount_amount | number:'1.0-2' }}</span>
+        </div>
+        <div class="mc-field" *ngIf="p.note" style="grid-column:span 2">
+          <span class="mc-lbl">{{ 'customer_payment.col_note' | translate }}</span>
+          <span class="mc-val muted">{{ p.note }}</span>
+        </div>
+      </div>
+    </div>
+    <app-paginator [page]="histPage" [pages]="histPages" [total]="histTotal" [pageSize]="histPageSize" (pageChange)="onHistPage($event)"></app-paginator>
+  </div>
+
+</div>

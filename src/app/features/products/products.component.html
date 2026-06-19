@@ -1,49 +1,157 @@
-<div class="container">
+﻿<div class="page">
 
-    <h2>Product Management</h2>
-
-    <!-- ADD PRODUCT FORM -->
-    <div class="form-box">
-
-        <input placeholder="Product Name" [(ngModel)]="newProduct.name">
-        <input placeholder="SKU" [(ngModel)]="newProduct.sku">
-
-        <select [(ngModel)]="newProduct.category_id">
-            <option value="0">Select Category</option>
-
-            <option *ngFor="let c of categories" [value]="c.id">
-                {{c.name}}
-            </option>
-        </select>
-
-        <input type="number" placeholder="Purchase Price" [(ngModel)]="newProduct.purchase_price">
-        <input type="number" placeholder="Sale Price" [(ngModel)]="newProduct.sale_price">
-
-        <input type="number" placeholder="Opening Stock" [(ngModel)]="newProduct.current_stock">
-
-        <button (click)="save()">Save Product</button>
-
+  <div class="page-header">
+    <div>
+      <h2>{{ 'products.title' | translate }}</h2>
+      <p class="sub">{{ 'products.subtitle' | translate }}</p>
     </div>
+  </div>
 
-    <!-- PRODUCT TABLE -->
-    <table>
+  <!-- FORM -->
+  <div class="card card-body" style="margin-bottom:10px">
+    <p class="card-title">{{ newProduct.id ? ('products.edit_title' | translate) : ('products.add_title' | translate) }}</p>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>{{ 'products.name_placeholder' | translate }}</label>
+        <input [placeholder]="'products.name_placeholder' | translate" [(ngModel)]="newProduct.name" />
+      </div>
+      <div class="form-group">
+        <label>{{ 'products.sku_placeholder' | translate }}</label>
+        <input [placeholder]="'products.sku_placeholder' | translate" [(ngModel)]="newProduct.sku" />
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select [(ngModel)]="newProduct.category_id">
+          <option value="0">{{ 'products.select_category' | translate }}</option>
+          <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>{{ 'products.purchase_price_placeholder' | translate }}</label>
+        <input type="number" [placeholder]="'products.purchase_price_placeholder' | translate" [(ngModel)]="newProduct.purchase_price" />
+      </div>
+      <div class="form-group">
+        <label>{{ 'products.sale_price_placeholder' | translate }}</label>
+        <input type="number" [placeholder]="'products.sale_price_placeholder' | translate" [(ngModel)]="newProduct.sale_price" />
+      </div>
+      <div class="form-group">
+        <label>{{ 'products.stock_placeholder' | translate }}</label>
+        <input type="number" [placeholder]="'products.stock_placeholder' | translate" [(ngModel)]="newProduct.current_stock" />
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" (click)="save()">
+        {{ newProduct.id ? ('products.update' | translate) : ('products.save' | translate) }}
+      </button>
+      <button class="btn btn-ghost" *ngIf="newProduct.id" (click)="reset()">{{ 'products.cancel' | translate }}</button>
+    </div>
+  </div>
 
-        <tr>
-            <th>Name</th>
-            <th>SKU</th>
-            <th>Purchase</th>
-            <th>Sale</th>
-            <th>Stock</th>
-        </tr>
+  <!-- DESKTOP TABLE -->
+  <div class="card desktop-table">
+    <div class="card-header-row">
+      <div class="chr-left">
+        <span class="card-title" style="margin-bottom:0">{{ 'products.title' | translate }}</span>
+        <span class="count-badge">{{ total }} total</span>
+      </div>
+      <div class="chr-toolbar">
+        <input [placeholder]="'products.filter_name' | translate" [(ngModel)]="filterName" (keyup.enter)="applyFilter()" />
+        <select [(ngModel)]="filterCategoryId">
+          <option value="0">{{ 'products.filter_all_categories' | translate }}</option>
+          <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
+        </select>
+        <select [(ngModel)]="filterStatus">
+          <option value="">{{ 'products.filter_all_status' | translate }}</option>
+          <option value="OK">OK</option>
+          <option value="LOW">LOW</option>
+        </select>
+        <button class="btn btn-primary btn-sm" (click)="applyFilter()">{{ 'common.filter' | translate }}</button>
+        <button class="btn btn-ghost btn-sm" (click)="clearFilter()">{{ 'common.clear' | translate }}</button>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ 'products.col_no' | translate }}</th>
+            <th>{{ 'products.col_product' | translate }}</th>
+            <th>{{ 'products.col_sku' | translate }}</th>
+            <th>{{ 'products.col_purchase' | translate }}</th>
+            <th>{{ 'products.col_sale' | translate }}</th>
+            <th>{{ 'products.col_stock' | translate }}</th>
+            <th>{{ 'products.col_status' | translate }}</th>
+            <th>{{ 'products.col_actions' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of products; let i = index">
+            <td class="muted">{{ (page - 1) * pageSize + i + 1 }}</td>
+            <td class="bold">{{ p.name }}</td>
+            <td class="muted">{{ p.sku }}</td>
+            <td>{{ p.purchase_price | number }}</td>
+            <td>{{ p.sale_price | number }}</td>
+            <td><span class="stock-chip">{{ p.current_stock }}</span></td>
+            <td>
+              <span class="badge" [ngClass]="p.status === 'LOW' ? 'badge-danger' : 'badge-success'">{{ p.status }}</span>
+            </td>
+            <td>
+              <div class="row-actions">
+                <button class="btn btn-warning btn-sm" (click)="edit(p)">{{ 'products.edit' | translate }}</button>
+                <button class="btn btn-danger btn-sm" (click)="delete(p.id)">{{ 'products.delete' | translate }}</button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="loading" class="loading-row">
+            <td colspan="8"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+          </tr>
+          <tr *ngIf="!loading && products.length === 0">
+            <td colspan="8" class="empty-row">{{ 'products.empty' | translate }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
+  </div>
 
-        <tr *ngFor="let p of products">
-            <td>{{p.name}}</td>
-            <td>{{p.sku}}</td>
-            <td>{{p.purchase_price}}</td>
-            <td>{{p.sale_price}}</td>
-            <td>{{p.current_stock}}</td>
-        </tr>
-
-    </table>
+  <!-- MOBILE LIST -->
+  <div class="mobile-list">
+    <div class="mobile-meta">
+      <span class="mobile-title">{{ 'products.title' | translate }}</span>
+      <span class="count-badge">{{ total }}</span>
+    </div>
+    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
+    <div class="mobile-empty" *ngIf="!loading && products.length === 0"><p>{{ 'products.empty' | translate }}</p></div>
+    <div class="mobile-card" *ngFor="let p of products; let i = index">
+      <div class="mc-top">
+        <div class="mc-name-wrap">
+          <span class="mc-num">{{ (page-1)*pageSize+i+1 }}</span>
+          <div>
+            <div class="mc-title">{{ p.name }}</div>
+            <div class="mc-sub">{{ p.sku }}</div>
+          </div>
+        </div>
+        <span class="badge" [ngClass]="p.status === 'LOW' ? 'badge-danger' : 'badge-success'">{{ p.status }}</span>
+      </div>
+      <div class="mc-grid">
+        <div class="mc-field">
+          <span class="mc-lbl">Buy Price</span>
+          <span class="mc-val">{{ p.purchase_price | number }}</span>
+        </div>
+        <div class="mc-field">
+          <span class="mc-lbl">Sale Price</span>
+          <span class="mc-val">{{ p.sale_price | number }}</span>
+        </div>
+        <div class="mc-field">
+          <span class="mc-lbl">Stock</span>
+          <span class="stock-chip">{{ p.current_stock }}</span>
+        </div>
+      </div>
+      <div class="mc-actions">
+        <button class="btn btn-warning btn-sm" (click)="edit(p)">{{ 'products.edit' | translate }}</button>
+        <button class="btn btn-danger btn-sm" (click)="delete(p.id)">{{ 'products.delete' | translate }}</button>
+      </div>
+    </div>
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
+  </div>
 
 </div>

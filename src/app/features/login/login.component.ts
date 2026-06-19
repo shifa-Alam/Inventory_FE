@@ -3,16 +3,12 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { Router } from '@angular/router';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
+import { TranslatePipe } from '@ngx-translate/core';
+import { LanguageService } from '../../core/services/language.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -20,17 +16,27 @@ export class LoginComponent {
 
   username = '';
   password = '';
+  errorMsg = '';
+  loading = false;
 
-  constructor(private auth: AuthService, private router: Router) { }
+  constructor(private auth: AuthService, private router: Router, public lang: LanguageService) { }
 
   login() {
-    this.auth.login({
-      username: this.username,
-      password: this.password
-    }).subscribe((res: any) => {
-      this.auth.setToken(res.access_token);
-      // ✅ Redirect to dashboard
-      this.router.navigate(['/dashboard']);
+    if (!this.username.trim() || !this.password.trim()) {
+      this.errorMsg = 'Please enter username and password.';
+      return;
+    }
+    this.loading = true;
+    this.errorMsg = '';
+    this.auth.login({ username: this.username, password: this.password }).subscribe({
+      next: (res: any) => {
+        this.auth.setToken(res.access_token);
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMsg = err?.error?.detail || 'Invalid username or password.';
+      }
     });
   }
 }

@@ -1,0 +1,154 @@
+.invoice-doc {
+  max-width: 820px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  box-shadow: var(--shadow);
+}
+
+/* Header */
+.doc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.company-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.company-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.inv-meta {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.inv-badge {
+  background: var(--primary);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.inv-detail {
+  display: flex;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.inv-detail span { color: var(--text-muted); }
+.inv-detail b    { color: var(--text); font-weight: 600; }
+
+.doc-divider {
+  border-top: 2px solid var(--border);
+  margin: 24px 0;
+}
+
+/* Supplier block */
+.supplier-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.block-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.block-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Totals */
+.totals-block {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.total-row {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  font-size: 14px;
+  color: var(--text-muted);
+  padding: 10px 0;
+}
+
+.total-row.highlight {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  border-top: 2px solid var(--border);
+  padding-top: 14px;
+}
+
+.total-row.highlight b {
+  font-size: 20px;
+  color: var(--primary);
+}
+
+/* Footer signatures */
+.doc-footer {
+  margin-top: 60px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.sig-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 180px;
+}
+
+.sig-line {
+  width: 100%;
+  border-top: 1.5px solid var(--text);
+}
+
+.sig-block span {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Loading */
+.loading-state {
+  text-align: center;
+  padding: 60px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+@media print {
+  .invoice-doc {
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+    max-width: 100%;
+  }
+}

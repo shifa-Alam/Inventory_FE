@@ -1,0 +1,270 @@
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <h2>{{ 'operator_summary.title' | translate }}</h2>
+      <p class="sub">{{ 'operator_summary.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="card filter-card">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label class="filter-label">{{ 'operator_summary.filter_from' | translate }}</label>
+        <input type="date" [(ngModel)]="dateFrom" />
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">{{ 'operator_summary.filter_to' | translate }}</label>
+        <input type="date" [(ngModel)]="dateTo" />
+      </div>
+      <div class="filter-actions">
+        <button class="btn btn-primary btn-sm" (click)="load()">{{ 'common.apply' | translate }}</button>
+        <button class="btn btn-ghost btn-sm" (click)="setToday()">{{ 'common.today' | translate }}</button>
+        <button class="btn btn-ghost btn-sm" (click)="setThisWeek()">{{ 'common.this_week' | translate }}</button>
+        <button class="btn btn-ghost btn-sm" (click)="setThisMonth()">{{ 'common.this_month' | translate }}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="card loading-card" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <span class="loading-text">{{ 'common.loading' | translate }}</span>
+  </div>
+
+  <!-- EMPTY -->
+  <div class="card empty-card" *ngIf="!loading && operators.length === 0">
+    <div class="empty-icon">👤</div>
+    <p>{{ 'operator_summary.no_data' | translate }}</p>
+  </div>
+
+  <ng-container *ngIf="!loading && operators.length > 0">
+
+    <!-- GRAND TOTAL BANNER -->
+    <div class="grand-banner" style="margin-top:6px">
+      <div class="gb-block">
+        <span class="gb-label">{{ 'operator_summary.banner_period' | translate }}</span>
+        <span class="gb-value text">{{ dateLabel }}</span>
+      </div>
+      <div class="gb-block">
+        <span class="gb-label">{{ 'operator_summary.banner_operators' | translate }}</span>
+        <span class="gb-value">{{ operators.length }}</span>
+      </div>
+      <div class="gb-block">
+        <span class="gb-label">{{ 'operator_summary.banner_cash_in' | translate }}</span>
+        <span class="gb-value success">৳{{ grand.total_cash_in | number:'1.0-2' }}</span>
+      </div>
+      <div class="gb-block">
+        <span class="gb-label">{{ 'operator_summary.banner_discounts' | translate }}</span>
+        <span class="gb-value warn">৳{{ grand.discount_given | number:'1.0-2' }}</span>
+      </div>
+      <div class="gb-block">
+        <span class="gb-label">{{ 'operator_summary.banner_returns' | translate }}</span>
+        <span class="gb-value danger">৳{{ grand.return_amount | number:'1.0-2' }}</span>
+      </div>
+      <div class="gb-block">
+        <span class="gb-label">{{ 'operator_summary.banner_net_cash' | translate }}</span>
+        <span class="gb-value" [ngClass]="grand.net_cash >= 0 ? 'success' : 'danger'">৳{{ grand.net_cash | number:'1.0-2' }}</span>
+      </div>
+      <div class="gb-block">
+        <span class="gb-label">{{ 'operator_summary.banner_transactions' | translate }}</span>
+        <span class="gb-value">{{ grand.total_txn }}</span>
+      </div>
+    </div>
+
+    <!-- OPERATOR CARDS (DESKTOP TABLE) -->
+    <div class="card desktop-table" style="margin-top:6px">
+      <div class="card-header-row">
+        <div class="chr-left">
+          <span class="card-title" style="margin-bottom:0">{{ 'operator_summary.per_operator' | translate }}</span>
+          <span class="count-badge">{{ operators.length }} {{ 'operator_summary.operators_label' | translate }}</span>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>{{ 'operator_summary.col_operator' | translate }}</th>
+              <th class="right">{{ 'operator_summary.col_sales' | translate }}</th>
+              <th class="right">{{ 'operator_summary.col_collections' | translate }}</th>
+              <th class="right">{{ 'operator_summary.banner_cash_in' | translate }}</th>
+              <th class="right">{{ 'operator_summary.col_discounts' | translate }}</th>
+              <th class="right">{{ 'operator_summary.col_returns' | translate }}</th>
+              <th class="right">{{ 'operator_summary.col_net' | translate }}</th>
+              <th class="right">{{ 'operator_summary.col_txns' | translate }}</th>
+              <th class="right">{{ 'operator_summary.col_share' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let op of operators">
+              <tr class="op-row" (click)="toggleExpand(op.operator)" [class.expanded]="expandedOp === op.operator">
+                <td>
+                  <div class="op-name-wrap">
+                    <div class="op-avatar">{{ op.operator.charAt(0).toUpperCase() }}</div>
+                    <div>
+                      <div class="op-name">{{ op.operator }}</div>
+                      <div class="op-sub muted">{{ op.total_txn }} {{ 'operator_summary.transactions_label' | translate }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="right">
+                  <div class="amt-cell">
+                    <span class="amount-paid">৳{{ op.sale_payment.amount | number:'1.0-2' }}</span>
+                    <span class="txn-count">{{ op.sale_payment.count }} {{ 'operator_summary.txn_label' | translate }}</span>
+                  </div>
+                </td>
+                <td class="right">
+                  <div class="amt-cell">
+                    <span class="amount-primary">৳{{ op.due_payment.amount | number:'1.0-2' }}</span>
+                    <span class="txn-count">{{ op.due_payment.count }} {{ 'operator_summary.txn_label' | translate }}</span>
+                  </div>
+                </td>
+                <td class="right fw">৳{{ op.total_cash_in | number:'1.0-2' }}</td>
+                <td class="right">
+                  <div class="amt-cell" *ngIf="op.discount.amount > 0; else noDiscount">
+                    <span class="amount-warn">৳{{ op.discount.amount | number:'1.0-2' }}</span>
+                    <span class="txn-count">{{ op.discount.count }} {{ 'operator_summary.txn_label' | translate }}</span>
+                  </div>
+                  <ng-template #noDiscount><span class="muted">—</span></ng-template>
+                </td>
+                <td class="right">
+                  <div class="amt-cell" *ngIf="op.return.amount > 0; else noReturn">
+                    <span class="amount-danger">৳{{ op.return.amount | number:'1.0-2' }}</span>
+                    <span class="txn-count">{{ op.return.count }} {{ 'operator_summary.txn_label' | translate }}</span>
+                  </div>
+                  <ng-template #noReturn><span class="muted">—</span></ng-template>
+                </td>
+                <td class="right fw" [ngClass]="op.net_cash >= 0 ? 'amount-paid' : 'amount-danger'">
+                  ৳{{ op.net_cash | number:'1.0-2' }}
+                </td>
+                <td class="right">
+                  <span class="txn-badge">{{ op.total_txn }}</span>
+                </td>
+                <td class="right">
+                  <div class="share-wrap">
+                    <div class="share-bar">
+                      <div class="share-fill" [style.width]="share(op) + '%'"></div>
+                    </div>
+                    <span class="share-pct">{{ share(op) }}%</span>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- EXPANDED DETAIL ROW -->
+              <tr *ngIf="expandedOp === op.operator" class="detail-row">
+                <td colspan="9">
+                  <div class="detail-panel">
+                    <div class="detail-grid">
+                      <div class="detail-block success">
+                        <div class="db-label">{{ 'operator_summary.detail_sale_payment' | translate }}</div>
+                        <div class="db-amount">৳{{ op.sale_payment.amount | number:'1.0-2' }}</div>
+                        <div class="db-count">{{ op.sale_payment.count }} {{ 'operator_summary.transactions_label' | translate }}</div>
+                        <div class="db-avg" *ngIf="op.sale_payment.count > 0">
+                          {{ 'operator_summary.detail_avg' | translate }} ৳{{ (op.sale_payment.amount / op.sale_payment.count) | number:'1.0-2' }}
+                        </div>
+                      </div>
+                      <div class="detail-block primary">
+                        <div class="db-label">{{ 'operator_summary.detail_due_collection' | translate }}</div>
+                        <div class="db-amount">৳{{ op.due_payment.amount | number:'1.0-2' }}</div>
+                        <div class="db-count">{{ op.due_payment.count }} {{ 'operator_summary.transactions_label' | translate }}</div>
+                        <div class="db-avg" *ngIf="op.due_payment.count > 0">
+                          {{ 'operator_summary.detail_avg' | translate }} ৳{{ (op.due_payment.amount / op.due_payment.count) | number:'1.0-2' }}
+                        </div>
+                      </div>
+                      <div class="detail-block warn">
+                        <div class="db-label">{{ 'operator_summary.detail_discounts_given' | translate }}</div>
+                        <div class="db-amount">৳{{ op.discount.amount | number:'1.0-2' }}</div>
+                        <div class="db-count">{{ op.discount.count }} {{ 'operator_summary.transactions_label' | translate }}</div>
+                        <div class="db-avg" *ngIf="op.discount.count > 0">
+                          {{ 'operator_summary.detail_avg' | translate }} ৳{{ (op.discount.amount / op.discount.count) | number:'1.0-2' }}
+                        </div>
+                      </div>
+                      <div class="detail-block danger">
+                        <div class="db-label">{{ 'operator_summary.detail_returns_processed' | translate }}</div>
+                        <div class="db-amount">৳{{ op.return.amount | number:'1.0-2' }}</div>
+                        <div class="db-count">{{ op.return.count }} {{ 'operator_summary.transactions_label' | translate }}</div>
+                        <div class="db-avg" *ngIf="op.return.count > 0">
+                          {{ 'operator_summary.detail_avg' | translate }} ৳{{ (op.return.amount / op.return.count) | number:'1.0-2' }}
+                        </div>
+                      </div>
+                      <div class="detail-block net" [ngClass]="op.net_cash >= 0 ? 'net-pos' : 'net-neg'">
+                        <div class="db-label">{{ 'operator_summary.detail_net_cash' | translate }}</div>
+                        <div class="db-amount">৳{{ op.net_cash | number:'1.0-2' }}</div>
+                        <div class="db-count">{{ 'operator_summary.detail_cash_in_minus' | translate }}</div>
+                        <div class="db-avg">{{ share(op) }}{{ 'operator_summary.share_of_total' | translate }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+
+            <!-- GRAND TOTAL ROW -->
+            <tr class="grand-row">
+              <td class="fw">{{ 'operator_summary.grand_total' | translate }}</td>
+              <td class="right fw">—</td>
+              <td class="right fw">—</td>
+              <td class="right fw amount-paid">৳{{ grand.total_cash_in | number:'1.0-2' }}</td>
+              <td class="right fw amount-warn">৳{{ grand.discount_given | number:'1.0-2' }}</td>
+              <td class="right fw amount-danger">৳{{ grand.return_amount | number:'1.0-2' }}</td>
+              <td class="right fw" [ngClass]="grand.net_cash >= 0 ? 'amount-paid' : 'amount-danger'">৳{{ grand.net_cash | number:'1.0-2' }}</td>
+              <td class="right fw"><span class="txn-badge">{{ grand.total_txn }}</span></td>
+              <td class="right fw">100%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MOBILE OPERATOR CARDS -->
+    <div class="mobile-list" style="margin-top:6px">
+      <div class="mobile-meta">
+        <span class="mobile-title">{{ 'operator_summary.title' | translate }}</span>
+        <span class="count-badge">{{ operators.length }} {{ 'operator_summary.operators_label' | translate }}</span>
+      </div>
+      <div class="mobile-card" *ngFor="let op of operators">
+        <div class="mc-top">
+          <div class="mc-name-wrap">
+            <div class="op-avatar">{{ op.operator.charAt(0).toUpperCase() }}</div>
+            <div>
+              <div class="mc-title">{{ op.operator }}</div>
+              <div class="mc-sub">{{ op.total_txn }} {{ 'operator_summary.transactions_label' | translate }} · {{ share(op) }}%</div>
+            </div>
+          </div>
+          <span class="amount-paid fw">৳{{ op.net_cash | number:'1.0-2' }}</span>
+        </div>
+        <div class="mc-grid">
+          <div class="mc-field">
+            <span class="mc-lbl">{{ 'operator_summary.mobile_sale_payments' | translate }}</span>
+            <span class="mc-val amount-paid">৳{{ op.sale_payment.amount | number:'1.0-2' }}</span>
+          </div>
+          <div class="mc-field">
+            <span class="mc-lbl">{{ 'operator_summary.mobile_due_collections' | translate }}</span>
+            <span class="mc-val amount-primary">৳{{ op.due_payment.amount | number:'1.0-2' }}</span>
+          </div>
+          <div class="mc-field">
+            <span class="mc-lbl">{{ 'operator_summary.mobile_cash_in' | translate }}</span>
+            <span class="mc-val fw">৳{{ op.total_cash_in | number:'1.0-2' }}</span>
+          </div>
+          <div class="mc-field" *ngIf="op.discount.amount > 0">
+            <span class="mc-lbl">{{ 'operator_summary.mobile_discounts' | translate }}</span>
+            <span class="mc-val amount-warn">৳{{ op.discount.amount | number:'1.0-2' }}</span>
+          </div>
+          <div class="mc-field" *ngIf="op.return.amount > 0">
+            <span class="mc-lbl">{{ 'operator_summary.mobile_returns' | translate }}</span>
+            <span class="mc-val amount-danger">৳{{ op.return.amount | number:'1.0-2' }}</span>
+          </div>
+        </div>
+        <div class="share-wrap" style="margin:8px 0 4px">
+          <div class="share-bar">
+            <div class="share-fill" [style.width]="share(op) + '%'"></div>
+          </div>
+          <span class="share-pct">{{ share(op) }}%</span>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+
+</div>

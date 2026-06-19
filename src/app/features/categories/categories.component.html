@@ -1,27 +1,98 @@
-<div class="container">
+﻿<div class="page">
 
-    <h2>Category Management</h2>
-
-    <div class="form-box">
-
-        <input placeholder="Category Name" [(ngModel)]="newCategory.name">
-
-        <button (click)="save()">Save Category</button>
-
+  <div class="page-header">
+    <div>
+      <h2>{{ 'categories.title' | translate }}</h2>
+      <p class="sub">{{ 'categories.subtitle' | translate }}</p>
     </div>
+  </div>
 
-    <table>
+  <!-- FORM -->
+  <div class="card card-body" style="margin-bottom:10px">
+    <p class="card-title">{{ newCategory.id ? ('categories.edit_title' | translate) : ('categories.add_title' | translate) }}</p>
+    <div class="inline-form">
+      <div class="form-group" style="flex:1;max-width:360px">
+        <label>{{ 'categories.name_placeholder' | translate }}</label>
+        <input [placeholder]="'categories.name_placeholder' | translate" [(ngModel)]="newCategory.name" />
+      </div>
+      <button class="btn btn-primary" (click)="save()" style="margin-top:15px">
+        {{ newCategory.id ? ('categories.update' | translate) : ('categories.save' | translate) }}
+      </button>
+      <button class="btn btn-ghost" *ngIf="newCategory.id" (click)="newCategory = { id: 0, name: '' }" style="margin-top:15px">{{ 'categories.cancel' | translate }}</button>
+    </div>
+  </div>
 
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-        </tr>
+  <!-- DESKTOP TABLE -->
+  <div class="card desktop-table">
+    <div class="card-header-row">
+      <div class="chr-left">
+        <span class="card-title" style="margin-bottom:0">{{ 'categories.title' | translate }}</span>
+        <span class="count-badge">{{ total }} total</span>
+      </div>
+      <div class="chr-toolbar">
+        <input [placeholder]="'categories.filter_name' | translate" [(ngModel)]="filterName" (keyup.enter)="applyFilter()" />
+        <button class="btn btn-primary btn-sm" (click)="applyFilter()">{{ 'common.filter' | translate }}</button>
+        <button class="btn btn-ghost btn-sm" (click)="clearFilter()">{{ 'common.clear' | translate }}</button>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ 'categories.col_no' | translate }}</th>
+            <th>{{ 'categories.col_name' | translate }}</th>
+            <th>{{ 'categories.col_status' | translate }}</th>
+            <th>{{ 'categories.col_actions' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of categories; let i = index">
+            <td class="muted">{{ (page - 1) * pageSize + i + 1 }}</td>
+            <td class="bold">{{ c.name }}</td>
+            <td><span class="badge badge-success">{{ 'categories.status_active' | translate }}</span></td>
+            <td>
+              <div class="row-actions">
+                <button class="btn btn-warning btn-sm" (click)="edit(c)">{{ 'categories.edit' | translate }}</button>
+                <button class="btn btn-danger btn-sm" (click)="delete(c.id)">{{ 'categories.delete' | translate }}</button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="loading" class="loading-row">
+            <td colspan="4"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+          </tr>
+          <tr *ngIf="!loading && categories.length === 0">
+            <td colspan="4" class="empty-row">{{ 'categories.empty' | translate }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
+  </div>
 
-        <tr *ngFor="let c of categories">
-            <td>{{c.id}}</td>
-            <td>{{c.name}}</td>
-        </tr>
-
-    </table>
+  <!-- MOBILE LIST -->
+  <div class="mobile-list">
+    <div class="mobile-meta">
+      <span class="mobile-title">{{ 'categories.title' | translate }}</span>
+      <span class="count-badge">{{ total }}</span>
+    </div>
+    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
+    <div class="mobile-empty" *ngIf="!loading && categories.length === 0"><p>{{ 'categories.empty' | translate }}</p></div>
+    <div class="mobile-card" *ngFor="let c of categories; let i = index">
+      <div class="mc-top">
+        <div class="mc-name-wrap">
+          <span class="mc-num">{{ (page-1)*pageSize+i+1 }}</span>
+          <div>
+            <div class="mc-title">{{ c.name }}</div>
+          </div>
+        </div>
+        <span class="badge badge-success">{{ 'categories.status_active' | translate }}</span>
+      </div>
+      <div class="mc-actions">
+        <button class="btn btn-warning btn-sm" (click)="edit(c)">{{ 'categories.edit' | translate }}</button>
+        <button class="btn btn-danger btn-sm" (click)="delete(c.id)">{{ 'categories.delete' | translate }}</button>
+      </div>
+    </div>
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
+  </div>
 
 </div>

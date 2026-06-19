@@ -1,0 +1,133 @@
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <h2>{{ 'stock_ledger.title' | translate }}</h2>
+      <p class="sub">{{ 'stock_ledger.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-row">
+    <div class="summary-chip info">
+      <span class="chip-label">{{ 'stock_ledger.type_purchase' | translate }}</span>
+      <span class="chip-value">{{ countByType('PURCHASE') }}</span>
+    </div>
+    <div class="summary-chip danger">
+      <span class="chip-label">{{ 'stock_ledger.type_sale' | translate }}</span>
+      <span class="chip-value">{{ countByType('SALE') }}</span>
+    </div>
+    <div class="summary-chip success">
+      <span class="chip-label">{{ 'stock_ledger.type_return' | translate }}</span>
+      <span class="chip-value">{{ countByType('RETURN') }}</span>
+    </div>
+    <div class="summary-chip warn">
+      <span class="chip-label">{{ 'stock_ledger.type_waste' | translate }}</span>
+      <span class="chip-value">{{ countByType('WASTE') }}</span>
+    </div>
+  </div>
+
+  <!-- DESKTOP TABLE -->
+  <div class="card desktop-table">
+    <div class="card-header-row">
+      <div class="chr-left">
+        <span class="card-title" style="margin-bottom:0">{{ 'stock_ledger.list_title' | translate }}</span>
+        <span class="count-badge">{{ total }} {{ 'stock_ledger.entries_label' | translate }}</span>
+      </div>
+      <div class="chr-toolbar">
+        <select [(ngModel)]="filterType" (ngModelChange)="onFilterChange()">
+          <option value="">{{ 'stock_ledger.filter_all' | translate }}</option>
+          <option value="PURCHASE">{{ 'stock_ledger.type_purchase' | translate }}</option>
+          <option value="SALE">{{ 'stock_ledger.type_sale' | translate }}</option>
+          <option value="RETURN">{{ 'stock_ledger.type_return' | translate }}</option>
+          <option value="WASTE">{{ 'stock_ledger.type_waste' | translate }}</option>
+        </select>
+        <input type="date" [(ngModel)]="filterDateFrom" />
+        <input type="date" [(ngModel)]="filterDateTo" />
+        <button class="btn btn-primary btn-sm" (click)="applyFilter()">{{ 'common.filter' | translate }}</button>
+        <button class="btn btn-ghost btn-sm" (click)="clearFilter()">{{ 'common.clear' | translate }}</button>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ 'stock_ledger.col_date' | translate }}</th>
+            <th>{{ 'stock_ledger.col_type' | translate }}</th>
+            <th>{{ 'stock_ledger.col_reference' | translate }}</th>
+            <th>{{ 'stock_ledger.col_product' | translate }}</th>
+            <th>{{ 'stock_ledger.col_direction' | translate }}</th>
+            <th>{{ 'stock_ledger.col_qty' | translate }}</th>
+            <th>{{ 'stock_ledger.col_before' | translate }}</th>
+            <th>{{ 'stock_ledger.col_after' | translate }}</th>
+            <th>{{ 'stock_ledger.col_note' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of transactions">
+            <td class="muted date-cell">{{ t.created_at | date:'dd MMM yyyy, HH:mm' }}</td>
+            <td><span class="type-badge" [ngClass]="typeClass(t.transaction_type)">{{ t.transaction_type }}</span></td>
+            <td><span class="ref-text">{{ t.reference_no }}</span></td>
+            <td class="bold">{{ t.product_name }}</td>
+            <td><span class="dir-badge" [ngClass]="directionClass(t.transaction_type)">{{ directionSign(t.transaction_type) }}</span></td>
+            <td class="qty-cell">{{ t.quantity }}</td>
+            <td class="muted">{{ t.stock_before }}</td>
+            <td class="bold">{{ t.stock_after }}</td>
+            <td class="muted note-cell">{{ t.note || '—' }}</td>
+          </tr>
+          <tr *ngIf="loading" class="loading-row">
+            <td colspan="9"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
+          </tr>
+          <tr *ngIf="!loading && transactions.length === 0">
+            <td colspan="9" class="empty-row"><div class="empty-icon">📋</div>{{ 'stock_ledger.empty' | translate }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
+  </div>
+
+  <!-- MOBILE LIST -->
+  <div class="mobile-list">
+    <div class="mobile-meta">
+      <span class="mobile-title">{{ 'stock_ledger.list_title' | translate }}</span>
+      <span class="count-badge">{{ total }}</span>
+    </div>
+    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
+    <div class="mobile-empty" *ngIf="!loading && transactions.length === 0"><div class="empty-icon">📋</div><p>{{ 'stock_ledger.empty' | translate }}</p></div>
+    <div class="mobile-card" *ngFor="let t of transactions">
+      <div class="mc-top">
+        <div class="mc-name-wrap">
+          <div>
+            <div class="mc-title">{{ t.product_name }}</div>
+            <div class="mc-sub">{{ t.created_at | date:'dd MMM yyyy, HH:mm' }} · <span class="ref-text">{{ t.reference_no }}</span></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:5px">
+          <span class="dir-badge" [ngClass]="directionClass(t.transaction_type)">{{ directionSign(t.transaction_type) }}</span>
+          <span class="type-badge" [ngClass]="typeClass(t.transaction_type)">{{ t.transaction_type }}</span>
+        </div>
+      </div>
+      <div class="mc-grid">
+        <div class="mc-field">
+          <span class="mc-lbl">{{ 'stock_ledger.col_qty' | translate }}</span>
+          <span class="mc-val fw7">{{ t.quantity }}</span>
+        </div>
+        <div class="mc-field">
+          <span class="mc-lbl">{{ 'stock_ledger.col_before' | translate }}</span>
+          <span class="mc-val muted">{{ t.stock_before }}</span>
+        </div>
+        <div class="mc-field">
+          <span class="mc-lbl">{{ 'stock_ledger.col_after' | translate }}</span>
+          <span class="mc-val fw7">{{ t.stock_after }}</span>
+        </div>
+        <div class="mc-field" *ngIf="t.note" style="grid-column: span 3">
+          <span class="mc-lbl">{{ 'stock_ledger.col_note' | translate }}</span>
+          <span class="mc-val muted">{{ t.note }}</span>
+        </div>
+      </div>
+    </div>
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
+  </div>
+
+</div>

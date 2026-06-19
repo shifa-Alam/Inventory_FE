@@ -2,29 +2,33 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
+import { TranslatePipe } from '@ngx-translate/core';
+import { PaginatorComponent } from '../../shared/paginator/paginator.component';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe, PaginatorComponent],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css']
 })
 export class ProductsComponent implements OnInit {
-
   products: any[] = [];
   categories: any[] = [];
+  loading = false;
 
-  newProduct = {
-    name: '',
-    sku: '',
-    category_id: 0,
-    purchase_price: 0,
-    sale_price: 0,
-    current_stock: 0
-  };
+  filterName = '';
+  filterCategoryId = 0;
+  filterStatus = '';
 
-  constructor(private api: ApiService) { }
+  page = 1;
+  pages = 1;
+  total = 0;
+  pageSize = 20;
+
+  newProduct = { id: 0, name: '', sku: '', category_id: 0, purchase_price: 0, sale_price: 0, current_stock: 0 };
+
+  constructor(private api: ApiService) {}
 
   ngOnInit() {
     this.load();
@@ -32,27 +36,63 @@ export class ProductsComponent implements OnInit {
   }
 
   load() {
-    this.api.get('/products/').subscribe((res: any) => {
-      this.products = res;
+    const params: string[] = [`page=${this.page}`, `page_size=${this.pageSize}`];
+    if (this.filterName.trim()) params.push(`name=${encodeURIComponent(this.filterName.trim())}`);
+    if (+this.filterCategoryId > 0) params.push(`category_id=${this.filterCategoryId}`);
+    if (this.filterStatus) params.push(`status=${this.filterStatus}`);
+
+    this.loading = true;
+    this.api.get(`/products/?${params.join('&')}`).subscribe({
+      next: (res: any) => {
+        this.products = res.data;
+        this.total = res.total;
+        this.pages = res.pages;
+        this.loading = false;
+      },
+      error: (err) => { console.error('Failed to load products', err); this.loading = false; }
     });
   }
+
   loadCategories() {
-    this.api.get('/categories/').subscribe((res: any) => {
-      this.categories = res;
+    this.api.get('/categories/').subscribe({
+      next: (res: any) => { this.categories = res.data ?? res; },
+      error: (err) => console.error('Failed to load categories', err)
     });
   }
-  save() {
-    this.api.post('/products/', this.newProduct).subscribe(() => {
-      alert('Product Added');
-      this.newProduct = {
-        name: '',
-        sku: '',
-        category_id: 0,
-        purchase_price: 0,
-        sale_price: 0,
-        current_stock: 0
-      };
-      this.load();
+
+  applyFilter() { this.page = 1; this.load(); }
+  clearFilter() { this.filterName = ''; this.filterCategoryId = 0; this.filterStatus = ''; this.applyFilter(); }
+  onPageChange(p: number) { this.page = p; this.load(); }
+
+  save() { this.newProduct.id ? this.update() : this.create(); }
+
+  create() {
+    this.api.post('/products/', this.newProduct).subscribe({
+      next: () => { alert('Product Added'); this.load(); this.reset(); },
+      error: (err) => console.error('Failed to create product', err)
     });
+  }
+
+  update() {
+    const { name, sku, category_id, purchase_price, sale_price } = this.newProduct;
+    this.api.put(`/products/${this.newProduct.id}`, { name, sku, category_id, purchase_price, sale_price }).subscribe({
+      next: () => { alert('Product Updated'); this.load(); this.reset(); },
+      error: (err) => console.error('Failed to update product', err)
+    });
+  }
+
+  edit(item: any) { this.newProduct = { ...item }; }
+
+  delete(id: number) {
+    if (confirm('Delete this product?')) {
+      this.api.delete(`/products/${id}`).subscribe({
+        next: () => this.load(),
+        error: (err) => console.error('Failed to delete product', err)
+      });
+    }
+  }
+
+  reset() {
+    this.newProduct = { id: 0, name: '', sku: '', category_id: 0, purchase_price: 0, sale_price: 0, current_stock: 0 };
   }
 }

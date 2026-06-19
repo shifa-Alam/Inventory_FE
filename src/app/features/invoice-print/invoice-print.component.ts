@@ -1,10 +1,13 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Location } from '@angular/common';
 import html2pdf from 'html2pdf.js';
+import { TranslatePipe } from '@ngx-translate/core';
+
 @Component({
   selector: 'app-invoice-print',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './invoice-print.component.html',
   styleUrls: ['./invoice-print.component.css']
 })
@@ -12,112 +15,17 @@ export class InvoicePrintComponent implements OnInit {
 
   invoice: any;
   @ViewChild('invoiceBox', { static: false }) invoiceBox!: ElementRef;
+
+  constructor(private location: Location) {}
+
   ngOnInit() {
     this.invoice = JSON.parse(localStorage.getItem('invoice') || '{}');
   }
 
-  // print(): void {
+  goBack() { this.location.back(); }
 
-  //   const printContents =
-  //     document.getElementById('invoice')?.innerHTML;
-
-  //   if (!printContents) {
-  //     alert('Invoice content not found');
-  //     return;
-  //   }
-
-  //   const popupWindow = window.open(
-  //     '',
-  //     '_blank',
-  //     'width=1000,height=800'
-  //   );
-
-  //   if (!popupWindow) {
-  //     alert('Unable to open print window');
-  //     return;
-  //   }
-
-  //   popupWindow.document.open();
-
-  //   popupWindow.document.write(`
-  //   <html>
-  //     <head>
-  //       <title>Invoice</title>
-
-  //       <style>
-
-  //         body{
-  //           font-family: Arial, sans-serif;
-  //           margin:20px;
-  //           color:#000;
-  //         }
-
-  //         table{
-  //           width:100%;
-  //           border-collapse:collapse;
-  //         }
-
-  //         th,
-  //         td{
-  //           border:1px solid #ddd;
-  //           padding:8px;
-  //           text-align:left;
-  //         }
-
-  //         th{
-  //           background:#f5f5f5;
-  //         }
-
-  //         .summary{
-  //           width:300px;
-  //           margin-left:auto;
-  //           margin-top:20px;
-  //         }
-
-  //         .footer{
-  //           margin-top:80px;
-  //           display:flex;
-  //           justify-content:space-between;
-  //         }
-
-  //         @page{
-  //           size:A4;
-  //           margin:10mm;
-  //         }
-
-  //       </style>
-  //     </head>
-
-  //     <body>
-
-  //       ${printContents}
-
-  //     </body>
-  //   </html>
-  // `);
-
-  //   popupWindow.document.close();
-
-  //   setTimeout(() => {
-  //     popupWindow.focus();
-  //     popupWindow.print();
-  //     popupWindow.close();
-  //   }, 500);
-  // }
   print(): void {
-    const printContent = document.getElementById('invoice-print-area');
-
-    if (!printContent) return;
-
-    const originalContents = document.body.innerHTML;
-
-    document.body.innerHTML = printContent.innerHTML;
-
     window.print();
-
-    document.body.innerHTML = originalContents;
-
-    window.location.reload();
   }
 
   downloadPDF() {

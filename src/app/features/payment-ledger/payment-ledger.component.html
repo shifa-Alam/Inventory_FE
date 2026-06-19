@@ -1,0 +1,198 @@
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <h2>{{ 'payment_ledger.title' | translate }}</h2>
+      <p class="sub">{{ 'payment_ledger.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="card filter-card">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label class="filter-label">{{ 'common.from' | translate }}</label>
+        <input type="date" [(ngModel)]="dateFrom" />
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">{{ 'common.to' | translate }}</label>
+        <input type="date" [(ngModel)]="dateTo" />
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">{{ 'payment_ledger.filter_type' | translate }}</label>
+        <select [(ngModel)]="filterType">
+          <option *ngFor="let t of TYPES" [value]="t.value">{{ t.key | translate }}</option>
+        </select>
+      </div>
+      <div class="filter-group customer-group">
+        <label class="filter-label">{{ 'payment_ledger.filter_customer' | translate }}</label>
+        <div class="customer-input-wrap">
+          <input
+            type="text"
+            [(ngModel)]="customerSearch"
+            (ngModelChange)="onCustomerInput()"
+            (blur)="showCustomerDropdown = false"
+            [placeholder]="'payment_ledger.search_customer_ph' | translate"
+            [class.has-value]="selectedCustomer"
+          />
+          <button class="clear-customer" *ngIf="selectedCustomer" (click)="clearCustomer()" title="Clear">×</button>
+          <div class="customer-dropdown" *ngIf="showCustomerDropdown">
+            <div
+              class="cd-item"
+              *ngFor="let c of customerResults"
+              (mousedown)="selectCustomer(c)"
+            >
+              <span class="cd-name">{{ c.name }}</span>
+              <span class="cd-phone muted" *ngIf="c.phone">{{ c.phone }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="filter-actions">
+        <button class="btn btn-primary btn-sm" (click)="applyFilter()">{{ 'common.apply' | translate }}</button>
+        <button class="btn btn-ghost btn-sm" (click)="clearFilter()">{{ 'common.today' | translate }}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY SUMMARY -->
+  <div class="card summary-card" style="margin-top:6px">
+    <div class="card-header-row">
+      <div class="chr-left">
+        <span class="card-title" style="margin-bottom:0">{{ 'payment_ledger.summary_title' | translate }}</span>
+        <span class="count-badge" *ngIf="summary.date">{{ summary.date }}</span>
+      </div>
+    </div>
+    <div class="summary-grid" *ngIf="!loadingSummary">
+      <div class="sg-block success">
+        <div class="sg-label">{{ 'payment_ledger.summary_sale_payment' | translate }}</div>
+        <div class="sg-value">৳{{ summary.sale_payment | number:'1.0-2' }}</div>
+        <div class="sg-count">{{ summary.counts.sale_payment }} {{ 'common.txn' | translate }}</div>
+      </div>
+      <div class="sg-block primary">
+        <div class="sg-label">{{ 'payment_ledger.summary_due_payment' | translate }}</div>
+        <div class="sg-value">৳{{ summary.due_payment | number:'1.0-2' }}</div>
+        <div class="sg-count">{{ summary.counts.due_payment }} {{ 'common.txn' | translate }}</div>
+      </div>
+      <div class="sg-block total">
+        <div class="sg-label">{{ 'payment_ledger.summary_cash_in' | translate }}</div>
+        <div class="sg-value">৳{{ summary.total_cash_in | number:'1.0-2' }}</div>
+        <div class="sg-count">{{ summary.counts.sale_payment + summary.counts.due_payment }} {{ 'common.txn' | translate }}</div>
+      </div>
+      <div class="sg-block warn">
+        <div class="sg-label">{{ 'payment_ledger.summary_discount' | translate }}</div>
+        <div class="sg-value">৳{{ summary.discount_given | number:'1.0-2' }}</div>
+        <div class="sg-count">{{ summary.counts.discount }} {{ 'common.txn' | translate }}</div>
+      </div>
+      <div class="sg-block danger">
+        <div class="sg-label">{{ 'payment_ledger.summary_return' | translate }}</div>
+        <div class="sg-value">৳{{ summary.return_amount | number:'1.0-2' }}</div>
+        <div class="sg-count">{{ summary.counts.return }} {{ 'common.txn' | translate }}</div>
+      </div>
+      <div class="sg-block net" [ngClass]="summary.net_cash >= 0 ? 'net-pos' : 'net-neg'">
+        <div class="sg-label">{{ 'payment_ledger.summary_net_cash' | translate }}</div>
+        <div class="sg-value">৳{{ summary.net_cash | number:'1.0-2' }}</div>
+        <div class="sg-count">{{ 'payment_ledger.cash_in_minus_returns' | translate }}</div>
+      </div>
+      <div class="sg-block due-block">
+        <div class="sg-label">{{ 'payment_ledger.summary_outstanding' | translate }}</div>
+        <div class="sg-value due-val">৳{{ summary.total_outstanding_due | number:'1.0-2' }}</div>
+        <div class="sg-count">{{ 'payment_ledger.all_customers' | translate }}</div>
+      </div>
+    </div>
+    <div class="loading-row" *ngIf="loadingSummary" style="padding:16px 0">
+      <div class="loading-spinner"></div><span class="loading-text">{{ 'payment_ledger.summary_loading' | translate }}</span>
+    </div>
+  </div>
+
+  <!-- LEDGER TABLE (DESKTOP) -->
+  <div class="card desktop-table" style="margin-top:6px">
+    <div class="card-header-row">
+      <div class="chr-left">
+        <span class="card-title" style="margin-bottom:0">{{ 'payment_ledger.transactions_title' | translate }}</span>
+        <span class="count-badge">{{ total }} {{ 'payment_ledger.records' | translate }}</span>
+      </div>
+      <div class="chr-right" *ngIf="selectedCustomer">
+        <span class="active-filter-chip">
+          {{ 'payment_ledger.customer_filter_chip' | translate }} {{ selectedCustomer.name }}
+          <button (click)="clearCustomer(); applyFilter()">×</button>
+        </span>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ 'payment_ledger.col_date_time' | translate }}</th>
+            <th>{{ 'payment_ledger.col_type' | translate }}</th>
+            <th>{{ 'payment_ledger.col_ref' | translate }}</th>
+            <th>{{ 'payment_ledger.col_customer' | translate }}</th>
+            <th>{{ 'payment_ledger.col_note' | translate }}</th>
+            <th>{{ 'payment_ledger.col_operator' | translate }}</th>
+            <th class="right">{{ 'payment_ledger.col_amount' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of entries" [ngClass]="isNegative(e) ? 'row-negative' : 'row-positive'">
+            <td class="muted">{{ e.created_at | date:'dd MMM yyyy, HH:mm' }}</td>
+            <td><span class="type-badge" [ngClass]="typeClass(e.transaction_type)">{{ typeLabel(e.transaction_type) | translate }}</span></td>
+            <td class="bold">{{ e.reference_no || '—' }}</td>
+            <td>{{ e.customer_name }}</td>
+            <td class="muted">{{ e.note || '—' }}</td>
+            <td class="muted">{{ e.created_by || '—' }}</td>
+            <td class="right amount-cell" [ngClass]="isNegative(e) ? 'neg' : 'pos'">
+              {{ isNegative(e) ? '−' : '+' }}৳{{ (e.amount < 0 ? -e.amount : e.amount) | number:'1.0-2' }}
+            </td>
+          </tr>
+          <tr *ngIf="loading" class="loading-row">
+            <td colspan="7"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
+          </tr>
+          <tr *ngIf="!loading && entries.length === 0">
+            <td colspan="7" class="empty-row"><div class="empty-icon">📋</div>{{ 'payment_ledger.no_transactions' | translate }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPage($event)"></app-paginator>
+  </div>
+
+  <!-- MOBILE LIST -->
+  <div class="mobile-list" style="margin-top:6px">
+    <div class="mobile-meta">
+      <span class="mobile-title">{{ 'payment_ledger.mobile_title' | translate }}</span>
+      <span class="count-badge">{{ total }}</span>
+    </div>
+    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div></div>
+    <div class="mobile-empty" *ngIf="!loading && entries.length === 0"><div class="empty-icon">📋</div><p>{{ 'payment_ledger.no_transactions' | translate }}</p></div>
+    <div class="mobile-card" *ngFor="let e of entries" [ngClass]="isNegative(e) ? 'mc-danger' : 'mc-success'">
+      <div class="mc-top">
+        <div class="mc-name-wrap">
+          <div>
+            <div class="mc-title">{{ e.reference_no || '—' }}</div>
+            <div class="mc-sub">{{ e.created_at | date:'dd MMM yyyy, HH:mm' }} · {{ e.customer_name }}</div>
+          </div>
+        </div>
+        <span class="type-badge" [ngClass]="typeClass(e.transaction_type)">{{ typeLabel(e.transaction_type) | translate }}</span>
+      </div>
+      <div class="mc-grid">
+        <div class="mc-field">
+          <span class="mc-lbl">{{ 'payment_ledger.mobile_amount' | translate }}</span>
+          <span class="mc-val fw" [ngClass]="isNegative(e) ? 'danger' : 'success'">
+            {{ isNegative(e) ? '−' : '+' }}৳{{ (e.amount < 0 ? -e.amount : e.amount) | number:'1.0-2' }}
+          </span>
+        </div>
+        <div class="mc-field" *ngIf="e.note">
+          <span class="mc-lbl">{{ 'payment_ledger.mobile_note' | translate }}</span>
+          <span class="mc-val muted">{{ e.note }}</span>
+        </div>
+        <div class="mc-field" *ngIf="e.created_by">
+          <span class="mc-lbl">{{ 'payment_ledger.mobile_operator' | translate }}</span>
+          <span class="mc-val muted">{{ e.created_by }}</span>
+        </div>
+      </div>
+    </div>
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPage($event)"></app-paginator>
+  </div>
+
+</div>

@@ -10,6 +10,17 @@ import { CustomersComponent } from './features/customers/customers.component';
 import { PurchaseComponent } from './features/purchase/purchase.component';
 import { SalesListComponent } from './features/sales-list/sales-list.component';
 import { InvoicePrintComponent } from './features/invoice-print/invoice-print.component';
+import { PurchaseHistoryComponent } from './features/purchase-history/purchase-history.component';
+import { PurchaseViewComponent } from './features/purchase-view/purchase-view.component';
+import { StockDashboardComponent } from './features/stock-dashboard/stock-dashboard.component';
+import { SaleReturnComponent } from './features/sale-return/sale-return.component';
+import { ProductWasteComponent } from './features/product-waste/product-waste.component';
+import { StockLedgerComponent } from './features/stock-ledger/stock-ledger.component';
+import { UsersComponent } from './features/users/users.component';
+import { CustomerPaymentComponent } from './features/customer-payment/customer-payment.component';
+import { PaymentLedgerComponent } from './features/payment-ledger/payment-ledger.component';
+import { OperatorSummaryComponent } from './features/operator-summary/operator-summary.component';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -19,7 +30,7 @@ export const routes: Routes = [
     {
         path: '',
         component: LayoutComponent,
-        // canActivate: [AuthGuard],
+        canActivate: [authGuard],
         children: [
             { path: 'dashboard', component: DashboardComponent },
             { path: 'categories', component: CategoriesComponent },
@@ -27,18 +38,19 @@ export const routes: Routes = [
             { path: 'billing', component: SalesComponent },
             { path: 'customers', component: CustomersComponent },
             { path: 'purchase', component: PurchaseComponent },
-            {
-                path: 'sales',
-                component: SalesListComponent
-            },
-            {
-                path: 'invoice-print',
-                component: InvoicePrintComponent
-            },
-            {
-                path: 'suppliers',
-                component: SuppliersComponent
-            }
+            { path: 'purchases', component: PurchaseHistoryComponent },
+            { path: 'purchase/:id', component: PurchaseViewComponent },
+            { path: 'sales', component: SalesListComponent },
+            { path: 'invoice-print', component: InvoicePrintComponent },
+            { path: 'suppliers', component: SuppliersComponent },
+            { path: 'stock', component: StockDashboardComponent },
+            { path: 'sale-return', component: SaleReturnComponent },
+            { path: 'product-waste', component: ProductWasteComponent },
+            { path: 'stock-ledger', component: StockLedgerComponent },
+            { path: 'users', component: UsersComponent },
+            { path: 'customer-payment', component: CustomerPaymentComponent },
+            { path: 'payment-ledger', component: PaymentLedgerComponent },
+            { path: 'operator-summary', component: OperatorSummaryComponent }
         ]
     }
 ];

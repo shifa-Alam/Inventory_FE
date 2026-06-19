@@ -2,47 +2,65 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
+import { TranslatePipe } from '@ngx-translate/core';
+import { PaginatorComponent } from '../../shared/paginator/paginator.component';
 
 @Component({
   selector: 'app-suppliers',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe, PaginatorComponent],
   templateUrl: './suppliers.component.html',
   styleUrls: ['./suppliers.component.css']
 })
 export class SuppliersComponent implements OnInit {
-
   suppliers: any[] = [];
+  loading = false;
 
-  newSupplier = {
-    name: '',
-    phone: '',
-    address: '',
-    opening_due: 0
-  };
+  filterName = '';
 
-  constructor(private api: ApiService) { }
+  page = 1;
+  pages = 1;
+  total = 0;
+  pageSize = 20;
 
-  ngOnInit() {
-    this.load();
-  }
+  newSupplier = { name: '', phone: '', address: '', opening_due: 0 };
+
+  constructor(private api: ApiService) {}
+
+  ngOnInit() { this.load(); }
 
   load() {
-    this.api.get('/suppliers/').subscribe((res: any) => {
-      this.suppliers = res;
+    const params: string[] = [`page=${this.page}`, `page_size=${this.pageSize}`];
+    if (this.filterName.trim()) params.push(`name=${encodeURIComponent(this.filterName.trim())}`);
+
+    this.loading = true;
+    this.api.get(`/suppliers/?${params.join('&')}`).subscribe({
+      next: (res: any) => {
+        this.suppliers = res.data;
+        this.total = res.total;
+        this.pages = res.pages;
+        this.loading = false;
+      },
+      error: (err) => { console.error('Failed to load suppliers', err); this.loading = false; }
     });
   }
 
+  applyFilter() { this.page = 1; this.load(); }
+  clearFilter() { this.filterName = ''; this.applyFilter(); }
+  onPageChange(p: number) { this.page = p; this.load(); }
+
+  totalDue(): number {
+    return this.suppliers.reduce((sum, s) => sum + (s.opening_due || 0), 0);
+  }
+
   save() {
-    this.api.post('/suppliers/', this.newSupplier).subscribe(() => {
-      alert('Supplier Added');
-      this.newSupplier = {
-        name: '',
-        phone: '',
-        address: '',
-        opening_due: 0
-      };
-      this.load();
+    this.api.post('/suppliers/', this.newSupplier).subscribe({
+      next: () => {
+        alert('Supplier Added');
+        this.newSupplier = { name: '', phone: '', address: '', opening_due: 0 };
+        this.load();
+      },
+      error: (err) => console.error('Failed to save supplier', err)
     });
   }
 }

@@ -1,0 +1,96 @@
+﻿<div class="page">
+
+  <div class="page-header">
+    <div>
+      <h2>{{ 'purchase_history.title' | translate }}</h2>
+      <p class="sub">{{ 'purchase_history.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- DESKTOP TABLE -->
+  <div class="card desktop-table">
+    <div class="card-header-row">
+      <div class="chr-left">
+        <span class="card-title" style="margin-bottom:0">{{ 'purchase_history.title' | translate }}</span>
+        <span class="count-badge">{{ total }} total</span>
+      </div>
+      <div class="chr-toolbar">
+        <select [(ngModel)]="filterSupplierId">
+          <option value="0">{{ 'purchase_history.filter_all_suppliers' | translate }}</option>
+          <option *ngFor="let s of suppliers" [value]="s.id">{{ s.name }}</option>
+        </select>
+        <input type="date" [(ngModel)]="filterDateFrom" />
+        <input type="date" [(ngModel)]="filterDateTo" />
+        <button class="btn btn-primary btn-sm" (click)="applyFilter()">{{ 'common.filter' | translate }}</button>
+        <button class="btn btn-ghost btn-sm" (click)="clearFilter()">{{ 'common.clear' | translate }}</button>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ 'purchase_history.col_date' | translate }}</th>
+            <th>{{ 'purchase_history.col_invoice' | translate }}</th>
+            <th>{{ 'purchase_history.col_supplier' | translate }}</th>
+            <th class="right">{{ 'purchase_history.col_total' | translate }}</th>
+            <th>{{ 'purchase_history.col_status' | translate }}</th>
+            <th>{{ 'purchase_history.col_action' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of purchases">
+            <td class="muted">{{ p.created_at | date:'dd MMM yyyy' }}</td>
+            <td class="bold">{{ p.invoice_no }}</td>
+            <td>{{ p.supplier_name }}</td>
+            <td class="right">{{ p.total_amount | number }}</td>
+            <td><span class="badge badge-info">{{ 'purchase_history.status_purchased' | translate }}</span></td>
+            <td><button class="btn btn-outline btn-sm" (click)="view(p.id)">{{ 'purchase_history.view' | translate }}</button></td>
+          </tr>
+          <tr *ngIf="loading" class="loading-row">
+            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+          </tr>
+          <tr *ngIf="!loading && purchases.length === 0">
+            <td colspan="6" class="empty-row">{{ 'purchase_history.empty' | translate }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
+  </div>
+
+  <!-- MOBILE LIST -->
+  <div class="mobile-list">
+    <div class="mobile-meta">
+      <span class="mobile-title">{{ 'purchase_history.title' | translate }}</span>
+      <span class="count-badge">{{ total }}</span>
+    </div>
+    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
+    <div class="mobile-empty" *ngIf="!loading && purchases.length === 0"><p>{{ 'purchase_history.empty' | translate }}</p></div>
+    <div class="mobile-card" *ngFor="let p of purchases">
+      <div class="mc-top">
+        <div class="mc-name-wrap">
+          <div>
+            <div class="mc-title">{{ p.invoice_no }}</div>
+            <div class="mc-sub">{{ p.created_at | date:'dd MMM yyyy' }} · {{ p.supplier_name }}</div>
+          </div>
+        </div>
+        <span class="badge badge-info">{{ 'purchase_history.status_purchased' | translate }}</span>
+      </div>
+      <div class="mc-grid">
+        <div class="mc-field">
+          <span class="mc-lbl">Total</span>
+          <span class="mc-val fw7">{{ p.total_amount | number }}</span>
+        </div>
+        <div class="mc-field">
+          <span class="mc-lbl">Supplier</span>
+          <span class="mc-val muted">{{ p.supplier_name }}</span>
+        </div>
+      </div>
+      <div class="mc-actions">
+        <button class="btn btn-outline btn-sm" (click)="view(p.id)">{{ 'purchase_history.view' | translate }}</button>
+      </div>
+    </div>
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
+  </div>
+
+</div>

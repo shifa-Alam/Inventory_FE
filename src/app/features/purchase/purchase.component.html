@@ -1,1 +1,90 @@
-<p>purchase works!</p>
+<div class="scan-toast" *ngIf="scanToast" [class.toast-success]="scanToast.type === 'success'" [class.toast-error]="scanToast.type === 'error'">
+  <span class="toast-icon">{{ scanToast.type === 'success' ? '✓' : '✕' }}</span>
+  {{ scanToast.message }}
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div>
+      <h2>{{ 'purchase.title' | translate }}</h2>
+      <p class="sub">{{ 'purchase.subtitle' | translate }}</p>
+    </div>
+    <div class="header-supplier">
+      <label class="field-label">{{ 'purchase.supplier_label' | translate }}</label>
+      <select [(ngModel)]="supplier_id" style="width:220px">
+        <option value="0">{{ 'purchase.select_supplier' | translate }}</option>
+        <option *ngFor="let s of suppliers" [value]="s.id">{{ s.name }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="card card-body search-wrap" style="margin-bottom:16px">
+    <input
+      #searchInput
+      type="text"
+      [placeholder]="'purchase.search_placeholder' | translate"
+      [(ngModel)]="productSearch"
+      (ngModelChange)="onSearchChange($event)"
+      (keydown)="onKeyDown($event)"
+    />
+    <div class="dropdown" *ngIf="filteredProducts.length > 0">
+      <div
+        class="dropdown-item"
+        *ngFor="let p of filteredProducts; let i = index"
+        [class.active]="i === selectedIndex"
+        (click)="selectProduct(p)"
+      >
+        <span class="dp-name">{{ p.name }}</span>
+        <span class="dp-stock">{{ 'purchase.col_stock' | translate }}: {{ p.current_stock }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ITEMS TABLE -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ 'purchase.col_no' | translate }}</th>
+            <th>{{ 'purchase.col_product' | translate }}</th>
+            <th style="width:110px">{{ 'purchase.col_qty' | translate }}</th>
+            <th style="width:130px">{{ 'purchase.col_rate' | translate }}</th>
+            <th>{{ 'purchase.col_total' | translate }}</th>
+            <th style="width:50px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of items; let i = index">
+            <td class="muted">{{ i + 1 }}</td>
+            <td class="bold">{{ item.product_name }}</td>
+            <td><input type="number" [(ngModel)]="item.quantity" min="1" /></td>
+            <td><input type="number" [(ngModel)]="item.rate" min="0" /></td>
+            <td class="right">{{ item.quantity * item.rate | number }}</td>
+            <td>
+              <button class="btn btn-danger btn-sm" (click)="removeRow(i)">✕</button>
+            </td>
+          </tr>
+          <tr *ngIf="items.length === 0">
+            <td colspan="6" class="empty-row">{{ 'purchase.empty' | translate }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ACTION BAR -->
+  <div class="action-bar">
+    <div class="total-info">
+      <span class="total-label">{{ 'purchase.total_amount' | translate }}</span>
+      <span class="total-value">{{ getTotal() | number }}</span>
+    </div>
+    <button class="btn btn-primary btn-lg" (click)="save()" [disabled]="items.length === 0">
+      {{ 'purchase.save' | translate }}
+    </button>
+  </div>
+
+</div>

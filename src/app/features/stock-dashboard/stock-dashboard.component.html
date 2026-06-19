@@ -1,0 +1,191 @@
+<div class="page">
+
+  <!-- PAGE HEADER -->
+  <div class="sd-header">
+    <div>
+      <h2 class="sd-title">{{ 'stock.title' | translate }}</h2>
+      <p class="sd-sub">{{ 'stock.subtitle' | translate }}</p>
+    </div>
+    <button class="btn-refresh" (click)="load()" [disabled]="loading" title="Refresh">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" [class.spin]="loading"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    </button>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-icon-wrap si-blue">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+      </div>
+      <div class="stat-body">
+        <span class="stat-val">{{ summary.total_products | number }}</span>
+        <span class="stat-lbl">Total Products</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon-wrap si-green">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      <div class="stat-body">
+        <span class="stat-val">{{ summary.total_stock_value | number:'1.0-0' }}</span>
+        <span class="stat-lbl">Stock Value</span>
+      </div>
+    </div>
+    <div class="stat-card clickable" (click)="filterStatus='LOW'; onFilterChange()">
+      <div class="stat-icon-wrap si-orange">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div class="stat-body">
+        <span class="stat-val warn">{{ summary.low_stock_count | number }}</span>
+        <span class="stat-lbl">Low Stock</span>
+      </div>
+      <span class="tap-hint">tap to filter</span>
+    </div>
+    <div class="stat-card clickable" (click)="filterStatus='OUT'; onFilterChange()">
+      <div class="stat-icon-wrap si-red">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+      </div>
+      <div class="stat-body">
+        <span class="stat-val danger">{{ summary.out_of_stock_count | number }}</span>
+        <span class="stat-lbl">Out of Stock</span>
+      </div>
+      <span class="tap-hint">tap to filter</span>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <div class="search-wrap">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" [(ngModel)]="searchText" (ngModelChange)="onSearchChange()" placeholder="Search product or SKU…" />
+    </div>
+    <div class="filter-selects">
+      <select [(ngModel)]="filterCategory" (ngModelChange)="onFilterChange()">
+        <option value="">All Categories</option>
+        <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
+      </select>
+      <select [(ngModel)]="filterStatus" (ngModelChange)="onFilterChange()">
+        <option value="">All Status</option>
+        <option value="OK">OK</option>
+        <option value="LOW">Low Stock</option>
+        <option value="OUT">Out of Stock</option>
+      </select>
+      <button class="btn-clear" *ngIf="hasFilters" (click)="clearFilters()">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Clear
+      </button>
+    </div>
+  </div>
+
+  <!-- DESKTOP TABLE -->
+  <div class="card desktop-table">
+    <div class="table-meta">
+      <span class="table-title">Stock List</span>
+      <span class="count-badge">{{ total }} items</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th class="col-no">#</th>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Category</th>
+            <th class="right">Buy</th>
+            <th class="right">Sale</th>
+            <th class="center">Qty</th>
+            <th class="right">Value</th>
+            <th class="center">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of stocks; let i = index"
+            [class.row-low]="s.status === 'LOW'"
+            [class.row-out]="s.status === 'OUT'">
+            <td class="col-no muted">{{ (page-1)*pageSize+i+1 }}</td>
+            <td><span class="product-name">{{ s.name }}</span></td>
+            <td><span class="sku-tag">{{ s.sku }}</span></td>
+            <td class="muted">{{ s.category }}</td>
+            <td class="right">{{ s.purchase_price | number }}</td>
+            <td class="right">{{ s.sale_price | number }}</td>
+            <td class="center">
+              <span class="qty-pill" [class.qty-low]="s.status==='LOW'" [class.qty-out]="s.status==='OUT'">{{ s.current_stock }}</span>
+            </td>
+            <td class="right amount-cell">{{ s.stock_value | number:'1.0-0' }}</td>
+            <td class="center">
+              <span class="status-pill dot-ok" *ngIf="s.status==='OK'">● OK</span>
+              <span class="status-pill dot-low" *ngIf="s.status==='LOW'">● Low</span>
+              <span class="status-pill dot-out" *ngIf="s.status==='OUT'">● Out</span>
+            </td>
+          </tr>
+          <tr *ngIf="loading" class="loading-row">
+            <td colspan="9"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+          </tr>
+          <tr *ngIf="!loading && stocks.length === 0">
+            <td colspan="9" class="empty-row"><div class="empty-icon">📦</div>No stock data found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
+  </div>
+
+  <!-- MOBILE CARDS -->
+  <div class="mobile-list">
+    <div class="mobile-meta">
+      <span class="table-title">Stock List</span>
+      <span class="count-badge">{{ total }} items</span>
+    </div>
+
+    <div *ngIf="loading" class="mobile-loading">
+      <div class="loading-spinner"></div><span class="loading-text">Loading…</span>
+    </div>
+
+    <div *ngIf="!loading && stocks.length === 0" class="mobile-empty">
+      <div class="empty-icon">📦</div>
+      <p>No stock data found.</p>
+    </div>
+
+    <div class="mobile-card" *ngFor="let s of stocks; let i = index"
+      [class.mc-low]="s.status==='LOW'"
+      [class.mc-out]="s.status==='OUT'">
+      <div class="mc-top">
+        <div class="mc-name-wrap">
+          <span class="mc-num">{{ (page-1)*pageSize+i+1 }}</span>
+          <div>
+            <div class="mc-name">{{ s.name }}</div>
+            <span class="sku-tag">{{ s.sku }}</span>
+          </div>
+        </div>
+        <span class="status-pill dot-ok" *ngIf="s.status==='OK'">● OK</span>
+        <span class="status-pill dot-low" *ngIf="s.status==='LOW'">● Low</span>
+        <span class="status-pill dot-out" *ngIf="s.status==='OUT'">● Out</span>
+      </div>
+      <div class="mc-row">
+        <div class="mc-field">
+          <span class="mc-lbl">Category</span>
+          <span class="mc-val">{{ s.category }}</span>
+        </div>
+        <div class="mc-field">
+          <span class="mc-lbl">Stock</span>
+          <span class="qty-pill" [class.qty-low]="s.status==='LOW'" [class.qty-out]="s.status==='OUT'">{{ s.current_stock }}</span>
+        </div>
+        <div class="mc-field">
+          <span class="mc-lbl">Buy Price</span>
+          <span class="mc-val">{{ s.purchase_price | number }}</span>
+        </div>
+        <div class="mc-field">
+          <span class="mc-lbl">Sale Price</span>
+          <span class="mc-val">{{ s.sale_price | number }}</span>
+        </div>
+        <div class="mc-field">
+          <span class="mc-lbl">Stock Value</span>
+          <span class="mc-val bold">{{ s.stock_value | number:'1.0-0' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
+  </div>
+
+</div>

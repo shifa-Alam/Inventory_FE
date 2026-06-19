@@ -1,32 +1,432 @@
-<div class="container">
+<div class="page">
 
-    <h2>Sales History</h2>
+  <div class="page-header">
+    <div>
+      <h2>{{ 'sales_list.title' | translate }}</h2>
+      <p class="sub">{{ 'sales_list.subtitle' | translate }}</p>
+    </div>
+  </div>
 
-    <table>
+  <!-- DESKTOP TABLE -->
+  <div class="card desktop-table">
+    <!-- Filter bar -->
+    <div class="sl-filter-bar">
+      <div class="sl-filter-row">
+        <!-- Date range -->
+        <div class="sl-fg">
+          <label class="sl-lbl">{{ 'sales_list.filter_from' | translate }}</label>
+          <input type="date" class="sl-inp" [(ngModel)]="filterDateFrom" (change)="applyFilter()" />
+        </div>
+        <div class="sl-fg">
+          <label class="sl-lbl">{{ 'sales_list.filter_to' | translate }}</label>
+          <input type="date" class="sl-inp" [(ngModel)]="filterDateTo" (change)="applyFilter()" />
+        </div>
+        <!-- Invoice -->
+        <div class="sl-fg sl-fg-grow">
+          <label class="sl-lbl">{{ 'sales_list.filter_invoice' | translate }}</label>
+          <input class="sl-inp" [placeholder]="'sales_list.filter_invoice_ph' | translate" [(ngModel)]="filterInvoice" (keyup.enter)="applyFilter()" />
+        </div>
+        <!-- Status -->
+        <div class="sl-fg">
+          <label class="sl-lbl">{{ 'sales_list.filter_status' | translate }}</label>
+          <select class="sl-inp" [(ngModel)]="filterStatus" (change)="applyFilter()">
+            <option value="">{{ 'sales_list.filter_all_status' | translate }}</option>
+            <option value="due">{{ 'sales_list.filter_has_due' | translate }}</option>
+            <option value="paid">{{ 'sales_list.filter_paid' | translate }}</option>
+          </select>
+        </div>
+        <!-- Customer autocomplete -->
+        <div class="sl-fg sl-fg-grow sl-ac-wrap">
+          <label class="sl-lbl">{{ 'sales_list.filter_customer' | translate }}</label>
+          <div class="sl-ac-field">
+            <input class="sl-inp" [placeholder]="'sales_list.filter_customer_ph' | translate"
+              [(ngModel)]="customerSearch"
+              (input)="onCustomerInput()"
+              (focus)="onCustomerInput()"
+              autocomplete="off" />
+            <button *ngIf="selectedCustomer" class="sl-ac-clear" (click)="clearCustomer(); applyFilter()">×</button>
+            <div class="sl-ac-drop" *ngIf="showCustomerDrop">
+              <div class="sl-ac-item" *ngFor="let c of customerResults" (mousedown)="selectCustomer(c); applyFilter()">
+                {{ c.name }} <span class="sl-ac-sub">{{ c.phone }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Quick date buttons -->
+      <div class="sl-quick-row">
+        <span class="sl-count">{{ total }} {{ 'sales_list.records' | translate }}</span>
+        <div class="sl-qbts">
+          <button class="sl-qb" (click)="setToday()">{{ 'sales_list.btn_today' | translate }}</button>
+          <button class="sl-qb" (click)="setThisWeek()">{{ 'sales_list.btn_week' | translate }}</button>
+          <button class="sl-qb" (click)="setThisMonth()">{{ 'sales_list.btn_month' | translate }}</button>
+          <button class="sl-qb" (click)="setAllTime()">{{ 'sales_list.btn_all' | translate }}</button>
+          <button class="sl-qb sl-qb-clear" (click)="clearFilter()">{{ 'sales_list.btn_reset' | translate }}</button>
+        </div>
+      </div>
+    </div>
 
-        <tr>
-            <th>Invoice</th>
-            <th>Customer</th>
-            <th>Total</th>
-            <th>Paid</th>
-            <th>Due</th>
-            <th>Action</th>
-        </tr>
+    <!-- alerts -->
+    <div style="padding:0 16px" *ngIf="successMsg || errorMsg">
+      <div class="alert alert-success" *ngIf="successMsg"><span class="alert-icon">✓</span> {{ successMsg }}</div>
+      <div class="alert alert-error"   *ngIf="errorMsg">  <span class="alert-icon">✕</span> {{ errorMsg }}</div>
+    </div>
 
-        <tr *ngFor="let s of sales">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ 'sales_list.col_invoice' | translate }}</th>
+            <th>{{ 'sales_list.col_date' | translate }}</th>
+            <th>{{ 'sales_list.col_customer' | translate }}</th>
+            <th class="right">{{ 'sales_list.col_total' | translate }}</th>
+            <th class="right">{{ 'sales_list.col_paid' | translate }}</th>
+            <th class="right">{{ 'sales_list.col_due' | translate }}</th>
+            <th>{{ 'sales_list.col_status' | translate }}</th>
+            <th>{{ 'sales_list.col_action' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let s of sales">
 
-            <td>#{{s.id}}</td>
-            <td>{{s.customer_name || 'Walk-in'}}</td>
-            <td>{{s.total_amount}}</td>
-            <td>{{s.paid_amount}}</td>
-            <td>{{s.due_amount}}</td>
+            <!-- MAIN ROW -->
+            <tr [class.row-selected]="selectedSale?.id === s.id">
+              <td class="bold">{{ s.invoice_no }}</td>
+              <td class="muted">{{ s.created_at | date:'dd MMM yyyy' }}</td>
+              <td>{{ s.customer_name || ('sales_list.walk_in' | translate) }}</td>
+              <td class="right">৳{{ s.total_amount | number:'1.0-2' }}</td>
+              <td class="right">৳{{ s.paid_amount | number:'1.0-2' }}</td>
+              <td class="right">
+                <span *ngIf="s.due_amount > 0" class="due-chip">৳{{ s.due_amount | number:'1.0-2' }}</span>
+                <span *ngIf="s.due_amount === 0" class="muted">—</span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="s.due_amount == 0 ? 'badge-success' : 'badge-warn'">
+                  {{ s.due_amount == 0 ? ('sales_list.status_paid' | translate) : ('sales_list.status_due' | translate) }}
+                </span>
+              </td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-outline btn-sm" (click)="viewInvoice(s)" [title]="'sales_list.view_print' | translate">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                  <button class="btn btn-success btn-sm" *ngIf="s.due_amount > 0"
+                    [class.btn-ghost]="selectedSale?.id === s.id && activePanel === 'payment'"
+                    (click)="openPayment(s)" [title]="'sales_list.panel_collect' | translate">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    {{ 'sales_list.pay_btn' | translate }}
+                  </button>
+                  <button class="btn btn-danger btn-sm"
+                    [class.btn-ghost]="selectedSale?.id === s.id && activePanel === 'return'"
+                    (click)="openReturn(s)" [title]="'sales_list.panel_return' | translate"
+                    *ngIf="s.items?.length > 0">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.37"/></svg>
+                    {{ 'sales_list.return_btn' | translate }}
+                  </button>
+                </div>
+              </td>
+            </tr>
 
-            <td>
-                <button (click)="viewInvoice(s)">View / Print</button>
-            </td>
+            <!-- PAYMENT PANEL -->
+            <tr *ngIf="selectedSale?.id === s.id && activePanel === 'payment'" class="panel-row">
+              <td colspan="8">
+                <div class="inline-panel pay-panel-wrap">
+                  <div class="panel-header">
+                    <span class="panel-title">{{ 'sales_list.panel_collect' | translate }} — {{ s.invoice_no }}</span>
+                    <button class="panel-close" (click)="closePanel()">×</button>
+                  </div>
+                  <div class="panel-body">
+                    <div class="pay-info-strip">
+                      <div class="pis-item">
+                        <span class="pis-lbl">{{ 'sales_list.pay_total' | translate }}</span>
+                        <span class="pis-val">৳{{ s.total_amount | number:'1.0-2' }}</span>
+                      </div>
+                      <div class="pis-item">
+                        <span class="pis-lbl">{{ 'sales_list.pay_paid_so_far' | translate }}</span>
+                        <span class="pis-val">৳{{ s.paid_amount | number:'1.0-2' }}</span>
+                      </div>
+                      <div class="pis-item">
+                        <span class="pis-lbl">{{ 'sales_list.pay_outstanding' | translate }}</span>
+                        <span class="pis-val due">৳{{ s.due_amount | number:'1.0-2' }}</span>
+                      </div>
+                      <div class="pis-item" *ngIf="totalReduction > 0 && totalReduction <= maxDue">
+                        <span class="pis-lbl">{{ 'sales_list.pay_after' | translate }}</span>
+                        <span class="pis-val" [ngClass]="afterPayment === 0 ? 'ok' : 'warn'">৳{{ afterPayment | number:'1.0-2' }}</span>
+                      </div>
+                    </div>
 
-        </tr>
+                    <div class="pay-fields-row">
+                      <div class="form-group">
+                        <label>{{ 'sales_list.pay_amount' | translate }} <span class="hint">({{ 'sales_list.pay_cash' | translate }})</span></label>
+                        <div class="amount-row">
+                          <input type="number" [(ngModel)]="payAmount" placeholder="0.00" min="0" [max]="maxDue" />
+                          <button class="btn btn-ghost btn-sm" (click)="setFullPay()">{{ 'sales_list.pay_full' | translate }}</button>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label>{{ 'sales_list.pay_discount' | translate }} <span class="hint">({{ 'sales_list.pay_waive' | translate }})</span></label>
+                        <input type="number" [(ngModel)]="payDiscount" placeholder="0.00" min="0" [max]="maxDue" />
+                      </div>
+                      <div class="form-group" style="flex:2">
+                        <label>{{ 'sales_list.pay_note' | translate }}</label>
+                        <input type="text" [(ngModel)]="payNote" [placeholder]="'sales_list.pay_note_ph' | translate" maxlength="255" />
+                      </div>
+                      <div class="form-group" style="justify-content:flex-end">
+                        <label>&nbsp;</label>
+                        <div class="pay-actions">
+                          <button class="btn btn-success" (click)="submitPayment()" [disabled]="!payValid || paying">
+                            <span *ngIf="paying" class="spinner"></span>
+                            {{ paying ? ('sales_list.pay_saving' | translate) : ('sales_list.pay_confirm' | translate) }}
+                          </button>
+                          <button class="btn btn-ghost" (click)="closePanel()">{{ 'common.cancel' | translate }}</button>
+                        </div>
+                      </div>
+                    </div>
 
-    </table>
+                    <p class="hint-error" *ngIf="totalReduction > maxDue">
+                      {{ 'sales_list.pay_exceeds' | translate }} ৳{{ maxDue | number:'1.0-2' }}
+                    </p>
+                    <div class="breakdown" *ngIf="totalReduction > 0 && totalReduction <= maxDue">
+                      <span *ngIf="(payAmount||0) > 0">৳{{ payAmount | number:'1.0-2' }} {{ 'sales_list.pay_bd_payment' | translate }}</span>
+                      <span class="bd-sep" *ngIf="(payAmount||0) > 0 && (payDiscount||0) > 0">+</span>
+                      <span class="bd-disc" *ngIf="(payDiscount||0) > 0">৳{{ payDiscount | number:'1.0-2' }} {{ 'sales_list.pay_bd_discount' | translate }}</span>
+                      <span class="bd-sep">=</span>
+                      <span class="bd-total">৳{{ totalReduction | number:'1.0-2' }} {{ 'sales_list.pay_bd_total' | translate }}</span>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <!-- RETURN PANEL -->
+            <tr *ngIf="selectedSale?.id === s.id && activePanel === 'return'" class="panel-row">
+              <td colspan="8">
+                <div class="inline-panel ret-panel-wrap">
+                  <div class="panel-header">
+                    <span class="panel-title">{{ 'sales_list.panel_return' | translate }} — {{ s.invoice_no }}</span>
+                    <button class="panel-close" (click)="closePanel()">×</button>
+                  </div>
+                  <div class="panel-body">
+
+                    <div class="return-items-table">
+                      <table class="inner-table">
+                        <thead>
+                          <tr>
+                            <th>{{ 'sale_return.col_product' | translate }}</th>
+                            <th class="right">{{ 'sale_return.col_rate' | translate }}</th>
+                            <th class="right">{{ 'sale_return.col_max' | translate }}</th>
+                            <th class="right" style="width:110px">{{ 'sale_return.col_return_qty' | translate }}</th>
+                            <th class="right">{{ 'sale_return.col_amount' | translate }}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let item of returnItems">
+                            <td>{{ item.product_name }}</td>
+                            <td class="right muted">৳{{ item.rate | number:'1.0-2' }}</td>
+                            <td class="right muted">{{ item.max_qty }}</td>
+                            <td class="right">
+                              <input
+                                type="number" class="qty-input"
+                                [(ngModel)]="item.qty"
+                                min="0" [max]="item.max_qty"
+                                [class.qty-error]="item.qty < 0 || item.qty > item.max_qty"
+                              />
+                            </td>
+                            <td class="right">
+                              <span *ngIf="item.qty > 0" class="ret-amount">৳{{ (item.qty * item.rate) | number:'1.0-2' }}</span>
+                              <span *ngIf="!item.qty" class="muted">—</span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div class="ret-footer">
+                      <div class="form-group" style="flex:1">
+                        <label>{{ 'sales_list.ret_reason' | translate }} <span class="hint">({{ 'sales_list.ret_reason_optional' | translate }})</span></label>
+                        <input type="text" [(ngModel)]="returnReason" [placeholder]="'sales_list.ret_reason_ph' | translate" maxlength="255" />
+                      </div>
+                      <div class="ret-total-wrap">
+                        <span class="ret-total-lbl">{{ 'sales_list.ret_return_total' | translate }}</span>
+                        <span class="ret-total-val">৳{{ returnTotal | number:'1.0-2' }}</span>
+                      </div>
+                      <div class="pay-actions" style="align-self:flex-end">
+                        <button class="btn btn-danger" (click)="submitReturn()" [disabled]="!returnValid || returning">
+                          <span *ngIf="returning" class="spinner"></span>
+                          {{ returning ? ('sales_list.ret_processing' | translate) : ('sales_list.ret_confirm' | translate) }}
+                        </button>
+                        <button class="btn btn-ghost" (click)="closePanel()">{{ 'common.cancel' | translate }}</button>
+                      </div>
+                    </div>
+
+                    <p class="hint-error" *ngIf="!s.customer_id">
+                      {{ 'sales_list.ret_no_customer' | translate }}
+                    </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+          </ng-container>
+
+          <tr *ngIf="loading" class="loading-row">
+            <td colspan="8"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
+          </tr>
+          <tr *ngIf="!loading && sales.length === 0">
+            <td colspan="8" class="empty-row">{{ 'sales_list.empty' | translate }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
+  </div>
+
+  <!-- MOBILE LIST -->
+  <div class="mobile-list">
+    <div class="mobile-meta">
+      <span class="mobile-title">{{ 'sales_list.title' | translate }}</span>
+      <span class="count-badge">{{ total }}</span>
+    </div>
+    <!-- Mobile filter -->
+    <div class="sl-filter-bar" style="margin-bottom:8px">
+      <div class="sl-filter-row">
+        <div class="sl-fg">
+          <label class="sl-lbl">{{ 'sales_list.filter_from' | translate }}</label>
+          <input type="date" class="sl-inp" [(ngModel)]="filterDateFrom" (change)="applyFilter()" />
+        </div>
+        <div class="sl-fg">
+          <label class="sl-lbl">{{ 'sales_list.filter_to' | translate }}</label>
+          <input type="date" class="sl-inp" [(ngModel)]="filterDateTo" (change)="applyFilter()" />
+        </div>
+        <div class="sl-fg sl-fg-grow">
+          <label class="sl-lbl">{{ 'sales_list.filter_invoice' | translate }}</label>
+          <input class="sl-inp" [placeholder]="'sales_list.filter_invoice_ph' | translate" [(ngModel)]="filterInvoice" (keyup.enter)="applyFilter()" />
+        </div>
+        <div class="sl-fg">
+          <label class="sl-lbl">{{ 'sales_list.filter_status' | translate }}</label>
+          <select class="sl-inp" [(ngModel)]="filterStatus" (change)="applyFilter()">
+            <option value="">{{ 'sales_list.filter_all_status' | translate }}</option>
+            <option value="due">{{ 'sales_list.filter_has_due' | translate }}</option>
+            <option value="paid">{{ 'sales_list.filter_paid' | translate }}</option>
+          </select>
+        </div>
+        <div class="sl-fg sl-fg-grow sl-ac-wrap">
+          <label class="sl-lbl">{{ 'sales_list.filter_customer' | translate }}</label>
+          <div class="sl-ac-field">
+            <input class="sl-inp" [placeholder]="'sales_list.filter_customer_ph' | translate"
+              [(ngModel)]="customerSearch"
+              (input)="onCustomerInput()"
+              (focus)="onCustomerInput()"
+              autocomplete="off" />
+            <button *ngIf="selectedCustomer" class="sl-ac-clear" (click)="clearCustomer(); applyFilter()">×</button>
+            <div class="sl-ac-drop" *ngIf="showCustomerDrop">
+              <div class="sl-ac-item" *ngFor="let c of customerResults" (mousedown)="selectCustomer(c); applyFilter()">
+                {{ c.name }} <span class="sl-ac-sub">{{ c.phone }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sl-quick-row">
+        <div class="sl-qbts">
+          <button class="sl-qb" (click)="setToday()">{{ 'sales_list.btn_today' | translate }}</button>
+          <button class="sl-qb" (click)="setThisWeek()">{{ 'sales_list.btn_week_short' | translate }}</button>
+          <button class="sl-qb" (click)="setThisMonth()">{{ 'sales_list.btn_month_short' | translate }}</button>
+          <button class="sl-qb" (click)="setAllTime()">{{ 'sales_list.btn_all_short' | translate }}</button>
+          <button class="sl-qb sl-qb-clear" (click)="clearFilter()">{{ 'sales_list.btn_reset' | translate }}</button>
+        </div>
+      </div>
+    </div>
+    <div class="alert alert-success" *ngIf="successMsg" style="margin-bottom:8px"><span class="alert-icon">✓</span> {{ successMsg }}</div>
+    <div class="alert alert-error"   *ngIf="errorMsg"   style="margin-bottom:8px"><span class="alert-icon">✕</span> {{ errorMsg }}</div>
+    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
+    <div class="mobile-empty" *ngIf="!loading && sales.length === 0"><p>{{ 'sales_list.empty' | translate }}</p></div>
+
+    <div class="mobile-card" *ngFor="let s of sales" [class.mc-warn]="s.due_amount > 0" [class.mc-selected]="selectedSale?.id === s.id">
+      <div class="mc-top">
+        <div class="mc-name-wrap">
+          <div>
+            <div class="mc-title">{{ s.invoice_no }}</div>
+            <div class="mc-sub">{{ s.created_at | date:'dd MMM yyyy' }} · {{ s.customer_name || ('sales_list.walk_in' | translate) }}</div>
+          </div>
+        </div>
+        <span class="badge" [ngClass]="s.due_amount == 0 ? 'badge-success' : 'badge-warn'">
+          {{ s.due_amount == 0 ? ('sales_list.status_paid' | translate) : ('sales_list.status_due' | translate) }}
+        </span>
+      </div>
+      <div class="mc-grid">
+        <div class="mc-field"><span class="mc-lbl">{{ 'sales_list.col_total' | translate }}</span><span class="mc-val fw7">৳{{ s.total_amount | number:'1.0-2' }}</span></div>
+        <div class="mc-field"><span class="mc-lbl">{{ 'sales_list.col_paid' | translate }}</span><span class="mc-val">৳{{ s.paid_amount | number:'1.0-2' }}</span></div>
+        <div class="mc-field"><span class="mc-lbl">{{ 'sales_list.col_due' | translate }}</span>
+          <span class="mc-val" [class.danger]="s.due_amount > 0">৳{{ s.due_amount | number:'1.0-2' }}</span>
+        </div>
+      </div>
+      <div class="mc-actions">
+        <button class="btn btn-outline btn-sm" (click)="viewInvoice(s)">{{ 'sales_list.view_btn' | translate }}</button>
+        <button class="btn btn-success btn-sm" *ngIf="s.due_amount > 0" (click)="openPayment(s)"
+          [class.btn-ghost]="selectedSale?.id === s.id && activePanel === 'payment'">
+          {{ selectedSale?.id === s.id && activePanel === 'payment' ? ('common.cancel' | translate) : ('sales_list.pay_btn' | translate) }}
+        </button>
+        <button class="btn btn-danger btn-sm" *ngIf="s.items?.length > 0" (click)="openReturn(s)"
+          [class.btn-ghost]="selectedSale?.id === s.id && activePanel === 'return'">
+          {{ selectedSale?.id === s.id && activePanel === 'return' ? ('common.cancel' | translate) : ('sales_list.return_btn' | translate) }}
+        </button>
+      </div>
+
+      <!-- Mobile Payment Panel -->
+      <div class="mobile-inline-panel" *ngIf="selectedSale?.id === s.id && activePanel === 'payment'">
+        <div class="mip-title">{{ 'sales_list.panel_collect' | translate }}</div>
+        <div class="form-group"><label>{{ 'sales_list.pay_amount' | translate }}</label>
+          <div class="amount-row">
+            <input type="number" [(ngModel)]="payAmount" placeholder="0.00" [max]="maxDue" />
+            <button class="btn btn-ghost btn-sm" (click)="setFullPay()">{{ 'sales_list.pay_full' | translate }}</button>
+          </div>
+        </div>
+        <div class="form-group"><label>{{ 'sales_list.pay_discount' | translate }}</label>
+          <input type="number" [(ngModel)]="payDiscount" placeholder="0.00" [max]="maxDue" />
+        </div>
+        <div class="form-group"><label>{{ 'sales_list.pay_note' | translate }}</label>
+          <input type="text" [(ngModel)]="payNote" placeholder="…" />
+        </div>
+        <p class="hint-error" *ngIf="totalReduction > maxDue">{{ 'sales_list.pay_exceeds' | translate }} ৳{{ maxDue | number:'1.0-2' }}</p>
+        <div class="pay-actions" style="margin-top:8px">
+          <button class="btn btn-success btn-sm" style="flex:1;justify-content:center" (click)="submitPayment()" [disabled]="!payValid||paying">
+            <span *ngIf="paying" class="spinner"></span>{{ paying ? ('sales_list.pay_saving' | translate) : ('sales_list.pay_confirm' | translate) }}
+          </button>
+          <button class="btn btn-ghost btn-sm" (click)="closePanel()">{{ 'common.cancel' | translate }}</button>
+        </div>
+      </div>
+
+      <!-- Mobile Return Panel -->
+      <div class="mobile-inline-panel" *ngIf="selectedSale?.id === s.id && activePanel === 'return'">
+        <div class="mip-title">{{ 'sales_list.panel_return' | translate }}</div>
+        <div *ngFor="let item of returnItems" class="mb-return-item">
+          <div class="mb-ret-name">{{ item.product_name }}</div>
+          <div class="mb-ret-row">
+            <span class="muted" style="font-size:11px">{{ 'sales_list.ret_max' | translate }}: {{ item.max_qty }} &#64; ৳{{ item.rate }}</span>
+            <div class="amount-row" style="flex:1;justify-content:flex-end">
+              <input type="number" class="qty-input" [(ngModel)]="item.qty" min="0" [max]="item.max_qty" placeholder="0" />
+            </div>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:8px"><label>{{ 'sales_list.ret_reason' | translate }}</label>
+          <input type="text" [(ngModel)]="returnReason" [placeholder]="'sales_list.ret_reason_ph' | translate" />
+        </div>
+        <div class="ret-total-wrap" style="margin-top:6px">
+          <span class="ret-total-lbl">{{ 'sales_list.ret_return_total' | translate }}</span>
+          <span class="ret-total-val">৳{{ returnTotal | number:'1.0-2' }}</span>
+        </div>
+        <p class="hint-error" *ngIf="!s.customer_id">{{ 'sales_list.ret_no_customer' | translate }}</p>
+        <div class="pay-actions" style="margin-top:8px">
+          <button class="btn btn-danger btn-sm" style="flex:1;justify-content:center" (click)="submitReturn()" [disabled]="!returnValid||returning">
+            <span *ngIf="returning" class="spinner"></span>{{ returning ? ('sales_list.ret_processing' | translate) : ('sales_list.ret_confirm' | translate) }}
+          </button>
+          <button class="btn btn-ghost btn-sm" (click)="closePanel()">{{ 'common.cancel' | translate }}</button>
+        </div>
+      </div>
+    </div>
+
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
+  </div>
 
 </div>
