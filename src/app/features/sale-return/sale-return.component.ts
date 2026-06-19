@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, AfterViewInit, DestroyRef, inject, HostLi
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { Subject, EMPTY } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -37,7 +38,7 @@ export class SaleReturnComponent implements OnInit, AfterViewInit, OnDestroy {
   scanToast: { message: string; type: 'success' | 'error' } | null = null;
   private toastTimer: any;
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private toast: ToastService) {}
 
   ngOnInit() {
     this.searchSubject.pipe(
@@ -164,19 +165,19 @@ export class SaleReturnComponent implements OnInit, AfterViewInit, OnDestroy {
 
   save() {
     if (!this.customer_id || +this.customer_id === 0) {
-      alert('Please select a customer.');
+      this.toast.warning('Please select a customer.');
       return;
     }
     if (!this.sale_id) {
-      alert('Please enter the Sale ID to return against.');
+      this.toast.warning('Please enter the Sale ID to return against.');
       return;
     }
     if (!this.reason.trim()) {
-      alert('Please enter a reason for the return.');
+      this.toast.warning('Please enter a reason for the return.');
       return;
     }
     if (this.items.length === 0) {
-      alert('Please add at least one product to return.');
+      this.toast.warning('Please add at least one product to return.');
       return;
     }
 
@@ -191,9 +192,11 @@ export class SaleReturnComponent implements OnInit, AfterViewInit, OnDestroy {
       }))
     };
 
+    this.toast.startSaving();
     this.api.post('/sale-returns/', payload).subscribe({
       next: (res: any) => {
-        alert(`Return recorded: ${res.return_no}`);
+        this.toast.stopSaving();
+        this.toast.success(`Return recorded: ${res.return_no}`);
         this.items = [];
         this.customer_id = 0;
         this.sale_id = null;
@@ -201,7 +204,7 @@ export class SaleReturnComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loadReturns();
         this.searchInputRef.nativeElement.focus();
       },
-      error: (err) => alert(err?.error?.detail || 'Failed to save return')
+      error: (err) => { this.toast.stopSaving(); this.toast.error(err?.error?.detail || 'Failed to save return'); }
     });
   }
 }

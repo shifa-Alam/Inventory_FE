@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, AfterViewInit, DestroyRef, inject, HostLi
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { Subject, EMPTY } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -35,7 +36,7 @@ export class ProductWasteComponent implements OnInit, AfterViewInit, OnDestroy {
   scanToast: { message: string; type: 'success' | 'error' } | null = null;
   private toastTimer: any;
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private toast: ToastService) {}
 
   ngOnInit() {
     this.searchSubject.pipe(
@@ -144,19 +145,19 @@ export class ProductWasteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   save() {
     if (!this.selectedProduct) {
-      alert('Please search and select a product.');
+      this.toast.warning('Please search and select a product.');
       return;
     }
     if (!this.quantity || this.quantity < 1) {
-      alert('Quantity must be at least 1.');
+      this.toast.warning('Quantity must be at least 1.');
       return;
     }
     if (this.quantity > this.selectedProduct.current_stock) {
-      alert(`Not enough stock. Available: ${this.selectedProduct.current_stock}`);
+      this.toast.error(`Not enough stock. Available: ${this.selectedProduct.current_stock}`);
       return;
     }
     if (!this.reason.trim()) {
-      alert('Please enter a reason for the waste.');
+      this.toast.warning('Please enter a reason for the waste.');
       return;
     }
 
@@ -166,15 +167,17 @@ export class ProductWasteComponent implements OnInit, AfterViewInit, OnDestroy {
       reason: this.reason.trim()
     };
 
+    this.toast.startSaving();
     this.api.post('/product-wastes/', payload).subscribe({
       next: (res: any) => {
-        alert(`Waste recorded: ${res.waste_no}. Remaining stock: ${res.remaining_stock}`);
+        this.toast.stopSaving();
+        this.toast.success(`Waste recorded: ${res.waste_no}. Remaining stock: ${res.remaining_stock}`);
         this.clearProduct();
         this.reason = '';
         this.quantity = 1;
         this.loadWastes();
       },
-      error: (err) => alert(err?.error?.detail || 'Failed to save waste record')
+      error: (err) => { this.toast.stopSaving(); this.toast.error(err?.error?.detail || 'Failed to save waste record'); }
     });
   }
 }

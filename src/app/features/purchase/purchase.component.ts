@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, DestroyRef, inject, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { ApiService } from '../../core/services/api.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, EMPTY } from 'rxjs';
@@ -32,7 +33,7 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
   scanToast: { message: string; type: 'success' | 'error' } | null = null;
   private toastTimer: any;
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private toast: ToastService) {}
 
   ngOnInit() {
     this.searchSubject.pipe(
@@ -150,7 +151,7 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectProduct(product: any) {
     if (this.items.find(i => i.product_id === product.id)) {
-      alert('Product already added!');
+      this.toast.warning('Product already added!');
       return;
     }
     this.items.push({
@@ -172,11 +173,11 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
 
   save() {
     if (!this.supplier_id || +this.supplier_id === 0) {
-      alert('Please select a supplier before saving.');
+      this.toast.warning('Please select a supplier before saving.');
       return;
     }
     if (this.items.length === 0) {
-      alert('Please add at least one product.');
+      this.toast.warning('Please add at least one product.');
       return;
     }
     const payload = {
@@ -188,14 +189,15 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
       })),
       total_amount: this.getTotal()
     };
+    this.toast.startSaving();
     this.api.post('/purchases/', payload).subscribe({
       next: () => {
-        alert('Purchase Saved');
+        this.toast.stopSaving(); this.toast.success('Purchase Saved');
         this.items = [];
         this.supplier_id = 0;
         this.searchInputRef.nativeElement.focus();
       },
-      error: (err) => console.error('Failed to save purchase', err)
+      error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to save purchase'); console.error(err); }
     });
   }
 }

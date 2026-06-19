@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, AfterViewInit, DestroyRef, inject, HostLi
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { Subject, EMPTY } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -33,7 +34,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   scanToast: { message: string; type: 'success' | 'error' } | null = null;
   private toastTimer: any;
 
-  constructor(private api: ApiService) { }
+  constructor(private api: ApiService, private toast: ToastService) { }
 
   ngOnInit() {
     this.searchSubject.pipe(
@@ -172,11 +173,11 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectProduct(product: any) {
     if (product.current_stock <= 0) {
-      alert(`"${product.name}" is out of stock.`);
+      this.toast.error(`"${product.name}" is out of stock.`);
       return;
     }
     if (this.items.find(i => i.product_id === product.id)) {
-      alert('Product already added!');
+      this.toast.warning('Product already added!');
       this.filteredProducts = [];
       this.productSearch = '';
       this.selectedIndex = -1;
@@ -211,15 +212,16 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
         rate: +i.rate
       }))
     };
+    this.toast.startSaving();
     this.api.post('/sales/', payload).subscribe({
       next: () => {
-        alert('Sale Completed Successfully');
+        this.toast.stopSaving(); this.toast.success('Sale Completed Successfully');
         this.customer_id = 0;
         this.paid_amount = 0;
         this.items = [];
         this.searchInputRef.nativeElement.focus();
       },
-      error: (err) => console.error('Failed to submit sale', err)
+      error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to submit sale'); console.error(err); }
     });
   }
 }

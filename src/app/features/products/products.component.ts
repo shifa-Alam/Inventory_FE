@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-products',
@@ -28,7 +29,7 @@ export class ProductsComponent implements OnInit {
 
   newProduct = { id: 0, name: '', sku: '', category_id: 0, purchase_price: 0, sale_price: 0, current_stock: 0 };
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private toast: ToastService) {}
 
   ngOnInit() {
     this.load();
@@ -67,17 +68,19 @@ export class ProductsComponent implements OnInit {
   save() { this.newProduct.id ? this.update() : this.create(); }
 
   create() {
+    this.toast.startSaving();
     this.api.post('/products/', this.newProduct).subscribe({
-      next: () => { alert('Product Added'); this.load(); this.reset(); },
-      error: (err) => console.error('Failed to create product', err)
+      next: () => { this.toast.stopSaving(); this.toast.success('Product Added'); this.load(); this.reset(); },
+      error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to create product'); console.error(err); }
     });
   }
 
   update() {
     const { name, sku, category_id, purchase_price, sale_price } = this.newProduct;
+    this.toast.startSaving();
     this.api.put(`/products/${this.newProduct.id}`, { name, sku, category_id, purchase_price, sale_price }).subscribe({
-      next: () => { alert('Product Updated'); this.load(); this.reset(); },
-      error: (err) => console.error('Failed to update product', err)
+      next: () => { this.toast.stopSaving(); this.toast.success('Product Updated'); this.load(); this.reset(); },
+      error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to update product'); console.error(err); }
     });
   }
 

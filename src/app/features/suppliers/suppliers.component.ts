@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-suppliers',
@@ -25,7 +26,7 @@ export class SuppliersComponent implements OnInit {
 
   newSupplier = { name: '', phone: '', address: '', opening_due: 0 };
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private toast: ToastService) {}
 
   ngOnInit() { this.load(); }
 
@@ -54,13 +55,14 @@ export class SuppliersComponent implements OnInit {
   }
 
   save() {
+    this.toast.startSaving();
     this.api.post('/suppliers/', this.newSupplier).subscribe({
       next: () => {
-        alert('Supplier Added');
+        this.toast.stopSaving(); this.toast.success('Supplier Added');
         this.newSupplier = { name: '', phone: '', address: '', opening_due: 0 };
         this.load();
       },
-      error: (err) => console.error('Failed to save supplier', err)
+      error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to save supplier'); console.error(err); }
     });
   }
 }

@@ -4,11 +4,12 @@ import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/rou
 import { TranslatePipe } from '@ngx-translate/core';
 import { LanguageService } from '../core/services/language.service';
 import { AuthService } from '../core/services/auth.service';
+import { ToastComponent } from '../shared/components/toast/toast.component';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, ToastComponent],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.css'
 })

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-customers',
@@ -26,7 +27,7 @@ export class CustomersComponent implements OnInit {
 
   newCustomer = { id: 0, name: '', phone: '', address: '', credit_limit: 0, current_due: 0 };
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private toast: ToastService) {}
 
   ngOnInit() { this.load(); }
 
@@ -54,9 +55,10 @@ export class CustomersComponent implements OnInit {
   save() { this.newCustomer.id > 0 ? this.updateCustomer() : this.createCustomer(); }
 
   createCustomer() {
+    this.toast.startSaving();
     this.api.post('/customers/', this.newCustomer).subscribe({
-      next: () => { alert('Customer Added'); this.load(); this.reset(); },
-      error: (err) => console.error('Failed to create customer', err)
+      next: () => { this.toast.stopSaving(); this.toast.success('Customer Added'); this.load(); this.reset(); },
+      error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to create customer'); console.error(err); }
     });
   }
 
@@ -64,9 +66,10 @@ export class CustomersComponent implements OnInit {
 
   updateCustomer() {
     const { name, phone, address, credit_limit, current_due } = this.newCustomer;
+    this.toast.startSaving();
     this.api.put(`/customers/${this.newCustomer.id}`, { name, phone, address, credit_limit, current_due }).subscribe({
-      next: () => { alert('Customer Updated'); this.load(); this.reset(); },
-      error: (err) => console.error('Failed to update customer', err)
+      next: () => { this.toast.stopSaving(); this.toast.success('Customer Updated'); this.load(); this.reset(); },
+      error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to update customer'); console.error(err); }
     });
   }
 
