@@ -103,8 +103,16 @@
     <!-- ── Totals ── -->
     <div class="totals-wrap">
       <div class="totals-box">
-        <div class="t-row">
+        <div class="t-row" *ngIf="invoice?.discount_amount > 0">
           <span class="t-label">{{ 'invoice.subtotal' | translate }}</span>
+          <span class="t-val">৳&thinsp;{{ invoice?.subtotal | number }}</span>
+        </div>
+        <div class="t-row t-disc" *ngIf="invoice?.discount_amount > 0">
+          <span class="t-label">{{ 'invoice.discount' | translate }}</span>
+          <span class="t-val disc-val">−&thinsp;৳&thinsp;{{ invoice?.discount_amount | number }}</span>
+        </div>
+        <div class="t-row" [class.t-net]="invoice?.discount_amount > 0">
+          <span class="t-label">{{ invoice?.discount_amount > 0 ? ('invoice.net_total' | translate) : ('invoice.subtotal' | translate) }}</span>
           <span class="t-val">৳&thinsp;{{ invoice?.total_amount | number }}</span>
         </div>
         <div class="t-row t-paid">

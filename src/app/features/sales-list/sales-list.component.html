@@ -79,6 +79,8 @@
             <th>{{ 'sales_list.col_invoice' | translate }}</th>
             <th>{{ 'sales_list.col_date' | translate }}</th>
             <th>{{ 'sales_list.col_customer' | translate }}</th>
+            <th class="right">{{ 'sales_list.col_subtotal' | translate }}</th>
+            <th class="right disc-col">{{ 'sales_list.col_discount' | translate }}</th>
             <th class="right">{{ 'sales_list.col_total' | translate }}</th>
             <th class="right">{{ 'sales_list.col_paid' | translate }}</th>
             <th class="right">{{ 'sales_list.col_due' | translate }}</th>
@@ -94,7 +96,12 @@
               <td class="bold">{{ s.invoice_no }}</td>
               <td class="muted">{{ s.created_at | date:'dd MMM yyyy' }}</td>
               <td>{{ s.customer_name || ('sales_list.walk_in' | translate) }}</td>
-              <td class="right">৳{{ s.total_amount | number:'1.0-2' }}</td>
+              <td class="right muted">৳{{ s.subtotal | number:'1.0-2' }}</td>
+              <td class="right disc-col">
+                <span *ngIf="s.discount_amount > 0" class="disc-chip">−৳{{ s.discount_amount | number:'1.0-2' }}</span>
+                <span *ngIf="!s.discount_amount" class="muted">—</span>
+              </td>
+              <td class="right fw7">৳{{ s.total_amount | number:'1.0-2' }}</td>
               <td class="right">৳{{ s.paid_amount | number:'1.0-2' }}</td>
               <td class="right">
                 <span *ngIf="s.due_amount > 0" class="due-chip">৳{{ s.due_amount | number:'1.0-2' }}</span>
@@ -129,7 +136,7 @@
 
             <!-- PAYMENT PANEL -->
             <tr *ngIf="selectedSale?.id === s.id && activePanel === 'payment'" class="panel-row">
-              <td colspan="8">
+              <td colspan="10">
                 <div class="inline-panel pay-panel-wrap">
                   <div class="panel-header">
                     <span class="panel-title">{{ 'sales_list.panel_collect' | translate }} — {{ s.invoice_no }}</span>
@@ -137,6 +144,14 @@
                   </div>
                   <div class="panel-body">
                     <div class="pay-info-strip">
+                      <div class="pis-item" *ngIf="s.discount_amount > 0">
+                        <span class="pis-lbl">{{ 'sales_list.col_subtotal' | translate }}</span>
+                        <span class="pis-val muted">৳{{ s.subtotal | number:'1.0-2' }}</span>
+                      </div>
+                      <div class="pis-item" *ngIf="s.discount_amount > 0">
+                        <span class="pis-lbl">{{ 'sales_list.col_discount' | translate }}</span>
+                        <span class="pis-val disc-val">−৳{{ s.discount_amount | number:'1.0-2' }}</span>
+                      </div>
                       <div class="pis-item">
                         <span class="pis-lbl">{{ 'sales_list.pay_total' | translate }}</span>
                         <span class="pis-val">৳{{ s.total_amount | number:'1.0-2' }}</span>
@@ -200,7 +215,7 @@
 
             <!-- RETURN PANEL -->
             <tr *ngIf="selectedSale?.id === s.id && activePanel === 'return'" class="panel-row">
-              <td colspan="8">
+              <td colspan="10">
                 <div class="inline-panel ret-panel-wrap">
                   <div class="panel-header">
                     <span class="panel-title">{{ 'sales_list.panel_return' | translate }} — {{ s.invoice_no }}</span>
@@ -270,10 +285,10 @@
           </ng-container>
 
           <tr *ngIf="loading" class="loading-row">
-            <td colspan="8"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
+            <td colspan="10"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
           </tr>
           <tr *ngIf="!loading && sales.length === 0">
-            <td colspan="8" class="empty-row">{{ 'sales_list.empty' | translate }}</td>
+            <td colspan="10" class="empty-row">{{ 'sales_list.empty' | translate }}</td>
           </tr>
         </tbody>
       </table>
@@ -355,6 +370,14 @@
         </span>
       </div>
       <div class="mc-grid">
+        <div class="mc-field" *ngIf="s.discount_amount > 0">
+          <span class="mc-lbl">{{ 'sales_list.col_subtotal' | translate }}</span>
+          <span class="mc-val muted">৳{{ s.subtotal | number:'1.0-2' }}</span>
+        </div>
+        <div class="mc-field" *ngIf="s.discount_amount > 0">
+          <span class="mc-lbl">{{ 'sales_list.col_discount' | translate }}</span>
+          <span class="mc-val disc-val">−৳{{ s.discount_amount | number:'1.0-2' }}</span>
+        </div>
         <div class="mc-field"><span class="mc-lbl">{{ 'sales_list.col_total' | translate }}</span><span class="mc-val fw7">৳{{ s.total_amount | number:'1.0-2' }}</span></div>
         <div class="mc-field"><span class="mc-lbl">{{ 'sales_list.col_paid' | translate }}</span><span class="mc-val">৳{{ s.paid_amount | number:'1.0-2' }}</span></div>
         <div class="mc-field"><span class="mc-lbl">{{ 'sales_list.col_due' | translate }}</span>

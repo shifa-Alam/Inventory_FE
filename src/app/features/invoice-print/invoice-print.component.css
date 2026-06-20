@@ -242,6 +242,9 @@
 .t-label { font-size: 13px; color: #64748b; }
 .t-val   { font-size: 13px; font-weight: 600; color: #1e293b; }
 .t-paid .t-val { color: #16a34a; }
+.t-disc .t-val { color: #d97706; }
+.t-net { border-top: 1px solid #e2e8f0; padding-top: 6px; }
+.disc-val { color: #d97706; }
 
 .t-grand {
   display: flex;

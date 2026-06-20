@@ -31,6 +31,12 @@
 /* Selected row */
 .row-selected td { background: var(--primary-light) !important; }
 
+/* Discount chip */
+.disc-chip { display: inline-block; background: #fef3c7; color: #92400e; border-radius: 4px; padding: 1px 5px; font-size: 11px; font-weight: 600; }
+.disc-col { min-width: 90px; }
+.disc-val { color: #d97706 !important; }
+.pis-val.muted { color: var(--text-light) !important; font-weight: 500; }
+
 /* Due chip */
 .due-chip {
   display: inline-block;
