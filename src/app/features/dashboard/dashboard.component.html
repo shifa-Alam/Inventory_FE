@@ -217,6 +217,34 @@
 
     </div>
 
+    <!-- ── ROW 3b: Slow-moving items ───────────────────────────── -->
+    <div class="card slow-card">
+      <div class="card-head">
+        <div>
+          <span class="card-ttl">Slow-Moving Items</span>
+          <span class="card-sub">In stock but not selling this month</span>
+        </div>
+        <button class="link-btn" (click)="router.navigate(['/products'])">View all</button>
+      </div>
+      <div *ngIf="data.slow_moving_items?.length">
+        <div class="slow-grid">
+          <div class="slow-item" *ngFor="let item of data.slow_moving_items">
+            <div class="slow-name">{{ item.name }}</div>
+            <div class="slow-meta">
+              <span class="slow-stock">{{ item.stock }} in stock</span>
+              <span class="slow-sold" [class.sold-zero]="item.month_qty === 0" [class.sold-low]="item.month_qty > 0">
+                {{ item.month_qty === 0 ? 'No sales' : item.month_qty + ' sold' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="all-good" *ngIf="!data.slow_moving_items?.length">
+        <svg width="28" height="28" fill="none" stroke="#22c55e" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span>All products are selling well!</span>
+      </div>
+    </div>
+
     <!-- ── ROW 4: Recent Sales ───────────────────────────────── -->
     <div class="card recent-card">
       <div class="card-head">
