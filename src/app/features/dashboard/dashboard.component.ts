@@ -16,6 +16,7 @@ export class DashboardComponent implements OnInit {
 
   data: any = {};
   loading = false;
+  today = new Date();
 
   constructor(private api: ApiService, public router: Router) {}
 
@@ -27,26 +28,20 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  /* ── Chart helpers ─────────────────────────────────────────── */
-
-  get chartBars(): { label: string; amount: number; count: number; height: number; isToday: boolean }[] {
+  get chartBars(): { label: string; amount: number; collection: number; count: number; height: number; collectHeight: number; isToday: boolean }[] {
     const rows: any[] = this.data.sales_chart ?? [];
     if (!rows.length) return [];
-    const max = Math.max(...rows.map(r => r.amount), 1);
+    const max = Math.max(...rows.map(r => Math.max(r.amount, r.collection ?? 0)), 1);
     const todayStr = localDateStr();
     return rows.map(r => ({
-      label:   r.label,
-      amount:  r.amount,
-      count:   r.count,
-      height:  Math.max(4, Math.round((r.amount / max) * 100)),
-      isToday: r.date === todayStr
+      label:         r.label,
+      amount:        r.amount,
+      collection:    r.collection ?? 0,
+      count:         r.count,
+      height:        Math.max(r.amount > 0 ? 4 : 0, Math.round((r.amount / max) * 100)),
+      collectHeight: Math.max(r.collection > 0 ? 4 : 0, Math.round(((r.collection ?? 0) / max) * 100)),
+      isToday:       r.date === todayStr
     }));
-  }
-
-  get chartMaxLabel(): string {
-    const rows: any[] = this.data.sales_chart ?? [];
-    const max = Math.max(...rows.map(r => r.amount), 0);
-    return '৳' + this.fmt(max);
   }
 
   fmt(n: number): string {
@@ -55,11 +50,15 @@ export class DashboardComponent implements OnInit {
     return Math.round(n).toString();
   }
 
-  /* top products bar width */
   topBarWidth(rev: number): number {
     const rows: any[] = this.data.top_products ?? [];
     const max = Math.max(...rows.map((r: any) => r.revenue), 1);
     return Math.round((rev / max) * 100);
+  }
+
+  stockBarWidth(stock: number): number {
+    const max = Math.max(...(this.data.low_stock_items ?? []).map((i: any) => i.max_stock ?? 50), 50);
+    return Math.max(2, Math.round((stock / max) * 100));
   }
 
   get profitPositive(): boolean { return (this.data.profit ?? 0) >= 0; }

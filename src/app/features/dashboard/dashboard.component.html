@@ -1,228 +1,255 @@
 <div class="page">
 
+  <!-- ── Header ───────────────────────────────────────────────── -->
   <div class="page-header">
     <div>
       <h2>{{ 'dashboard.title' | translate }}</h2>
-
-      <p class="sub">{{ 'dashboard.subtitle' | translate }} · {{ data.today_invoices ?? 0 }} {{ 'dashboard.invoices'
-        | translate }}</p>
+      <p class="sub">{{ today | date:'EEEE, d MMMM y' }} &nbsp;·&nbsp; {{ data.month_invoices ?? 0 }} {{ 'dashboard.invoices' | translate }} {{ 'dashboard.this_month' | translate }}</p>
     </div>
     <button class="btn btn-ghost btn-sm" (click)="ngOnInit()">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <polyline points="23 4 23 10 17 10" />
-        <path d="M20.49 15a9 9 0 1 1-.49-4.5" />
+        <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.49-4.5"/>
       </svg>
       {{ 'common.refresh' | translate }}
     </button>
   </div>
 
   <div *ngIf="loading" class="db-loading">
-    <div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span>
+    <div class="loading-spinner"></div>
+    <span class="loading-text">{{ 'common.loading' | translate }}</span>
   </div>
 
   <ng-container *ngIf="!loading">
 
-    <!-- ── ROW 1 : KPIs ───────────────────────────────────────── -->
+    <!-- ── ROW 1: KPI cards ──────────────────────────────────── -->
     <div class="kpi-row">
 
       <div class="kpi-card blue">
-        <div class="kpi-icon">
-          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M12 6v6l4 2" />
-          </svg>
+        <div class="kpi-top">
+          <div class="kpi-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <span class="trend-badge" *ngIf="data.today_trend != null" [class.up]="data.today_trend >= 0" [class.down]="data.today_trend < 0">
+            {{ data.today_trend >= 0 ? '▲' : '▼' }} {{ data.today_trend | number:'1.0-1' }}%
+          </span>
         </div>
-        <div class="kpi-body">
-          <span class="kpi-lbl">{{ 'dashboard.today_sales' | translate }}</span>
-          <span class="kpi-val">৳{{ fmt(data.today_sales ?? 0) }}</span>
-          <span class="kpi-sub">{{ data.today_invoices ?? 0 }} {{ 'dashboard.invoices' | translate }}</span>
-        </div>
+        <div class="kpi-val">৳{{ fmt(data.today_sales ?? 0) }}</div>
+        <div class="kpi-lbl">{{ 'dashboard.today_sales' | translate }}</div>
+        <div class="kpi-sub">{{ data.today_invoices ?? 0 }} invoices · vs yesterday ৳{{ fmt(data.yesterday_sales ?? 0) }}</div>
       </div>
 
       <div class="kpi-card green">
-        <div class="kpi-icon">
-          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <rect x="1" y="4" width="22" height="16" rx="2" />
-            <line x1="1" y1="10" x2="23" y2="10" />
-          </svg>
+        <div class="kpi-top">
+          <div class="kpi-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          <span class="rate-badge">{{ data.collection_rate ?? 0 | number:'1.0-1' }}% collected</span>
         </div>
-        <div class="kpi-body">
-          <span class="kpi-lbl">{{ 'dashboard.today_collections' | translate }}</span>
-          <span class="kpi-val">৳{{ fmt(data.today_collections ?? 0) }}</span>
-          <span class="kpi-sub">{{ 'dashboard.cash_received' | translate }}</span>
-        </div>
+        <div class="kpi-val">৳{{ fmt(data.month_collections ?? 0) }}</div>
+        <div class="kpi-lbl">{{ 'dashboard.today_collections' | translate }}</div>
+        <div class="kpi-sub">Today ৳{{ fmt(data.today_collections ?? 0) }} · Month total</div>
       </div>
 
       <div class="kpi-card violet">
-        <div class="kpi-icon">
-          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-          </svg>
+        <div class="kpi-top">
+          <div class="kpi-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <span class="trend-badge" *ngIf="data.month_trend != null" [class.up]="data.month_trend >= 0" [class.down]="data.month_trend < 0">
+            {{ data.month_trend >= 0 ? '▲' : '▼' }} {{ data.month_trend | number:'1.0-1' }}%
+          </span>
         </div>
-        <div class="kpi-body">
-          <span class="kpi-lbl">{{ 'dashboard.month_sales' | translate }}</span>
-          <span class="kpi-val">৳{{ fmt(data.month_sales ?? 0) }}</span>
-          <span class="kpi-sub">{{ 'dashboard.total_purchase' | translate }} ৳{{ fmt(data.total_purchase ?? 0) }}</span>
-        </div>
+        <div class="kpi-val">৳{{ fmt(data.month_sales ?? 0) }}</div>
+        <div class="kpi-lbl">{{ 'dashboard.month_sales' | translate }}</div>
+        <div class="kpi-sub">{{ data.month_invoices ?? 0 }} invoices · avg ৳{{ fmt(data.avg_order_value ?? 0) }}</div>
       </div>
 
       <div class="kpi-card" [ngClass]="profitPositive ? 'teal' : 'rose'">
-        <div class="kpi-icon">
-          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <line x1="12" y1="1" x2="12" y2="23" />
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-          </svg>
+        <div class="kpi-top">
+          <div class="kpi-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <span class="margin-badge">{{ data.profit_margin ?? 0 | number:'1.0-1' }}% margin</span>
         </div>
-        <div class="kpi-body">
-          <span class="kpi-lbl">{{ 'dashboard.net_profit' | translate }}</span>
-          <span class="kpi-val">{{ profitPositive ? '+' : '' }}৳{{ fmt(data.profit ?? 0) }}</span>
-          <span class="kpi-sub">{{ 'dashboard.this_month' | translate }}</span>
-        </div>
+        <div class="kpi-val">{{ profitPositive ? '+' : '' }}৳{{ fmt(data.profit ?? 0) }}</div>
+        <div class="kpi-lbl">{{ 'dashboard.net_profit' | translate }}</div>
+        <div class="kpi-sub">Purchase ৳{{ fmt(data.total_purchase ?? 0) }} · {{ 'dashboard.this_month' | translate }}</div>
       </div>
 
       <div class="kpi-card amber">
-        <div class="kpi-icon">
-          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-            <line x1="12" y1="9" x2="12" y2="13" />
-            <line x1="12" y1="17" x2="12.01" y2="17" />
-          </svg>
+        <div class="kpi-top">
+          <div class="kpi-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <span class="warn-badge" *ngIf="data.top_due_customers?.length">{{ data.top_due_customers.length }} customers</span>
         </div>
-        <div class="kpi-body">
-          <span class="kpi-lbl">{{ 'dashboard.outstanding_due' | translate }}</span>
-          <span class="kpi-val">৳{{ fmt(data.total_outstanding_due ?? 0) }}</span>
-          <span class="kpi-sub">{{ 'dashboard.all_customers' | translate }}</span>
-        </div>
+        <div class="kpi-val">৳{{ fmt(data.total_outstanding_due ?? 0) }}</div>
+        <div class="kpi-lbl">{{ 'dashboard.outstanding_due' | translate }}</div>
+        <div class="kpi-sub">{{ 'dashboard.all_customers' | translate }}</div>
       </div>
 
       <div class="kpi-card slate">
-        <div class="kpi-icon">
-          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
-            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
-          </svg>
+        <div class="kpi-top">
+          <div class="kpi-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+          </div>
+          <span class="low-badge" *ngIf="data.low_stock > 0">{{ data.low_stock }} low</span>
         </div>
-        <div class="kpi-body">
-          <span class="kpi-lbl">{{ 'dashboard.stock_value' | translate }}</span>
-          <span class="kpi-val">৳{{ fmt(data.stock_value ?? 0) }}</span>
-          <span class="kpi-sub">{{ data.total_products ?? 0 }} {{ 'dashboard.total_products' | translate }} · {{
-            data.total_customers ?? 0 }} {{ 'dashboard.customers' | translate }}</span>
-        </div>
+        <div class="kpi-val">৳{{ fmt(data.stock_value ?? 0) }}</div>
+        <div class="kpi-lbl">{{ 'dashboard.stock_value' | translate }}</div>
+        <div class="kpi-sub">{{ data.total_products ?? 0 }} products · {{ data.total_customers ?? 0 }} customers</div>
       </div>
 
     </div>
 
-    <!-- ── ROW 2 : Chart + Top Products ────────────────────────── -->
-    <div class="mid-row">
-
-      <div class="card chart-card">
-        <div class="card-head">
-          <span class="card-ttl">{{ 'dashboard.today_sales_trend' | translate }}</span>
-          <span class="card-sub">{{ 'dashboard.daily_trend' | translate }}</span>
+    <!-- ── ROW 2: Chart ──────────────────────────────────────── -->
+    <div class="chart-card card">
+      <div class="card-head">
+        <div>
+          <span class="card-ttl">7-Day Sales &amp; Collection Trend</span>
+          <span class="card-sub">Daily sales (blue) vs cash collected (green)</span>
         </div>
-        <div class="chart-wrap" *ngIf="chartBars.length">
-          <div class="chart-y-label">{{ chartMaxLabel }}</div>
-          <div class="bar-group">
-            <div class="bar-col" *ngFor="let b of chartBars" [class.bar-today]="b.isToday"
-              [title]="b.label + ': ৳' + (b.amount | number:'1.0-2') + ' (' + b.count + ' ' + ('dashboard.invoices' | translate) + ')'">
-              <div class="bar-fill" [style.height.%]="b.height"></div>
-              <span class="bar-lbl">{{ b.label }}</span>
+        <div class="chart-legend">
+          <span class="legend-dot blue-dot"></span><span>Sales</span>
+          <span class="legend-dot green-dot"></span><span>Collected</span>
+        </div>
+      </div>
+      <div class="chart-body" *ngIf="chartBars.length">
+        <div class="chart-cols">
+          <div class="chart-col" *ngFor="let b of chartBars" [class.col-today]="b.isToday">
+            <div class="bar-amounts">
+              <span class="bar-amount-lbl" *ngIf="b.amount > 0">৳{{ fmt(b.amount) }}</span>
+            </div>
+            <div class="dual-bar">
+              <div class="bar-sales" [style.height.%]="b.height" [title]="'Sales: ৳' + b.amount"></div>
+              <div class="bar-collect" [style.height.%]="b.collectHeight" [title]="'Collected: ৳' + b.collection"></div>
+            </div>
+            <div class="bar-footer">
+              <span class="bar-day">{{ b.label }}</span>
+              <span class="bar-count" *ngIf="b.count">{{ b.count }}</span>
             </div>
           </div>
-          <div class="chart-y-label zero">৳0</div>
         </div>
-        <div class="empty-note" *ngIf="!chartBars.length">{{ 'dashboard.no_sales' | translate }}</div>
       </div>
+      <div class="empty-note" *ngIf="!chartBars.length">No sales data for this period.</div>
+    </div>
 
-      <div class="card top-card">
+    <!-- ── ROW 3: Top Products + Due Customers ───────────────── -->
+    <div class="mid-row">
+
+      <div class="card">
         <div class="card-head">
           <span class="card-ttl">{{ 'dashboard.top_products' | translate }}</span>
           <span class="card-sub">{{ 'dashboard.top_products_sub' | translate }}</span>
         </div>
-        <div class="top-list" *ngIf="data.top_products?.length">
+        <div *ngIf="data.top_products?.length">
           <div class="top-item" *ngFor="let p of data.top_products; let i = index">
             <span class="top-rank">#{{ i + 1 }}</span>
             <div class="top-info">
-              <div class="top-name">{{ p.name }}</div>
+              <div class="top-name-row">
+                <span class="top-name">{{ p.name }}</span>
+                <span class="margin-tag" [class.margin-good]="p.margin >= 20" [class.margin-ok]="p.margin >= 10 && p.margin < 20" [class.margin-low]="p.margin < 10">{{ p.margin | number:'1.0-1' }}%</span>
+              </div>
               <div class="top-bar-wrap">
                 <div class="top-bar-fill" [style.width.%]="topBarWidth(p.revenue)"></div>
               </div>
             </div>
             <div class="top-stats">
               <span class="top-rev">৳{{ fmt(p.revenue) }}</span>
-              <span class="top-qty">{{ p.qty }} {{ 'dashboard.units' | translate }}</span>
+              <span class="top-qty">{{ p.qty }} units</span>
             </div>
           </div>
         </div>
-        <div class="empty-note" *ngIf="!data.top_products?.length">{{ 'dashboard.no_top_products' | translate }}</div>
+        <div class="empty-note" *ngIf="!data.top_products?.length">No sales this month.</div>
       </div>
 
-    </div>
-
-    <!-- ── ROW 3 : Recent Sales + Low Stock ─────────────────────── -->
-    <div class="bot-row">
-
-      <div class="card recent-card">
+      <div class="card">
         <div class="card-head">
-          <span class="card-ttl">{{ 'dashboard.recent_sales' | translate }}</span>
-          <button class="link-btn" (click)="router.navigate(['/sales'])">{{ 'dashboard.view_all' | translate }}</button>
+          <span class="card-ttl">Top Due Customers</span>
+          <button class="link-btn" (click)="router.navigate(['/customers'])">View all</button>
         </div>
-        <table class="db-table">
-          <thead>
-            <tr>
-              <th>{{ 'dashboard.col_invoice' | translate }}</th>
-              <th>{{ 'dashboard.col_customer' | translate }}</th>
-              <th class="right">{{ 'dashboard.col_total' | translate }}</th>
-              <th>{{ 'dashboard.col_due' | translate }}</th>
-              <th>{{ 'dashboard.col_time' | translate }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let s of data.recent_sales">
-              <td class="bold mono">{{ s.invoice_no }}</td>
-              <td class="muted">{{ s.customer_name }}</td>
-              <td class="right fw7">৳{{ s.total | number:'1.0-2' }}</td>
-              <td>
-                <span *ngIf="s.due > 0" class="due-pill">৳{{ s.due | number:'1.0-2' }}</span>
-                <span *ngIf="s.due === 0" class="paid-pill">{{ 'common.paid' | translate }}</span>
-              </td>
-              <td class="muted">{{ s.created_at | date:'dd MMM, hh:mm a' }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="empty-note" *ngIf="!data.recent_sales?.length">{{ 'dashboard.no_recent_sales' | translate }}</div>
+        <div *ngIf="data.top_due_customers?.length">
+          <div class="due-item" *ngFor="let c of data.top_due_customers">
+            <div class="due-avatar">{{ c.name.charAt(0) }}</div>
+            <div class="due-info">
+              <div class="due-name">{{ c.name }}</div>
+              <div class="due-phone">{{ c.phone }}</div>
+            </div>
+            <div class="due-amount">৳{{ fmt(c.due) }}</div>
+          </div>
+        </div>
+        <div class="all-good" *ngIf="!data.top_due_customers?.length">
+          <svg width="28" height="28" fill="none" stroke="#22c55e" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <span>No outstanding dues!</span>
+        </div>
       </div>
 
-      <div class="card stock-card">
+      <div class="card">
         <div class="card-head">
           <span class="card-ttl">
             {{ 'dashboard.low_stock_alerts' | translate }}
             <span class="alert-badge" *ngIf="data.low_stock > 0">{{ data.low_stock }}</span>
           </span>
-          <button class="link-btn" (click)="router.navigate(['/products'])">{{ 'dashboard.manage' | translate
-            }}</button>
+          <button class="link-btn" (click)="router.navigate(['/products'])">{{ 'dashboard.manage' | translate }}</button>
         </div>
         <div *ngIf="data.low_stock_items?.length">
           <div class="stock-item" *ngFor="let item of data.low_stock_items">
-            <span class="stock-name">{{ item.name }}</span>
-            <span class="stock-qty"
-              [ngClass]="item.stock === 0 ? 'qty-zero' : item.stock <= 5 ? 'qty-critical' : 'qty-low'">
-              {{ item.stock === 0 ? ('dashboard.out_of_stock' | translate) : item.stock + ' ' + ('dashboard.left' |
-              translate) }}
+            <div class="stock-info">
+              <div class="stock-name">{{ item.name }}</div>
+              <div class="stock-bar-wrap">
+                <div class="stock-bar-fill"
+                  [style.width.%]="stockBarWidth(item.stock)"
+                  [class.bar-zero]="item.stock === 0"
+                  [class.bar-critical]="item.stock > 0 && item.stock <= 5"
+                  [class.bar-low]="item.stock > 5"></div>
+              </div>
+            </div>
+            <span class="stock-qty" [ngClass]="item.stock === 0 ? 'qty-zero' : item.stock <= 5 ? 'qty-critical' : 'qty-low'">
+              {{ item.stock === 0 ? 'Out' : item.stock }}
             </span>
           </div>
         </div>
         <div class="all-good" *ngIf="!data.low_stock_items?.length">
-          <svg width="28" height="28" fill="none" stroke="#22c55e" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-            <polyline points="22 4 12 14.01 9 11.01" />
-          </svg>
+          <svg width="28" height="28" fill="none" stroke="#22c55e" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
           <span>{{ 'dashboard.all_good' | translate }}</span>
         </div>
       </div>
 
     </div>
 
-  </ng-container>
+    <!-- ── ROW 4: Recent Sales ───────────────────────────────── -->
+    <div class="card recent-card">
+      <div class="card-head">
+        <span class="card-ttl">{{ 'dashboard.recent_sales' | translate }}</span>
+        <button class="link-btn" (click)="router.navigate(['/sales-list'])">{{ 'dashboard.view_all' | translate }}</button>
+      </div>
+      <table class="db-table">
+        <thead>
+          <tr>
+            <th>{{ 'dashboard.col_invoice' | translate }}</th>
+            <th>{{ 'dashboard.col_customer' | translate }}</th>
+            <th class="right">Total</th>
+            <th class="right">Paid</th>
+            <th>{{ 'dashboard.col_due' | translate }}</th>
+            <th>{{ 'dashboard.col_time' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of data.recent_sales">
+            <td class="bold mono">{{ s.invoice_no }}</td>
+            <td class="muted">{{ s.customer_name }}</td>
+            <td class="right fw7">৳{{ s.total | number:'1.0-2' }}</td>
+            <td class="right paid-col">৳{{ s.paid | number:'1.0-2' }}</td>
+            <td>
+              <span *ngIf="s.due > 0" class="due-pill">৳{{ s.due | number:'1.0-2' }}</span>
+              <span *ngIf="s.due === 0" class="paid-pill">{{ 'common.paid' | translate }}</span>
+            </td>
+            <td class="muted">{{ s.created_at | date:'dd MMM, hh:mm a' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="empty-note" *ngIf="!data.recent_sales?.length">{{ 'dashboard.no_recent_sales' | translate }}</div>
+    </div>
 
+  </ng-container>
 </div>
