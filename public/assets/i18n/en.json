@@ -276,6 +276,8 @@
     "empty": "Search and select products to add them here.",
     "summary_title": "Invoice Summary",
     "subtotal": "Subtotal",
+    "discount": "Discount",
+    "net_total": "Net Total",
     "paid_amount": "Paid Amount",
     "balance_due": "Balance Due",
     "complete": "Complete Sale"

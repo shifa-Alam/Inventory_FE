@@ -23,6 +23,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   customers: any[] = [];
   customer_id: number = 0;
   paid_amount: number = 0;
+  discount: number = 0;
 
   productSearch = '';
   filteredProducts: any[] = [];
@@ -206,6 +207,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     const payload = {
       customer_id: custId > 0 ? custId : null,
       paid_amount: +this.paid_amount,
+      discount: +this.discount,
       items: this.items.map(i => ({
         product_id: +i.product_id,
         quantity: +i.quantity,
@@ -218,6 +220,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.toast.stopSaving(); this.toast.success('Sale Completed Successfully');
         this.customer_id = 0;
         this.paid_amount = 0;
+        this.discount = 0;
         this.items = [];
         this.searchInputRef.nativeElement.focus();
       },

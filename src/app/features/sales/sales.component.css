@@ -138,6 +138,9 @@
 
 .due-row { padding-top: 14px; }
 
+.discount-row input { color: #d97706; font-weight: 600; }
+.net-row .net-val { color: #059669; font-weight: 700; font-size: 15px; }
+
 .due-value {
   font-size: 22px;
   font-weight: 700;

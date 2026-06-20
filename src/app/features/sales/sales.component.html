@@ -87,16 +87,26 @@
           <span class="s-value">{{ getTotal() | number }}</span>
         </div>
 
+        <div class="summary-row discount-row">
+          <span class="s-label">{{ 'sales.discount' | translate }}</span>
+          <input type="number" [(ngModel)]="discount" placeholder="0" min="0" [max]="getTotal()" />
+        </div>
+
+        <div class="summary-row net-row" *ngIf="discount > 0">
+          <span class="s-label">{{ 'sales.net_total' | translate }}</span>
+          <span class="s-value net-val">{{ getTotal() - discount | number }}</span>
+        </div>
+
         <div class="summary-row">
           <span class="s-label">{{ 'sales.paid_amount' | translate }}</span>
-          <input type="number" [(ngModel)]="paid_amount" placeholder="0" />
+          <input type="number" [(ngModel)]="paid_amount" placeholder="0" min="0" />
         </div>
 
         <div class="summary-divider"></div>
 
         <div class="summary-row due-row">
           <span class="s-label">{{ 'sales.balance_due' | translate }}</span>
-          <span class="due-value">{{ getTotal() - paid_amount | number }}</span>
+          <span class="due-value">{{ getTotal() - discount - paid_amount | number }}</span>
         </div>
 
         <button class="btn btn-primary btn-lg complete-btn" (click)="submit()" [disabled]="items.length === 0">
