@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 import { ApiService } from '../../core/services/api.service';
 
 
@@ -17,7 +18,8 @@ export class PurchaseViewComponent {
 
   constructor(
     private route: ActivatedRoute,
-    private api: ApiService
+    private api: ApiService,
+    public location: Location
   ) { }
 
   ngOnInit() {
