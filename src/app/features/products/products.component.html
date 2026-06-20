@@ -35,6 +35,10 @@
         <input type="number" [placeholder]="'products.sale_price_placeholder' | translate" [(ngModel)]="newProduct.sale_price" />
       </div>
       <div class="form-group">
+        <label>{{ 'products.mrp_placeholder' | translate }}</label>
+        <input type="number" [placeholder]="'products.mrp_placeholder' | translate" [(ngModel)]="newProduct.mrp" />
+      </div>
+      <div class="form-group">
         <label>{{ 'products.stock_placeholder' | translate }}</label>
         <input type="number" [placeholder]="'products.stock_placeholder' | translate" [(ngModel)]="newProduct.current_stock" />
       </div>
@@ -78,6 +82,7 @@
             <th>{{ 'products.col_sku' | translate }}</th>
             <th>{{ 'products.col_purchase' | translate }}</th>
             <th>{{ 'products.col_sale' | translate }}</th>
+            <th>{{ 'products.col_mrp' | translate }}</th>
             <th>{{ 'products.col_stock' | translate }}</th>
             <th>{{ 'products.col_status' | translate }}</th>
             <th>{{ 'products.col_actions' | translate }}</th>
@@ -90,6 +95,7 @@
             <td class="muted">{{ p.sku }}</td>
             <td>{{ p.purchase_price | number }}</td>
             <td>{{ p.sale_price | number }}</td>
+            <td>{{ p.mrp ? (p.mrp | number) : '—' }}</td>
             <td><span class="stock-chip">{{ p.current_stock }}</span></td>
             <td>
               <span class="badge" [ngClass]="p.status === 'LOW' ? 'badge-danger' : 'badge-success'">{{ p.status }}</span>
@@ -102,10 +108,10 @@
             </td>
           </tr>
           <tr *ngIf="loading" class="loading-row">
-            <td colspan="8"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+            <td colspan="9"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
           </tr>
           <tr *ngIf="!loading && products.length === 0">
-            <td colspan="8" class="empty-row">{{ 'products.empty' | translate }}</td>
+            <td colspan="9" class="empty-row">{{ 'products.empty' | translate }}</td>
           </tr>
         </tbody>
       </table>
@@ -134,15 +140,19 @@
       </div>
       <div class="mc-grid">
         <div class="mc-field">
-          <span class="mc-lbl">Buy Price</span>
+          <span class="mc-lbl">{{ 'products.col_purchase' | translate }}</span>
           <span class="mc-val">{{ p.purchase_price | number }}</span>
         </div>
         <div class="mc-field">
-          <span class="mc-lbl">Sale Price</span>
+          <span class="mc-lbl">{{ 'products.col_sale' | translate }}</span>
           <span class="mc-val">{{ p.sale_price | number }}</span>
         </div>
         <div class="mc-field">
-          <span class="mc-lbl">Stock</span>
+          <span class="mc-lbl">{{ 'products.col_mrp' | translate }}</span>
+          <span class="mc-val mrp-val">{{ p.mrp ? (p.mrp | number) : '—' }}</span>
+        </div>
+        <div class="mc-field">
+          <span class="mc-lbl">{{ 'products.col_stock' | translate }}</span>
           <span class="stock-chip">{{ p.current_stock }}</span>
         </div>
       </div>

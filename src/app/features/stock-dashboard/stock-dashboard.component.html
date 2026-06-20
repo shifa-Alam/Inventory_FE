@@ -93,6 +93,7 @@
             <th>Category</th>
             <th class="right">Buy</th>
             <th class="right">Sale</th>
+            <th class="right">MRP</th>
             <th class="center">Qty</th>
             <th class="right">Value</th>
             <th class="center">Status</th>
@@ -108,6 +109,7 @@
             <td class="muted">{{ s.category }}</td>
             <td class="right">{{ s.purchase_price | number }}</td>
             <td class="right">{{ s.sale_price | number }}</td>
+            <td class="right mrp-cell">{{ s.mrp ? (s.mrp | number) : '—' }}</td>
             <td class="center">
               <span class="qty-pill" [class.qty-low]="s.status==='LOW'" [class.qty-out]="s.status==='OUT'">{{ s.current_stock }}</span>
             </td>
@@ -119,10 +121,10 @@
             </td>
           </tr>
           <tr *ngIf="loading" class="loading-row">
-            <td colspan="9"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+            <td colspan="10"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
           </tr>
           <tr *ngIf="!loading && stocks.length === 0">
-            <td colspan="9" class="empty-row"><div class="empty-icon">📦</div>No stock data found.</td>
+            <td colspan="10" class="empty-row"><div class="empty-icon">📦</div>No stock data found.</td>
           </tr>
         </tbody>
       </table>
