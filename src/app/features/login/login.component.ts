@@ -18,6 +18,10 @@ export class LoginComponent {
   password = '';
   errorMsg = '';
   loading = false;
+  showPassword = false;
+  userFocused = false;
+  passFocused = false;
+  year = new Date().getFullYear();
 
   constructor(private auth: AuthService, private router: Router, public lang: LanguageService) { }
 
