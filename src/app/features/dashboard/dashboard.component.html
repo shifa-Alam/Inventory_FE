@@ -35,7 +35,7 @@
         </div>
         <div class="kpi-val">৳{{ fmt(data.today_sales ?? 0) }}</div>
         <div class="kpi-lbl">{{ 'dashboard.today_sales' | translate }}</div>
-        <div class="kpi-sub">{{ data.today_invoices ?? 0 }} invoices · vs yesterday ৳{{ fmt(data.yesterday_sales ?? 0) }}</div>
+        <div class="kpi-sub">{{ data.today_invoices ?? 0 }} {{ 'dashboard.invoices' | translate }} · {{ 'dashboard.vs_yesterday' | translate }} ৳{{ fmt(data.yesterday_sales ?? 0) }}</div>
       </div>
 
       <div class="kpi-card green">
@@ -47,7 +47,7 @@
         </div>
         <div class="kpi-val">৳{{ fmt(data.month_collections ?? 0) }}</div>
         <div class="kpi-lbl">{{ 'dashboard.today_collections' | translate }}</div>
-        <div class="kpi-sub">Today ৳{{ fmt(data.today_collections ?? 0) }} · Month total</div>
+        <div class="kpi-sub">{{ 'dashboard.today_label' | translate }} ৳{{ fmt(data.today_collections ?? 0) }} · {{ 'dashboard.month_total' | translate }}</div>
       </div>
 
       <div class="kpi-card violet">
@@ -61,7 +61,7 @@
         </div>
         <div class="kpi-val">৳{{ fmt(data.month_sales ?? 0) }}</div>
         <div class="kpi-lbl">{{ 'dashboard.month_sales' | translate }}</div>
-        <div class="kpi-sub">{{ data.month_invoices ?? 0 }} invoices · avg ৳{{ fmt(data.avg_order_value ?? 0) }}</div>
+        <div class="kpi-sub">{{ data.month_invoices ?? 0 }} {{ 'dashboard.invoices' | translate }} · {{ 'dashboard.avg_label' | translate }} ৳{{ fmt(data.avg_order_value ?? 0) }}</div>
       </div>
 
       <div class="kpi-card" [ngClass]="profitPositive ? 'teal' : 'rose'">
@@ -73,7 +73,7 @@
         </div>
         <div class="kpi-val">{{ profitPositive ? '+' : '' }}৳{{ fmt(data.profit ?? 0) }}</div>
         <div class="kpi-lbl">{{ 'dashboard.net_profit' | translate }}</div>
-        <div class="kpi-sub">Purchase ৳{{ fmt(data.total_purchase ?? 0) }} · {{ 'dashboard.this_month' | translate }}</div>
+        <div class="kpi-sub">{{ 'dashboard.purchase_label' | translate }} ৳{{ fmt(data.total_purchase ?? 0) }} · {{ 'dashboard.this_month' | translate }}</div>
       </div>
 
       <div class="kpi-card amber">
@@ -106,12 +106,12 @@
     <div class="chart-card card">
       <div class="card-head">
         <div>
-          <span class="card-ttl">7-Day Sales &amp; Collection Trend</span>
-          <span class="card-sub">Daily sales (blue) vs cash collected (green)</span>
+          <span class="card-ttl">{{ 'dashboard.chart_title' | translate }}</span>
+          <span class="card-sub">{{ 'dashboard.chart_sub' | translate }}</span>
         </div>
         <div class="chart-legend">
-          <span class="legend-dot blue-dot"></span><span>Sales</span>
-          <span class="legend-dot green-dot"></span><span>Collected</span>
+          <span class="legend-dot blue-dot"></span><span>{{ 'dashboard.legend_sales' | translate }}</span>
+          <span class="legend-dot green-dot"></span><span>{{ 'dashboard.legend_collected' | translate }}</span>
         </div>
       </div>
       <div class="chart-body" *ngIf="chartBars.length">
@@ -131,7 +131,7 @@
           </div>
         </div>
       </div>
-      <div class="empty-note" *ngIf="!chartBars.length">No sales data for this period.</div>
+      <div class="empty-note" *ngIf="!chartBars.length">{{ 'dashboard.no_chart_data' | translate }}</div>
     </div>
 
     <!-- ── ROW 3: Top Products + Due Customers ───────────────── -->
@@ -160,13 +160,13 @@
             </div>
           </div>
         </div>
-        <div class="empty-note" *ngIf="!data.top_products?.length">No sales this month.</div>
+        <div class="empty-note" *ngIf="!data.top_products?.length">{{ 'dashboard.no_top_products' | translate }}</div>
       </div>
 
       <div class="card">
         <div class="card-head">
-          <span class="card-ttl">Top Due Customers</span>
-          <button class="link-btn" (click)="router.navigate(['/customers'])">View all</button>
+          <span class="card-ttl">{{ 'dashboard.top_due_customers' | translate }}</span>
+          <button class="link-btn" (click)="router.navigate(['/customers'])">{{ 'dashboard.view_all' | translate }}</button>
         </div>
         <div *ngIf="data.top_due_customers?.length">
           <div class="due-item" *ngFor="let c of data.top_due_customers">
@@ -180,7 +180,7 @@
         </div>
         <div class="all-good" *ngIf="!data.top_due_customers?.length">
           <svg width="28" height="28" fill="none" stroke="#22c55e" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          <span>No outstanding dues!</span>
+          <span>{{ 'dashboard.no_due' | translate }}</span>
         </div>
       </div>
 
@@ -221,19 +221,19 @@
     <div class="card slow-card">
       <div class="card-head">
         <div>
-          <span class="card-ttl">Slow-Moving Items</span>
-          <span class="card-sub">In stock but not selling this month</span>
+          <span class="card-ttl">{{ 'dashboard.slow_moving' | translate }}</span>
+          <span class="card-sub">{{ 'dashboard.slow_moving_sub' | translate }}</span>
         </div>
-        <button class="link-btn" (click)="router.navigate(['/products'])">View all</button>
+        <button class="link-btn" (click)="router.navigate(['/products'])">{{ 'dashboard.view_all' | translate }}</button>
       </div>
       <div *ngIf="data.slow_moving_items?.length">
         <div class="slow-grid">
           <div class="slow-item" *ngFor="let item of data.slow_moving_items">
             <div class="slow-name">{{ item.name }}</div>
             <div class="slow-meta">
-              <span class="slow-stock">{{ item.stock }} in stock</span>
+              <span class="slow-stock">{{ item.stock }} {{ 'dashboard.in_stock' | translate }}</span>
               <span class="slow-sold" [class.sold-zero]="item.month_qty === 0" [class.sold-low]="item.month_qty > 0">
-                {{ item.month_qty === 0 ? 'No sales' : item.month_qty + ' sold' }}
+                {{ item.month_qty === 0 ? ('dashboard.no_sales_badge' | translate) : (item.month_qty + ' ' + ('dashboard.sold_label' | translate)) }}
               </span>
             </div>
           </div>
@@ -241,7 +241,7 @@
       </div>
       <div class="all-good" *ngIf="!data.slow_moving_items?.length">
         <svg width="28" height="28" fill="none" stroke="#22c55e" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        <span>All products are selling well!</span>
+        <span>{{ 'dashboard.all_selling' | translate }}</span>
       </div>
     </div>
 
@@ -256,8 +256,8 @@
           <tr>
             <th>{{ 'dashboard.col_invoice' | translate }}</th>
             <th>{{ 'dashboard.col_customer' | translate }}</th>
-            <th class="right">Total</th>
-            <th class="right">Paid</th>
+            <th class="right">{{ 'common.total' | translate }}</th>
+            <th class="right">{{ 'common.paid' | translate }}</th>
             <th>{{ 'dashboard.col_due' | translate }}</th>
             <th>{{ 'dashboard.col_time' | translate }}</th>
           </tr>
