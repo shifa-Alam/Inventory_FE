@@ -151,8 +151,7 @@ export class SalesListComponent implements OnInit {
   }
 
   viewInvoice(sale: any) {
-    localStorage.setItem('invoice', JSON.stringify(sale));
-    this.router.navigate(['/invoice-print']);
+    this.router.navigate(['/invoice', sale.id]);
   }
 
   /* ── Panel helpers ── */

@@ -96,6 +96,6 @@ export class ProductsComponent implements OnInit {
   }
 
   reset() {
-    this.newProduct = { id: 0, name: '', sku: '', category_id: 0, purchase_price: 0, sale_price: 0, current_stock: 0 };
+    this.newProduct = { id: 0, name: '', sku: '', category_id: 0, purchase_price: 0, sale_price: 0, mrp: 0, current_stock: 0 };
   }
 }

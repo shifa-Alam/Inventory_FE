@@ -42,6 +42,7 @@ export const routes: Routes = [
             { path: 'purchase/:id', component: PurchaseViewComponent },
             { path: 'sales', component: SalesListComponent },
             { path: 'invoice-print', component: InvoicePrintComponent },
+            { path: 'invoice/:id', component: InvoicePrintComponent },
             { path: 'suppliers', component: SuppliersComponent },
             { path: 'stock', component: StockDashboardComponent },
             { path: 'sale-return', component: SaleReturnComponent },

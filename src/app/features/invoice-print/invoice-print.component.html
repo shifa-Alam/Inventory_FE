@@ -22,8 +22,11 @@
     </div>
   </div>
 
+  <!-- Loading -->
+  <div *ngIf="loading" class="inv-loading">Loading invoice…</div>
+
   <!-- ══ Invoice Document ══ -->
-  <div class="invoice-doc" #invoiceBox>
+  <div class="invoice-doc" #invoiceBox *ngIf="!loading && invoice">
 
     <!-- Top stripe -->
     <div class="accent-bar"></div>
@@ -84,6 +87,7 @@
             <th class="th-no">#</th>
             <th class="th-desc">{{ 'invoice.col_product' | translate }}</th>
             <th class="th-center">{{ 'invoice.col_qty' | translate }}</th>
+            <th class="th-right th-mrp">{{ 'invoice.col_mrp' | translate }}</th>
             <th class="th-right">{{ 'invoice.col_rate' | translate }}</th>
             <th class="th-right">{{ 'invoice.col_amount' | translate }}</th>
           </tr>
@@ -93,6 +97,7 @@
             <td class="td-no">{{ i + 1 }}</td>
             <td class="td-desc">{{ item.product_name }}</td>
             <td class="td-center">{{ item.quantity }}</td>
+            <td class="td-right td-mrp">{{ item.mrp ? ('৳ ' + (item.mrp | number)) : '—' }}</td>
             <td class="td-right">৳&thinsp;{{ item.rate | number }}</td>
             <td class="td-right td-amount">৳&thinsp;{{ item.quantity * item.rate | number }}</td>
           </tr>

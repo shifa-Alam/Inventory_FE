@@ -13,11 +13,60 @@
       <p class="sub">{{ 'sales.subtitle' | translate }}</p>
     </div>
     <div class="header-customer">
-      <label class="field-label">{{ 'sales.customer_label' | translate }}</label>
-      <select [(ngModel)]="customer_id" style="width:220px">
-        <option value="0">{{ 'sales.walk_in' | translate }}</option>
-        <option *ngFor="let c of customers" [value]="c.id">{{ c.name }}</option>
-      </select>
+
+      <!-- ① Searchable dropdown -->
+      <div class="cust-col">
+        <label class="field-label">{{ 'sales.customer_label' | translate }}</label>
+        <div class="cust-dd-wrap" (keydown.escape)="ddOpen=false" (focusout)="onDdFocusOut($event)">
+          <div class="cust-dd-box" (click)="openDropdown()">
+            <span class="cust-dd-val" [class.placeholder]="!selectedCustomer">
+              {{ selectedCustomer ? selectedCustomer.name : ('select one' ) }}
+            </span>
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </div>
+          <div class="cust-dd-panel" *ngIf="ddOpen">
+            <input #ddSearch type="text" class="cust-dd-search" [(ngModel)]="ddQuery"
+              (ngModelChange)="onDdSearch($event)" placeholder="Search name…" autocomplete="off" />
+            <div class="cust-dd-list">
+              <div class="cust-dd-item" *ngFor="let c of ddResults" (click)="pickCustomer(c)">
+                <span class="cdi-name">{{ c.name }}</span>
+                <span class="cdi-phone">{{ c.phone }}</span>
+              </div>
+              <div class="cust-dd-empty" *ngIf="ddResults.length === 0">No customers found</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ② Phone search + quick create -->
+      <div class="cust-col">
+        <label class="field-label">{{ 'sales.phone_search_label' | translate }}</label>
+        <div class="cust-phone-wrap">
+          <input type="text" class="cust-phone-input" [(ngModel)]="customerPhone"
+            (ngModelChange)="onPhoneChange($event)" [placeholder]="'sales.phone_search_ph' | translate"
+            autocomplete="off" />
+          <button *ngIf="customerPhone" class="btn-cancel-customer" (click)="clearPhone()">✕</button>
+        </div>
+
+        <!-- Phone results -->
+        <div class="cust-phone-results" *ngIf="phoneResults.length > 0">
+          <div class="cust-drop-item" *ngFor="let c of phoneResults" (click)="pickCustomer(c); clearPhone()">
+            <span class="cdi-name">{{ c.name }}</span>
+            <span class="cdi-phone">{{ c.phone }}</span>
+          </div>
+        </div>
+
+        <!-- Not found inline -->
+        <div *ngIf="phoneNotFound" class="phone-not-found">
+          <span class="not-found-label">Not found</span>
+          <input type="text" [(ngModel)]="newCustomerName" placeholder="Enter name" class="cust-name-input" />
+          <button class="btn-save-customer" [disabled]="!newCustomerName.trim()" (click)="savePhoneCustomer()">Save &
+            Select</button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -46,29 +95,30 @@
           <table>
             <thead>
               <tr>
-                <th>{{ 'sales.col_no' | translate }}</th>
-                <th>{{ 'sales.col_product' | translate }}</th>
-                <th>{{ 'sales.col_stock' | translate }}</th>
-                <th style="width:110px">{{ 'sales.col_qty' | translate }}</th>
-                <th style="width:130px">{{ 'sales.col_rate' | translate }}</th>
-                <th>{{ 'sales.col_total' | translate }}</th>
-                <th style="width:50px"></th>
+                <th class="col-no">#</th>
+                <th class="col-product">{{ 'sales.col_product' | translate }}</th>
+                <th class="col-stock col-center">{{ 'sales.col_stock' | translate }}</th>
+                <th class="col-mrp col-right">{{ 'sales.col_mrp' | translate }}</th>
+                <th class="col-qty col-center">{{ 'sales.col_qty' | translate }}</th>
+                <th class="col-rate col-right">{{ 'sales.col_rate' | translate }}</th>
+                <th class="col-total col-right">{{ 'sales.col_total' | translate }}</th>
+                <th class="col-action"></th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let item of items; let i = index">
-                <td class="muted">{{ i + 1 }}</td>
-                <td class="bold">{{ item.product_name }}</td>
-                <td><span class="stock-chip">{{ item.stock }}</span></td>
-                <td><input type="number" [(ngModel)]="item.quantity" min="1" [max]="item.stock" (change)="clampQuantity(item)" /></td>
-                <td><input type="number" [(ngModel)]="item.rate" min="0" /></td>
-                <td class="right">{{ item.quantity * item.rate | number }}</td>
-                <td>
-                  <button class="btn btn-danger btn-sm" (click)="removeRow(i)">✕</button>
-                </td>
+                <td class="col-no muted">{{ i + 1 }}</td>
+                <td class="col-product bold">{{ item.product_name }}</td>
+                <td class="col-stock col-center"><span class="stock-chip">{{ item.stock }}</span></td>
+                <td class="col-mrp col-right mrp-ref">{{ item.mrp ? (item.mrp | number) : '—' }}</td>
+                <td class="col-qty"><input type="number" [(ngModel)]="item.quantity" min="1" [max]="item.stock"
+                    (change)="clampQuantity(item)" /></td>
+                <td class="col-rate"><input type="number" [(ngModel)]="item.rate" min="0" /></td>
+                <td class="col-total col-right">{{ item.quantity * item.rate | number }}</td>
+                <td class="col-action"><button class="btn btn-danger btn-sm" (click)="removeRow(i)">✕</button></td>
               </tr>
               <tr *ngIf="items.length === 0">
-                <td colspan="7" class="empty-row">{{ 'sales.empty' | translate }}</td>
+                <td colspan="8" class="empty-row">{{ 'sales.empty' | translate }}</td>
               </tr>
             </tbody>
           </table>

@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, DestroyRef, inject, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { Subject, EMPTY } from 'rxjs';
@@ -20,10 +21,21 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
 
-  customers: any[] = [];
   customer_id: number = 0;
   paid_amount: number = 0;
   discount: number = 0;
+
+  // Dropdown
+  selectedCustomer: any = null;
+  ddOpen = false;
+  ddQuery = '';
+  ddResults: any[] = [];
+
+  // Phone search
+  customerPhone = '';
+  phoneResults: any[] = [];
+  phoneNotFound = false;
+  newCustomerName = '';
 
   productSearch = '';
   filteredProducts: any[] = [];
@@ -35,9 +47,10 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   scanToast: { message: string; type: 'success' | 'error' } | null = null;
   private toastTimer: any;
 
-  constructor(private api: ApiService, private toast: ToastService) { }
+  constructor(private api: ApiService, private toast: ToastService, private router: Router) { }
 
   ngOnInit() {
+    this.loadDdCustomers('');
     this.searchSubject.pipe(
       debounceTime(300),
       switchMap(v => v ? this.api.get(`/products/search?q=${v}`) : EMPTY),
@@ -49,7 +62,6 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: (err) => console.error('Product search failed', err)
     });
-    this.loadCustomers();
   }
 
   ngAfterViewInit() {
@@ -71,10 +83,72 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  loadCustomers() {
-    this.api.get('/customers/?page=1&page_size=1000').subscribe({
-      next: (res: any) => { this.customers = res.data ?? res; },
-      error: (err) => console.error('Failed to load customers', err)
+  // ── Dropdown ──────────────────────────────────────────────
+  loadDdCustomers(q: string) {
+    const url = q.trim()
+      ? `/customers/?name=${encodeURIComponent(q.trim())}&page=1&page_size=10`
+      : `/customers/?page=1&page_size=10`;
+    this.api.get(url).subscribe({
+      next: (res: any) => { this.ddResults = res.data ?? res; },
+      error: () => {}
+    });
+  }
+
+  openDropdown() {
+    this.ddOpen = true;
+    this.ddQuery = '';
+    this.loadDdCustomers('');
+  }
+
+  onDdFocusOut(event: FocusEvent) {
+    const wrap = (event.currentTarget as HTMLElement);
+    if (!wrap.contains(event.relatedTarget as Node)) {
+      this.ddOpen = false;
+    }
+  }
+
+  onDdSearch(q: string) { this.loadDdCustomers(q); }
+
+  pickCustomer(c: any | null) {
+    this.selectedCustomer = c;
+    this.customer_id = c ? c.id : 0;
+    this.ddOpen = false;
+    this.ddQuery = '';
+  }
+
+  // ── Phone search ──────────────────────────────────────────
+  onPhoneChange(phone: string) {
+    this.phoneResults = [];
+    this.phoneNotFound = false;
+    this.newCustomerName = '';
+    if (phone.trim().length < 3) return;
+    this.api.get(`/customers/?phone=${encodeURIComponent(phone.trim())}&page=1&page_size=10`).subscribe({
+      next: (res: any) => {
+        const list = res.data ?? res;
+        this.phoneResults = list;
+        if (!list.length) this.phoneNotFound = true;
+      },
+      error: () => {}
+    });
+  }
+
+  clearPhone() {
+    this.customerPhone = '';
+    this.phoneResults = [];
+    this.phoneNotFound = false;
+    this.newCustomerName = '';
+  }
+
+  savePhoneCustomer() {
+    const payload = { name: this.newCustomerName.trim(), phone: this.customerPhone.trim(), address: '', credit_limit: 0, opening_due: 0 };
+    this.api.post('/customers/', payload).subscribe({
+      next: (res: any) => {
+        this.toast.success(`Customer "${payload.name}" added`);
+        this.pickCustomer(res);
+        this.clearPhone();
+        this.loadDdCustomers('');
+      },
+      error: (err) => { this.toast.error('Failed to add customer'); console.error(err); }
     });
   }
 
@@ -151,6 +225,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
         product_id: product.id,
         product_name: product.name,
         stock: product.current_stock,
+        mrp: product.mrp ?? 0,
         quantity: 1,
         rate: product.sale_price
       });
@@ -188,6 +263,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
       product_id: product.id,
       product_name: product.name,
       stock: product.current_stock,
+      mrp: product.mrp ?? 0,
       quantity: 1,
       rate: product.sale_price
     });
@@ -203,9 +279,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   submit() {
-    const custId = +this.customer_id;
-    const payload = {
-      customer_id: custId > 0 ? custId : null,
+    const payload: any = {
       paid_amount: +this.paid_amount,
       discount: +this.discount,
       items: this.items.map(i => ({
@@ -214,15 +288,22 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
         rate: +i.rate
       }))
     };
+
+    if (this.customer_id > 0) {
+      payload.customer_id = +this.customer_id;
+    }
+
     this.toast.startSaving();
     this.api.post('/sales/', payload).subscribe({
-      next: () => {
-        this.toast.stopSaving(); this.toast.success('Sale Completed Successfully');
-        this.customer_id = 0;
+      next: (res: any) => {
+        this.toast.stopSaving();
         this.paid_amount = 0;
         this.discount = 0;
         this.items = [];
-        this.searchInputRef.nativeElement.focus();
+        this.selectedCustomer = null;
+        this.customer_id = 0;
+        this.clearPhone();
+        this.router.navigate(['/invoice', res.id], { queryParams: { print: '1' } });
       },
       error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to submit sale'); console.error(err); }
     });
