@@ -118,7 +118,7 @@
 .inv-table .th-center, .inv-table .td-center { text-align: center; }
 .inv-table .th-right, .inv-table .td-right   { text-align: right; }
 .inv-table .th-mrp   { width: 70px; text-align: right; }
-.inv-table .td-mrp   { color: #94a3b8; font-size: 10px; text-align: right; }
+.inv-table .td-mrp   { color: #0f172a; font-size: 10px; text-align: right; }
 .inv-table .td-desc  { font-weight: 600; color: #0f172a; }
 .inv-table .td-amount { font-weight: 700; color: #0f172a; }
 

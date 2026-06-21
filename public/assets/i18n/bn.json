@@ -290,7 +290,7 @@
     "discount": "ছাড়",
     "net_total": "নেট মোট",
     "paid_amount": "পরিশোধিত পরিমাণ",
-    "balance_due": "অবশিষ্ট বাকি",
+    "balance_due": "পরিশোধযোগ্য পরিমাণ",
     "complete": "বিক্রয় সম্পন্ন করুন"
   },
   "sales_list": {
@@ -417,7 +417,7 @@
     "discount": "ছাড়",
     "net_total": "নেট মোট",
     "paid": "পরিশোধিত",
-    "balance_due": "অবশিষ্ট বাকি",
+    "balance_due": "পরিশোধযোগ্য পরিমাণ",
     "status_paid": "পরিশোধিত",
     "status_due": "বাকি",
     "prepared_by": "অনুমোদিত স্বাক্ষর",

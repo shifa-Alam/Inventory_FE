@@ -290,7 +290,7 @@
     "discount": "Discount",
     "net_total": "Net Total",
     "paid_amount": "Paid Amount",
-    "balance_due": "Balance Due",
+    "balance_due": "Payable Amount",
     "complete": "Complete Sale"
   },
   "sales_list": {
@@ -417,7 +417,7 @@
     "discount": "Discount",
     "net_total": "Net Total",
     "paid": "Paid",
-    "balance_due": "Balance Due",
+    "balance_due": "Payable Amount",
     "status_paid": "PAID",
     "status_due": "DUE",
     "prepared_by": "Authorized Signature",
