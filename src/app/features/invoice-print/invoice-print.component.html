@@ -36,9 +36,6 @@
 
       <!-- Company -->
       <div class="company-block">
-        <div class="company-logo">
-          <div class="logo-mark">A</div>
-        </div>
         <div class="company-info">
           <div class="company-name">{{ 'invoice.company' | translate }}</div>
           <div class="company-sub">{{ 'invoice.company_sub' | translate }}</div>
@@ -76,6 +73,8 @@
       <div class="bill-block bill-block-right">
         <div class="bill-label">{{ 'invoice.bill_to' | translate }}</div>
         <div class="bill-name">{{ invoice?.customer_name || ('invoice.walk_in' | translate) }}</div>
+        <div class="bill-line" *ngIf="invoice?.customer_phone">{{ invoice?.customer_phone }}</div>
+        <div class="bill-line" *ngIf="invoice?.customer_address">{{ invoice?.customer_address }}</div>
       </div>
     </div>
 
