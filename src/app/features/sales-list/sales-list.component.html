@@ -123,13 +123,6 @@
                     <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                     {{ 'sales_list.pay_btn' | translate }}
                   </button>
-                  <button class="btn btn-danger btn-sm"
-                    [class.btn-ghost]="selectedSale?.id === s.id && activePanel === 'return'"
-                    (click)="openReturn(s)" [title]="'sales_list.panel_return' | translate"
-                    *ngIf="s.items?.length > 0">
-                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.37"/></svg>
-                    {{ 'sales_list.return_btn' | translate }}
-                  </button>
                 </div>
               </td>
             </tr>
@@ -213,74 +206,6 @@
               </td>
             </tr>
 
-            <!-- RETURN PANEL -->
-            <tr *ngIf="selectedSale?.id === s.id && activePanel === 'return'" class="panel-row">
-              <td colspan="10">
-                <div class="inline-panel ret-panel-wrap">
-                  <div class="panel-header">
-                    <span class="panel-title">{{ 'sales_list.panel_return' | translate }} — {{ s.invoice_no }}</span>
-                    <button class="panel-close" (click)="closePanel()">×</button>
-                  </div>
-                  <div class="panel-body">
-
-                    <div class="return-items-table">
-                      <table class="inner-table">
-                        <thead>
-                          <tr>
-                            <th>{{ 'sale_return.col_product' | translate }}</th>
-                            <th class="right">{{ 'sale_return.col_rate' | translate }}</th>
-                            <th class="right">{{ 'sale_return.col_max' | translate }}</th>
-                            <th class="right" style="width:110px">{{ 'sale_return.col_return_qty' | translate }}</th>
-                            <th class="right">{{ 'sale_return.col_amount' | translate }}</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr *ngFor="let item of returnItems">
-                            <td>{{ item.product_name }}</td>
-                            <td class="right muted">৳{{ item.rate | number:'1.0-2' }}</td>
-                            <td class="right muted">{{ item.max_qty }}</td>
-                            <td class="right">
-                              <input
-                                type="number" class="qty-input"
-                                [(ngModel)]="item.qty"
-                                min="0" [max]="item.max_qty"
-                                [class.qty-error]="item.qty < 0 || item.qty > item.max_qty"
-                              />
-                            </td>
-                            <td class="right">
-                              <span *ngIf="item.qty > 0" class="ret-amount">৳{{ (item.qty * item.rate) | number:'1.0-2' }}</span>
-                              <span *ngIf="!item.qty" class="muted">—</span>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div class="ret-footer">
-                      <div class="form-group" style="flex:1">
-                        <label>{{ 'sales_list.ret_reason' | translate }} <span class="hint">({{ 'sales_list.ret_reason_optional' | translate }})</span></label>
-                        <input type="text" [(ngModel)]="returnReason" [placeholder]="'sales_list.ret_reason_ph' | translate" maxlength="255" />
-                      </div>
-                      <div class="ret-total-wrap">
-                        <span class="ret-total-lbl">{{ 'sales_list.ret_return_total' | translate }}</span>
-                        <span class="ret-total-val">৳{{ returnTotal | number:'1.0-2' }}</span>
-                      </div>
-                      <div class="pay-actions" style="align-self:flex-end">
-                        <button class="btn btn-danger" (click)="submitReturn()" [disabled]="!returnValid || returning">
-                          <span *ngIf="returning" class="spinner"></span>
-                          {{ returning ? ('sales_list.ret_processing' | translate) : ('sales_list.ret_confirm' | translate) }}
-                        </button>
-                        <button class="btn btn-ghost" (click)="closePanel()">{{ 'common.cancel' | translate }}</button>
-                      </div>
-                    </div>
-
-                    <p class="hint-error" *ngIf="!s.customer_id">
-                      {{ 'sales_list.ret_no_customer' | translate }}
-                    </p>
-                  </div>
-                </div>
-              </td>
-            </tr>
 
           </ng-container>
 
@@ -390,10 +315,6 @@
           [class.btn-ghost]="selectedSale?.id === s.id && activePanel === 'payment'">
           {{ selectedSale?.id === s.id && activePanel === 'payment' ? ('common.cancel' | translate) : ('sales_list.pay_btn' | translate) }}
         </button>
-        <button class="btn btn-danger btn-sm" *ngIf="s.items?.length > 0" (click)="openReturn(s)"
-          [class.btn-ghost]="selectedSale?.id === s.id && activePanel === 'return'">
-          {{ selectedSale?.id === s.id && activePanel === 'return' ? ('common.cancel' | translate) : ('sales_list.return_btn' | translate) }}
-        </button>
       </div>
 
       <!-- Mobile Payment Panel -->
@@ -420,33 +341,6 @@
         </div>
       </div>
 
-      <!-- Mobile Return Panel -->
-      <div class="mobile-inline-panel" *ngIf="selectedSale?.id === s.id && activePanel === 'return'">
-        <div class="mip-title">{{ 'sales_list.panel_return' | translate }}</div>
-        <div *ngFor="let item of returnItems" class="mb-return-item">
-          <div class="mb-ret-name">{{ item.product_name }}</div>
-          <div class="mb-ret-row">
-            <span class="muted" style="font-size:11px">{{ 'sales_list.ret_max' | translate }}: {{ item.max_qty }} &#64; ৳{{ item.rate }}</span>
-            <div class="amount-row" style="flex:1;justify-content:flex-end">
-              <input type="number" class="qty-input" [(ngModel)]="item.qty" min="0" [max]="item.max_qty" placeholder="0" />
-            </div>
-          </div>
-        </div>
-        <div class="form-group" style="margin-top:8px"><label>{{ 'sales_list.ret_reason' | translate }}</label>
-          <input type="text" [(ngModel)]="returnReason" [placeholder]="'sales_list.ret_reason_ph' | translate" />
-        </div>
-        <div class="ret-total-wrap" style="margin-top:6px">
-          <span class="ret-total-lbl">{{ 'sales_list.ret_return_total' | translate }}</span>
-          <span class="ret-total-val">৳{{ returnTotal | number:'1.0-2' }}</span>
-        </div>
-        <p class="hint-error" *ngIf="!s.customer_id">{{ 'sales_list.ret_no_customer' | translate }}</p>
-        <div class="pay-actions" style="margin-top:8px">
-          <button class="btn btn-danger btn-sm" style="flex:1;justify-content:center" (click)="submitReturn()" [disabled]="!returnValid||returning">
-            <span *ngIf="returning" class="spinner"></span>{{ returning ? ('sales_list.ret_processing' | translate) : ('sales_list.ret_confirm' | translate) }}
-          </button>
-          <button class="btn btn-ghost btn-sm" (click)="closePanel()">{{ 'common.cancel' | translate }}</button>
-        </div>
-      </div>
     </div>
 
     <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>

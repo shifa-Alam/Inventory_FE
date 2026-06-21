@@ -1,11 +1,8 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, DestroyRef, inject, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../shared/services/toast.service';
-import { Subject, EMPTY } from 'rxjs';
-import { debounceTime, switchMap } from 'rxjs/operators';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
@@ -15,196 +12,148 @@ import { TranslatePipe } from '@ngx-translate/core';
   templateUrl: './sale-return.component.html',
   styleUrls: ['./sale-return.component.css']
 })
-export class SaleReturnComponent implements OnInit, AfterViewInit, OnDestroy {
-  private destroyRef = inject(DestroyRef);
+export class SaleReturnComponent implements OnInit {
 
-  @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
+  // Invoice search
+  invoiceQuery = '';
+  invoiceResults: any[] = [];
+  loadingInvoice = false;
 
-  customers: any[] = [];
+  // Loaded sale
+  sale: any = null;
+  returnItems: ReturnRow[] = [];
+  reason = '';
+
+  // History
   returns: any[] = [];
   loadingReturns = false;
 
-  customer_id = 0;
-  sale_id: number | null = null;
-  reason = '';
-
-  productSearch = '';
-  filteredProducts: any[] = [];
-  selectedIndex = -1;
-  items: any[] = [];
-
-  searchSubject = new Subject<string>();
-
-  scanToast: { message: string; type: 'success' | 'error' } | null = null;
-  private toastTimer: any;
-
   constructor(private api: ApiService, private toast: ToastService) {}
 
-  ngOnInit() {
-    this.searchSubject.pipe(
-      debounceTime(300),
-      switchMap(v => v ? this.api.get(`/products/search?q=${v}`) : EMPTY),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
+  ngOnInit() { this.loadReturns(); }
+
+  // ── Invoice search ────────────────────────────────────────────
+  searchInvoice() {
+    const q = this.invoiceQuery.trim();
+    if (!q) return;
+    this.loadingInvoice = true;
+    this.invoiceResults = [];
+    this.api.get(`/sales/?invoice_no=${encodeURIComponent(q)}&page=1&page_size=10`).subscribe({
       next: (res: any) => {
-        this.filteredProducts = res.data ?? res;
-        this.selectedIndex = this.filteredProducts.length === 1 ? 0 : -1;
+        this.invoiceResults = res.data ?? res;
+        this.loadingInvoice = false;
       },
-      error: (err) => console.error('Product search failed', err)
-    });
-    this.loadCustomers();
-    this.loadReturns();
-  }
-
-  ngAfterViewInit() {
-    this.searchInputRef.nativeElement.focus();
-  }
-
-  ngOnDestroy() {
-    clearTimeout(this.toastTimer);
-  }
-
-  @HostListener('document:keydown', ['$event'])
-  onGlobalKey(event: KeyboardEvent) {
-    const tag = (document.activeElement as HTMLElement)?.tagName?.toLowerCase();
-    const isInputFocused = tag === 'input' || tag === 'select' || tag === 'textarea';
-    if (!isInputFocused && event.key.length === 1) {
-      this.searchInputRef.nativeElement.focus();
-    }
-  }
-
-  loadCustomers() {
-    this.api.get('/customers/?page=1&page_size=1000').subscribe({
-      next: (res: any) => { this.customers = res.data ?? res; },
-      error: (err) => console.error('Failed to load customers', err)
+      error: () => { this.toast.error('Invoice not found'); this.loadingInvoice = false; }
     });
   }
 
-  loadReturns() {
-    this.loadingReturns = true;
-    this.api.get('/sale-returns/').subscribe({
-      next: (res: any) => { this.returns = res.data ?? res; this.loadingReturns = false; },
-      error: (err) => { console.error('Failed to load returns', err); this.loadingReturns = false; }
-    });
-  }
-
-  onSearchChange(value: string) {
-    this.selectedIndex = -1;
-    if (!value || value.length < 2) { this.filteredProducts = []; return; }
-    this.searchSubject.next(value);
-  }
-
-  onKeyDown(event: KeyboardEvent) {
-    if (event.key === 'ArrowDown') {
-      event.preventDefault();
-      if (this.filteredProducts.length)
-        this.selectedIndex = this.selectedIndex < this.filteredProducts.length - 1 ? this.selectedIndex + 1 : 0;
-    } else if (event.key === 'ArrowUp') {
-      event.preventDefault();
-      if (this.filteredProducts.length)
-        this.selectedIndex = this.selectedIndex > 0 ? this.selectedIndex - 1 : this.filteredProducts.length - 1;
-    } else if (event.key === 'Enter') {
-      event.preventDefault();
-      if (this.filteredProducts.length && this.selectedIndex >= 0) {
-        this.selectProduct(this.filteredProducts[this.selectedIndex]);
-      } else if (this.productSearch.trim().length >= 2) {
-        const code = this.productSearch.trim();
-        this.productSearch = '';
-        this.filteredProducts = [];
-        this.searchSubject.next('');
-        this.lookupBarcode(code);
-      }
-    } else if (event.key === 'Escape') {
-      this.filteredProducts = [];
-      this.productSearch = '';
-    }
-  }
-
-  private lookupBarcode(sku: string) {
-    this.api.get(`/products/search?q=${encodeURIComponent(sku)}`).subscribe({
-      next: (res: any) => {
-        const list = res.data ?? res;
-        if (!list?.length) { this.showToast(`Not found: ${sku}`, 'error'); return; }
-        const product = list.find((p: any) => p.sku === sku) ?? list[0];
-        this.selectProduct(product);
+  selectInvoice(inv: any) {
+    this.api.get(`/sales/${inv.id}`).subscribe({
+      next: (sale: any) => {
+        this.sale = sale;
+        // Each item now carries returned_qty from the DB
+        this.returnItems = (sale.items || [])
+          .map((item: any) => {
+            const returned = item.returned_qty || 0;
+            const remaining = item.quantity - returned;
+            return {
+              product_id: item.product_id,
+              product_name: item.product_name,
+              sold_qty: item.quantity,
+              already_returned: returned,
+              max_qty: remaining,
+              rate: item.rate,
+              return_qty: 0
+            };
+          })
+          .filter((row: ReturnRow) => row.max_qty > 0);
+        this.invoiceResults = [];
+        this.invoiceQuery = '';
       },
-      error: () => this.showToast(`Not found: ${sku}`, 'error')
+      error: () => this.toast.error('Failed to load invoice')
     });
   }
 
-  selectProduct(product: any) {
-    const existing = this.items.find(i => i.product_id === product.id);
-    if (existing) {
-      existing.quantity++;
-      this.showToast(`${product.name} × ${existing.quantity}`, 'success');
-    } else {
-      this.items.push({
-        product_id: product.id,
-        product_name: product.name,
-        quantity: 1,
-        rate: product.sale_price
-      });
-      this.showToast(`Added: ${product.name}`, 'success');
-    }
-    this.filteredProducts = [];
-    this.productSearch = '';
-    this.selectedIndex = -1;
+  clearSale() {
+    this.sale = null;
+    this.returnItems = [];
+    this.reason = '';
+    this.invoiceQuery = '';
+    this.invoiceResults = [];
   }
 
-  removeRow(i: number) { this.items.splice(i, 1); }
-
-  getTotal() {
-    return this.items.reduce((a, b) => a + (b.quantity * b.rate), 0);
+  // ── Calculations ──────────────────────────────────────────────
+  get returnGross(): number {
+    return this.returnItems.reduce((s, i) => s + (i.return_qty * i.rate), 0);
   }
 
-  private showToast(message: string, type: 'success' | 'error') {
-    clearTimeout(this.toastTimer);
-    this.scanToast = { message, type };
-    this.toastTimer = setTimeout(() => { this.scanToast = null; }, 2500);
+  get discountRate(): number {
+    if (!this.sale) return 0;
+    const subtotal = (this.sale.total_amount || 0) + (this.sale.discount_amount || 0);
+    if (!subtotal) return 0;
+    return (this.sale.discount_amount || 0) / subtotal;
   }
 
-  save() {
-    if (!this.customer_id || +this.customer_id === 0) {
-      this.toast.warning('Please select a customer.');
-      return;
-    }
-    if (!this.sale_id) {
-      this.toast.warning('Please enter the Sale ID to return against.');
-      return;
-    }
-    if (!this.reason.trim()) {
-      this.toast.warning('Please enter a reason for the return.');
-      return;
-    }
-    if (this.items.length === 0) {
-      this.toast.warning('Please add at least one product to return.');
-      return;
-    }
+  get discountDeduction(): number {
+    return this.returnGross * this.discountRate;
+  }
+
+  get returnNet(): number {
+    return this.returnGross - this.discountDeduction;
+  }
+
+  hasAnyReturn(): boolean {
+    return this.returnItems.some(i => i.return_qty > 0);
+  }
+
+  clampQty(row: ReturnRow) {
+    if (row.return_qty < 0) row.return_qty = 0;
+    if (row.return_qty > row.max_qty) row.return_qty = row.max_qty;
+  }
+
+  // ── Submit ────────────────────────────────────────────────────
+  submit() {
+    if (!this.sale) { this.toast.warning('Please select an invoice first.'); return; }
+    if (!this.hasAnyReturn()) { this.toast.warning('Please enter return quantity for at least one item.'); return; }
+    if (!this.reason.trim()) { this.toast.warning('Please enter a reason for the return.'); return; }
 
     const payload = {
-      sale_id: +this.sale_id,
-      customer_id: +this.customer_id,
+      sale_id: this.sale.id,
+      customer_id: this.sale.customer_id,
       reason: this.reason.trim(),
-      items: this.items.map(i => ({
-        product_id: +i.product_id,
-        quantity: +i.quantity,
-        rate: +i.rate
-      }))
+      items: this.returnItems
+        .filter(i => i.return_qty > 0)
+        .map(i => ({ product_id: i.product_id, quantity: i.return_qty, rate: i.rate }))
     };
 
     this.toast.startSaving();
     this.api.post('/sale-returns/', payload).subscribe({
       next: (res: any) => {
         this.toast.stopSaving();
-        this.toast.success(`Return recorded: ${res.return_no}`);
-        this.items = [];
-        this.customer_id = 0;
-        this.sale_id = null;
-        this.reason = '';
+        this.toast.success(`Return recorded: ${res.return_no} — Refund ৳${res.refund_amount?.toFixed(2)}`);
+        this.clearSale();
         this.loadReturns();
-        this.searchInputRef.nativeElement.focus();
       },
       error: (err) => { this.toast.stopSaving(); this.toast.error(err?.error?.detail || 'Failed to save return'); }
     });
   }
+
+  // ── History ───────────────────────────────────────────────────
+  loadReturns() {
+    this.loadingReturns = true;
+    this.api.get('/sale-returns/').subscribe({
+      next: (res: any) => { this.returns = res.data ?? res; this.loadingReturns = false; },
+      error: () => { this.loadingReturns = false; }
+    });
+  }
+}
+
+interface ReturnRow {
+  product_id: number;
+  product_name: string;
+  sold_qty: number;
+  already_returned: number;
+  max_qty: number;
+  rate: number;
+  return_qty: number;
 }

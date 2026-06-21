@@ -39,7 +39,7 @@ export class SalesListComponent implements OnInit {
 
   /* inline panel state */
   selectedSale: any = null;
-  activePanel: 'payment' | 'return' | null = null;
+  activePanel: 'payment' | null = null;
   successMsg = '';
   errorMsg = '';
 
@@ -49,10 +49,6 @@ export class SalesListComponent implements OnInit {
   payNote = '';
   paying = false;
 
-  /* return form */
-  returnItems: { product_id: number; product_name: string; rate: number; max_qty: number; qty: number }[] = [];
-  returnReason = '';
-  returning = false;
 
   constructor(private api: ApiService, private router: Router) {}
 
@@ -164,27 +160,11 @@ export class SalesListComponent implements OnInit {
     this.successMsg = ''; this.errorMsg = '';
   }
 
-  openReturn(sale: any) {
-    if (this.selectedSale?.id === sale.id && this.activePanel === 'return') { this.closePanel(); return; }
-    this.closePanel();
-    this.selectedSale = sale;
-    this.activePanel = 'return';
-    this.returnReason = ''; this.successMsg = ''; this.errorMsg = '';
-    this.returnItems = (sale.items || []).map((i: any) => ({
-      product_id: i.product_id,
-      product_name: i.product_name,
-      rate: i.rate,
-      max_qty: i.quantity,
-      qty: 0
-    }));
-  }
 
   closePanel() {
     this.selectedSale = null;
     this.activePanel = null;
-    this.returnItems = [];
     this.payAmount = null; this.payDiscount = null; this.payNote = '';
-    this.returnReason = '';
   }
 
   /* ── Payment getters ── */
@@ -228,37 +208,4 @@ export class SalesListComponent implements OnInit {
     });
   }
 
-  /* ── Return helpers ── */
-  get returnTotal(): number {
-    return this.returnItems.reduce((s, i) => s + (i.qty > 0 ? i.qty * i.rate : 0), 0);
-  }
-  get returnValid(): boolean {
-    return this.returnItems.some(i => i.qty > 0 && i.qty <= i.max_qty)
-      && !this.returnItems.some(i => i.qty < 0 || i.qty > i.max_qty);
-  }
-
-  submitReturn() {
-    if (!this.returnValid || !this.selectedSale || this.returning) return;
-    if (!this.selectedSale.customer_id) {
-      this.errorMsg = 'Sale returns are only supported for named customers.'; return;
-    }
-    this.returning = true; this.errorMsg = '';
-    const items = this.returnItems
-      .filter(i => i.qty > 0)
-      .map(i => ({ product_id: i.product_id, quantity: i.qty, rate: i.rate }));
-
-    this.api.post('/sale-returns/', {
-      sale_id: this.selectedSale.id,
-      customer_id: this.selectedSale.customer_id,
-      reason: this.returnReason || '',
-      items
-    }).subscribe({
-      next: (res: any) => {
-        this.returning = false;
-        this.successMsg = `Return ${res.return_no} recorded. ৳${res.total_returned} credited.`;
-        setTimeout(() => { this.successMsg = ''; this.closePanel(); this.load(); }, 3000);
-      },
-      error: (err: any) => { this.errorMsg = err?.error?.detail || 'Return failed.'; this.returning = false; }
-    });
-  }
 }

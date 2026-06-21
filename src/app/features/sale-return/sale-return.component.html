@@ -1,8 +1,3 @@
-<div class="scan-toast" *ngIf="scanToast" [class.toast-success]="scanToast.type === 'success'" [class.toast-error]="scanToast.type === 'error'">
-  <span class="toast-icon">{{ scanToast.type === 'success' ? '✓' : '✕' }}</span>
-  {{ scanToast.message }}
-</div>
-
 <div class="page">
 
   <div class="page-header">
@@ -12,97 +7,143 @@
     </div>
   </div>
 
-  <!-- FORM HEADER -->
-  <div class="card card-body form-header-card">
-    <div class="form-row">
-      <div class="form-group">
-        <label>{{ 'sale_return.customer_label' | translate }}</label>
-        <select [(ngModel)]="customer_id">
-          <option value="0">{{ 'sale_return.select_customer' | translate }}</option>
-          <option *ngFor="let c of customers" [value]="c.id">{{ c.name }}</option>
-        </select>
+  <!-- ── Step 1: Find Invoice ── -->
+  <div class="card card-body step-card" *ngIf="!sale">
+    <p class="step-label">{{ 'sale_return.search_invoice_label' | translate }}</p>
+    <div class="invoice-search-row">
+      <input type="text" [(ngModel)]="invoiceQuery" (keydown.enter)="searchInvoice()"
+        placeholder="INV-20240101-00001" class="invoice-input" />
+      <button class="btn btn-primary" (click)="searchInvoice()" [disabled]="loadingInvoice">
+        {{ loadingInvoice ? ('common.loading' | translate) : ('sale_return.search_btn' | translate) }}
+      </button>
+    </div>
+
+    <!-- Results -->
+    <div class="invoice-results" *ngIf="invoiceResults.length > 0">
+      <div class="inv-result-item" *ngFor="let inv of invoiceResults" (click)="selectInvoice(inv)">
+        <div class="inv-res-left">
+          <span class="inv-res-no">{{ inv.invoice_no }}</span>
+          <span class="inv-res-customer">{{ inv.customer_name || ('sales.walk_in' | translate) }}</span>
+        </div>
+        <div class="inv-res-right">
+          <span class="inv-res-amount">৳{{ inv.total_amount | number:'1.0-0' }}</span>
+          <span class="inv-res-date">{{ inv.created_at | date:'dd MMM yyyy' }}</span>
+        </div>
       </div>
-      <div class="form-group">
-        <label>{{ 'sale_return.sale_id_label' | translate }}</label>
-        <input type="number" [(ngModel)]="sale_id" [placeholder]="'sale_return.sale_id_placeholder' | translate" min="1" />
+    </div>
+
+    <p class="no-result" *ngIf="!loadingInvoice && invoiceResults.length === 0 && invoiceQuery && invoiceQuery.length > 2">
+      {{ 'sale_return.no_invoice_found' | translate }}
+    </p>
+  </div>
+
+  <!-- ── Step 2: Return Form ── -->
+  <div *ngIf="sale">
+
+    <!-- Sale summary banner -->
+    <div class="sale-banner">
+      <div class="banner-left">
+        <span class="banner-inv">{{ sale.invoice_no }}</span>
+        <span class="banner-customer">{{ sale.customer_name || ('sales.walk_in' | translate) }}</span>
+        <span class="banner-date">{{ sale.created_at | date:'dd MMM yyyy' }}</span>
       </div>
-      <div class="form-group reason-group">
-        <label>{{ 'sale_return.reason_label' | translate }}</label>
-        <input type="text" [(ngModel)]="reason" [placeholder]="'sale_return.reason_placeholder' | translate" />
+      <div class="banner-right">
+        <div class="banner-stat">
+          <span class="bs-label">{{ 'sales_list.col_total' | translate }}</span>
+          <span class="bs-val">৳{{ sale.total_amount | number:'1.0-0' }}</span>
+        </div>
+        <div class="banner-stat" *ngIf="sale.discount_amount > 0">
+          <span class="bs-label">{{ 'sale_return.discount_rate_label' | translate }}</span>
+          <span class="bs-val disc">{{ discountRate * 100 | number:'1.0-1' }}%</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" (click)="clearSale()">✕ {{ 'sale_return.change_invoice' | translate }}</button>
       </div>
+    </div>
+
+    <!-- Items table -->
+    <div class="card" style="margin-bottom:12px">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-no">#</th>
+              <th>{{ 'sale_return.col_product' | translate }}</th>
+              <th class="col-center">{{ 'sale_return.col_sold_qty' | translate }}</th>
+              <th class="col-right">{{ 'sale_return.col_rate' | translate }}</th>
+              <th class="col-right">{{ 'sale_return.col_sold_total' | translate }}</th>
+              <th class="col-center col-return">{{ 'sale_return.col_return_qty' | translate }}</th>
+              <th class="col-right col-highlight">{{ 'sale_return.col_return_amount' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of returnItems; let i = index" [class.row-returning]="row.return_qty > 0">
+              <td class="col-no muted">{{ i + 1 }}</td>
+              <td class="bold">{{ row.product_name }}</td>
+              <td class="col-center">
+                <span class="qty-chip">{{ row.sold_qty }}</span>
+              </td>
+              <td class="col-right muted">{{ row.rate | number }}</td>
+              <td class="col-right">{{ row.sold_qty * row.rate | number }}</td>
+              <td class="col-center col-return">
+                <div class="return-qty-wrap">
+                  <button class="qty-btn" (click)="row.return_qty = row.return_qty - 1; clampQty(row)" [disabled]="row.return_qty <= 0">−</button>
+                  <input type="number" [(ngModel)]="row.return_qty" min="0" [max]="row.max_qty"
+                    (change)="clampQty(row)" class="return-qty-input" />
+                  <button class="qty-btn" (click)="row.return_qty = row.return_qty + 1; clampQty(row)" [disabled]="row.return_qty >= row.max_qty">+</button>
+                </div>
+                <div class="qty-hint" *ngIf="row.already_returned > 0">{{ row.already_returned }} already returned</div>
+              </td>
+              <td class="col-right col-highlight">
+                <span *ngIf="row.return_qty > 0" class="return-amt">৳{{ row.return_qty * row.rate | number:'1.0-0' }}</span>
+                <span *ngIf="row.return_qty === 0" class="muted">—</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Reason + Summary row -->
+    <div class="bottom-row">
+
+      <div class="reason-box card card-body">
+        <label class="field-label">{{ 'sale_return.reason_label' | translate }}</label>
+        <textarea [(ngModel)]="reason" rows="3"
+          [placeholder]="'sale_return.reason_placeholder' | translate"
+          class="reason-input"></textarea>
+      </div>
+
+      <div class="summary-box card card-body">
+        <p class="summary-title">{{ 'sale_return.refund_summary' | translate }}</p>
+
+        <div class="s-row">
+          <span class="s-lbl">{{ 'sale_return.gross_return' | translate }}</span>
+          <span class="s-val">৳{{ returnGross | number:'1.0-2' }}</span>
+        </div>
+        <div class="s-row" *ngIf="sale.discount_amount > 0">
+          <span class="s-lbl">{{ 'sale_return.discount_deduction' | translate }} ({{ discountRate * 100 | number:'1.0-1' }}%)</span>
+          <span class="s-val disc">−৳{{ discountDeduction | number:'1.0-2' }}</span>
+        </div>
+        <div class="s-divider"></div>
+        <div class="s-row s-total">
+          <span class="s-lbl">{{ 'sale_return.net_refund' | translate }}</span>
+          <span class="s-val net">৳{{ returnNet | number:'1.0-2' }}</span>
+        </div>
+
+        <button class="btn btn-warning btn-lg submit-btn"
+          (click)="submit()" [disabled]="!hasAnyReturn()">
+          {{ 'sale_return.submit_return' | translate }}
+        </button>
+      </div>
+
     </div>
   </div>
 
-  <!-- SEARCH -->
-  <div class="card card-body search-wrap" style="margin-bottom:16px">
-    <input
-      #searchInput
-      type="text"
-      [placeholder]="'sale_return.search_placeholder' | translate"
-      [(ngModel)]="productSearch"
-      (ngModelChange)="onSearchChange($event)"
-      (keydown)="onKeyDown($event)"
-    />
-    <div class="dropdown" *ngIf="filteredProducts.length > 0">
-      <div
-        class="dropdown-item"
-        *ngFor="let p of filteredProducts; let i = index"
-        [class.active]="i === selectedIndex"
-        (click)="selectProduct(p)"
-      >
-        <span class="dp-name">{{ p.name }}</span>
-        <span class="dp-stock">{{ 'sale_return.stock' | translate }}: {{ p.current_stock }}</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ITEMS TABLE -->
-  <div class="card" style="margin-bottom:16px">
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>{{ 'sale_return.col_no' | translate }}</th>
-            <th>{{ 'sale_return.col_product' | translate }}</th>
-            <th style="width:110px">{{ 'sale_return.col_qty' | translate }}</th>
-            <th style="width:130px">{{ 'sale_return.col_rate' | translate }}</th>
-            <th>{{ 'sale_return.col_total' | translate }}</th>
-            <th style="width:50px"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of items; let i = index">
-            <td class="muted">{{ i + 1 }}</td>
-            <td class="bold">{{ item.product_name }}</td>
-            <td><input type="number" [(ngModel)]="item.quantity" min="1" /></td>
-            <td><input type="number" [(ngModel)]="item.rate" min="0" /></td>
-            <td class="right">{{ item.quantity * item.rate | number }}</td>
-            <td><button class="btn btn-danger btn-sm" (click)="removeRow(i)">✕</button></td>
-          </tr>
-          <tr *ngIf="items.length === 0">
-            <td colspan="6" class="empty-row">{{ 'sale_return.empty' | translate }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ACTION BAR -->
-  <div class="action-bar">
-    <div class="total-info">
-      <span class="total-label">{{ 'sale_return.total_return' | translate }}</span>
-      <span class="total-value return-value">{{ getTotal() | number }}</span>
-    </div>
-    <button class="btn btn-warning btn-lg" (click)="save()" [disabled]="items.length === 0">
-      {{ 'sale_return.save' | translate }}
-    </button>
-  </div>
-
-  <!-- HISTORY -->
+  <!-- ── Return History ── -->
   <div class="card" style="margin-top:24px">
     <div class="card-header-row">
-      <span class="card-title" style="margin-bottom:0">{{ 'sale_return.history_title' | translate }}</span>
-      <span class="count-badge">{{ returns.length }} total</span>
+      <span class="card-title">{{ 'sale_return.history_title' | translate }}</span>
+      <span class="count-badge">{{ returns.length }}</span>
     </div>
     <div class="table-wrapper">
       <table>
@@ -112,27 +153,24 @@
             <th>{{ 'sale_return.col_sale_id' | translate }}</th>
             <th>{{ 'sale_return.col_customer' | translate }}</th>
             <th>{{ 'sale_return.col_reason' | translate }}</th>
-            <th>{{ 'sale_return.col_amount' | translate }}</th>
+            <th class="col-right">{{ 'sale_return.col_amount' | translate }}</th>
             <th>{{ 'sale_return.col_date' | translate }}</th>
           </tr>
         </thead>
         <tbody>
+          <tr *ngIf="loadingReturns">
+            <td colspan="6" class="empty-row"><div class="loading-spinner"></div></td>
+          </tr>
           <tr *ngFor="let r of returns">
             <td><span class="ref-badge">{{ r.return_no }}</span></td>
-            <td class="muted">#{{ r.sale_id }}</td>
+            <td class="muted">{{ r.invoice_no || ('#' + r.sale_id) }}</td>
             <td class="bold">{{ r.customer_name || '—' }}</td>
-            <td class="muted">{{ r.reason || '—' }}</td>
-            <td><span class="amount-cell amount-return">৳{{ r.total_amount | number }}</span></td>
+            <td class="muted small">{{ r.reason || '—' }}</td>
+            <td class="col-right"><span class="amount-return">৳{{ r.total_amount | number:'1.0-2' }}</span></td>
             <td class="muted">{{ r.created_at | date:'dd MMM yyyy' }}</td>
           </tr>
-          <tr *ngIf="returns.length === 0">
-            <td colspan="6" class="empty-row">
-              <div class="empty-icon">↩</div>
-              {{ 'sale_return.history_empty' | translate }}
-            </td>
-          </tr>
-          <tr *ngIf="loadingReturns" class="loading-row">
-            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+          <tr *ngIf="!loadingReturns && returns.length === 0">
+            <td colspan="6" class="empty-row">{{ 'sale_return.history_empty' | translate }}</td>
           </tr>
         </tbody>
       </table>
