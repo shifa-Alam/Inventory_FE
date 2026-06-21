@@ -189,67 +189,67 @@
 
 /* ─── Print ──────────────────────────────────────────────────── */
 @media print {
-  @page { size: A4; margin: 6mm 8mm; }
+  @page { size: A4; margin: 8mm 10mm; }
 
-  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* No color forcing — let browser render in B&W naturally */
+  * { color: #000 !important; background: transparent !important; box-shadow: none !important; }
 
-  .no-print, .toolbar { display: none !important; }
+  .no-print, .toolbar, .footer-strip, .accent-bar { display: none !important; }
 
   .invoice-doc {
-    box-shadow: none !important;
     border-radius: 0 !important;
     max-width: 100% !important;
     width: 100% !important;
+    border: none !important;
   }
 
-  /* Stripe */
-  .accent-bar { height: 2px !important; background: #333 !important; }
-
   /* Header */
-  .inv-head { padding: 6px 10px !important; }
-  .logo-mark { width: 20px !important; height: 20px !important; font-size: 9px !important; background: #000 !important; color: #fff !important; }
-  .company-name { font-size: 10px !important; }
-  .company-sub  { font-size: 7.5px !important; }
-  .inv-word     { font-size: 9px !important; }
-  .inv-meta-label, .inv-meta-val { font-size: 8px !important; }
-  .status-pill  { font-size: 7px !important; padding: 1px 5px !important; }
+  .inv-head { padding: 6px 10px !important; border-bottom: 1px solid #000 !important; }
+  .company-name { font-size: 11px !important; font-weight: 800 !important; }
+  .company-sub  { font-size: 8px !important; }
+  .inv-word     { font-size: 10px !important; font-weight: 800 !important; }
+  .inv-meta-label { font-size: 8px !important; }
+  .inv-meta-val   { font-size: 8px !important; font-weight: 700 !important; }
+
+  /* Status pill — border only, no background */
+  .status-pill  { font-size: 7px !important; padding: 1px 5px !important; border: 1px solid #000 !important; border-radius: 2px !important; }
 
   /* Bill section */
+  .bill-section { border-bottom: 1px solid #000 !important; }
   .bill-block   { padding: 5px 10px !important; }
+  .bill-block-right { border-left: 1px solid #000 !important; }
   .bill-label   { font-size: 7px !important; }
   .bill-name    { font-size: 9px !important; }
   .bill-line    { font-size: 8px !important; }
 
   /* Table */
   .table-section { padding: 6px 10px 0 !important; }
-  .inv-table th  { font-size: 7.5px !important; padding: 5px 6px !important; letter-spacing: 0 !important; }
-  .inv-table td  { font-size: 10px !important; padding: 4px 6px !important; }
-  .inv-table thead tr { background: none !important; }
-  .inv-table th  { color: #0f172a !important; border: 1px solid #cbd5e1 !important; }
-  .inv-table td  { border: 1px solid #cbd5e1 !important; }
-  .inv-table tbody tr.row-alt { background: #f9f9f9 !important; }
+  .inv-table th  { font-size: 8px !important; padding: 5px 6px !important; letter-spacing: 0 !important; font-weight: 800 !important; border: 1px solid #000 !important; }
+  .inv-table td  { font-size: 10px !important; padding: 4px 6px !important; border: 1px solid #000 !important; }
+  .inv-table tbody tr.row-alt { background: transparent !important; }
   .inv-table .th-no, .inv-table .td-no { font-size: 8px !important; width: 24px !important; }
   .inv-table .td-mrp { font-size: 8px !important; }
-  .inv-table .td-desc { font-size: 10px !important; }
+  .inv-table .td-desc { font-size: 10px !important; font-weight: 700 !important; }
+  .inv-table .td-amount { font-weight: 800 !important; }
 
   /* Totals */
-  .totals-wrap  { padding: 0 10px !important; margin-top: 4px !important; }
+  .totals-wrap  { padding: 0 10px !important; margin-top: 4px !important; page-break-inside: avoid; }
   .totals-box   { width: 200px !important; }
-  .t-row        { padding: 3px 0 !important; }
+  .t-row        { padding: 3px 0 !important; border-bottom: 1px solid #ccc !important; }
   .t-label, .t-val { font-size: 9px !important; }
-  .t-grand      { padding: 6px 0 !important; margin-top: 4px !important; background: none !important; border-top: 2px solid #1e1b4b !important; }
-  .t-grand-label { font-size: 7.5px !important; color: #64748b !important; }
-  .t-grand-val  { font-size: 13px !important; color: #0f172a !important; }
+  .t-grand      { padding: 6px 0 !important; margin-top: 4px !important; border-top: 2px solid #000 !important; }
+  .t-grand-label { font-size: 8px !important; }
+  .t-grand-val  { font-size: 14px !important; font-weight: 800 !important; }
 
   /* Signature */
   .sig-row   { padding: 0 10px !important; margin-bottom: 8px !important; }
   .sig-block { width: 140px !important; }
-  .sig-space { height: 18px !important; }
+  .sig-space { height: 22px !important; }
+  .sig-line  { border-top: 1px solid #000 !important; }
+  .sig-line-dashed { border-top-style: dashed !important; }
   .sig-label { font-size: 7px !important; }
   .sig-sub   { font-size: 7.5px !important; }
 
   /* Footer */
-  .footer-strip   { display: none !important; }
-  .inv-footer     { margin-top: 10px !important; page-break-inside: avoid; }
-  .totals-wrap    { page-break-inside: avoid; }
+  .inv-footer { margin-top: 10px !important; page-break-inside: avoid; }
 }
