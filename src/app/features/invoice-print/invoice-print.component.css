@@ -100,19 +100,18 @@
 
 .inv-table { width: 100%; border-collapse: collapse; }
 
-.inv-table thead tr { background: #1e1b4b; }
+.inv-table thead tr { background: none; }
 
 .inv-table th {
-  font-size: 9px; font-weight: 600; text-transform: uppercase;
-  letter-spacing: 0.6px; color: rgba(255,255,255,0.75);
+  font-size: 9px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.6px; color: #0f172a;
   padding: 7px 8px; text-align: left;
+  border: 1px solid #cbd5e1;
 }
 
-.inv-table tbody tr { border-bottom: 1px solid #f1f5f9; }
 .inv-table tbody tr.row-alt { background: #fafbff; }
-.inv-table tbody tr:last-child { border-bottom: 2px solid #e2e8f0; }
 
-.inv-table td { padding: 7px 8px; font-size: 12px; color: #334155; }
+.inv-table td { padding: 7px 8px; font-size: 12px; color: #334155; border: 1px solid #cbd5e1; }
 
 .inv-table .th-no, .inv-table .td-no     { width: 32px; text-align: center; color: #94a3b8; font-size: 10px; }
 .inv-table .th-center, .inv-table .td-center { text-align: center; }
@@ -141,20 +140,20 @@
 
 .t-grand {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 9px 12px; margin-top: 6px;
-  background: #1e1b4b; border-radius: 5px;
+  padding: 9px 0; margin-top: 6px;
+  border-top: 2px solid #1e1b4b;
 }
 .t-grand-label {
-  font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.65);
+  font-size: 9px; font-weight: 700; color: #64748b;
   text-transform: uppercase; letter-spacing: 0.5px;
 }
-.t-grand-val { font-size: 17px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+.t-grand-val { font-size: 17px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; }
 
 /* ─── Footer ─────────────────────────────────────────────────── */
 .inv-footer { margin-top: 16px; }
 
 .sig-row {
-  display: flex; justify-content: flex-end;
+  display: flex; justify-content: flex-start;
   padding: 0 20px; margin-bottom: 14px;
 }
 .sig-block { width: 180px; }
@@ -225,11 +224,10 @@
   .table-section { padding: 6px 10px 0 !important; }
   .inv-table th  { font-size: 7.5px !important; padding: 5px 6px !important; letter-spacing: 0 !important; }
   .inv-table td  { font-size: 10px !important; padding: 4px 6px !important; }
-  .inv-table thead tr { background: #222 !important; }
-  .inv-table th  { color: #fff !important; }
-  .inv-table tbody tr { border-bottom: 1px solid #e5e5e5 !important; page-break-inside: avoid; }
+  .inv-table thead tr { background: none !important; }
+  .inv-table th  { color: #0f172a !important; border: 1px solid #cbd5e1 !important; }
+  .inv-table td  { border: 1px solid #cbd5e1 !important; }
   .inv-table tbody tr.row-alt { background: #f9f9f9 !important; }
-  .inv-table tbody tr:last-child { border-bottom: 1px solid #999 !important; }
   .inv-table .th-no, .inv-table .td-no { font-size: 8px !important; width: 24px !important; }
   .inv-table .td-mrp { font-size: 8px !important; }
   .inv-table .td-desc { font-size: 10px !important; }
@@ -239,9 +237,9 @@
   .totals-box   { width: 200px !important; }
   .t-row        { padding: 3px 0 !important; }
   .t-label, .t-val { font-size: 9px !important; }
-  .t-grand      { padding: 6px 10px !important; margin-top: 4px !important; background: #111 !important; border-radius: 3px !important; }
-  .t-grand-label { font-size: 7.5px !important; }
-  .t-grand-val  { font-size: 13px !important; }
+  .t-grand      { padding: 6px 0 !important; margin-top: 4px !important; background: none !important; border-top: 2px solid #1e1b4b !important; }
+  .t-grand-label { font-size: 7.5px !important; color: #64748b !important; }
+  .t-grand-val  { font-size: 13px !important; color: #0f172a !important; }
 
   /* Signature */
   .sig-row   { padding: 0 10px !important; margin-bottom: 8px !important; }
