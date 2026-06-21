@@ -35,7 +35,7 @@
 .inv-head {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 12px 20px;
   border-bottom: 1px solid #e2e8f0;
   gap: 12px;
