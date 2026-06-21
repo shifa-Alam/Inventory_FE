@@ -10,7 +10,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
   gap: 8px;
 }
@@ -20,236 +20,290 @@
 
 /* ─── Document shell ─────────────────────────────────────────── */
 .invoice-doc {
-  max-width: 680px;
+  max-width: 720px;
   background: #fff;
-  border-radius: 4px;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.07), 0 4px 20px rgba(0,0,0,0.1);
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 20px 60px rgba(0,0,0,0.14);
   font-family: inherit;
   color: #1e293b;
+  overflow: hidden;
 }
-
-/* ─── Accent bar ─────────────────────────────────────────────── */
-.accent-bar { height: 4px; background: #1e1b4b; }
 
 /* ─── Header ─────────────────────────────────────────────────── */
 .inv-head {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 12px 20px;
-  border-bottom: 1px solid #e2e8f0;
+  padding: 28px 32px 24px;
+  background: #0f172a;
   gap: 12px;
 }
 
-.company-block { display: flex; align-items: center; gap: 8px; }
+.company-block { display: flex; align-items: flex-start; gap: 0; }
+.company-info  { display: flex; flex-direction: column; }
 
-.logo-mark {
-  width: 26px; height: 26px;
-  background: #1e1b4b;
-  color: #fff;
-  border-radius: 5px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 800;
-  flex-shrink: 0;
+.company-name {
+  font-size: 18px; font-weight: 800;
+  color: #ffffff;
+  line-height: 1.2;
+  letter-spacing: -0.3px;
+}
+.company-sub {
+  font-size: 10px;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.5;
+  margin-top: 3px;
+  letter-spacing: 0.2px;
 }
 
-.company-name { font-size: 12px; font-weight: 700; color: #0f172a; line-height: 1.3; }
-.company-sub  { font-size: 9px; color: #64748b; line-height: 1.4; margin-top: 1px; }
+/* Gold accent rule under company name */
+.company-info::after {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 2px;
+  background: #c9a84c;
+  margin-top: 10px;
+  border-radius: 2px;
+}
 
 .inv-label-block { text-align: right; flex-shrink: 0; }
 
 .inv-word {
-  font-size: 11px; font-weight: 800;
-  letter-spacing: 1px;
-  color: #1e1b4b;
+  font-size: 26px; font-weight: 900;
+  letter-spacing: 4px;
+  color: rgba(255,255,255,0.15);
   text-transform: uppercase;
-  margin-bottom: 4px;
+  line-height: 1;
+  margin-bottom: 10px;
 }
 
 .inv-meta-row {
   display: flex; align-items: center; justify-content: flex-end;
-  gap: 4px; margin-bottom: 2px;
+  gap: 6px; margin-bottom: 3px;
 }
-.inv-meta-label { font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.3px; }
-.inv-meta-val   { font-size: 9px; font-weight: 700; color: #0f172a; }
+.inv-meta-label {
+  font-size: 9px; font-weight: 600;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.inv-meta-val {
+  font-size: 9px; font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: 0.3px;
+}
 
-.inv-status-row { margin-top: 4px; text-align: right; }
+.inv-status-row { margin-top: 6px; text-align: right; }
 .status-pill {
-  display: inline-block; padding: 2px 7px;
-  border-radius: 3px; font-size: 8.5px; font-weight: 700;
-  letter-spacing: 0.6px; text-transform: uppercase;
-  background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;
+  display: inline-block; padding: 3px 9px;
+  border-radius: 2px; font-size: 8px; font-weight: 800;
+  letter-spacing: 1px; text-transform: uppercase;
+  background: rgba(220,38,38,0.2); color: #fca5a5;
+  border: 1px solid rgba(220,38,38,0.4);
 }
-.status-pill.paid { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
+.status-pill.paid {
+  background: rgba(22,163,74,0.2); color: #86efac;
+  border-color: rgba(22,163,74,0.4);
+}
+
+/* ─── Gold divider ───────────────────────────────────────────── */
+.gold-bar {
+  height: 3px;
+  background: linear-gradient(90deg, #c9a84c 0%, #e8c97a 50%, #c9a84c 100%);
+}
 
 /* ─── Bill section ───────────────────────────────────────────── */
-.bill-section { display: flex; border-bottom: 1px solid #e2e8f0; }
+.bill-section {
+  display: flex;
+  border-bottom: 1px solid #e8ecf0;
+  background: #f8fafc;
+}
 
-.bill-block { flex: 1; padding: 8px 20px; }
-.bill-block-right { border-left: 1px solid #e2e8f0; }
+.bill-block { flex: 1; padding: 16px 32px; }
+.bill-block-right { border-left: 1px solid #e8ecf0; }
 
 .bill-label {
-  font-size: 8.5px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.6px; color: #94a3b8; margin-bottom: 3px;
+  font-size: 8px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1px; color: #c9a84c; margin-bottom: 5px;
 }
-.bill-name { font-size: 11px; font-weight: 700; color: #0f172a; }
-.bill-line  { font-size: 9.5px; color: #64748b; margin-top: 1px; }
+.bill-name { font-size: 12px; font-weight: 700; color: #0f172a; }
+.bill-line  { font-size: 10px; color: #64748b; margin-top: 2px; line-height: 1.5; }
 
 /* ─── Items table ────────────────────────────────────────────── */
-.table-section { padding: 12px 20px 0; }
+.table-section { padding: 20px 32px 0; }
 
 .inv-table { width: 100%; border-collapse: collapse; }
 
-.inv-table thead tr { background: none; }
+.inv-table thead tr { background: #0f172a; }
 
 .inv-table th {
-  font-size: 9px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.6px; color: #0f172a;
-  padding: 7px 8px; text-align: left;
-  border: 1px solid #cbd5e1;
+  font-size: 8.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.8px; color: rgba(255,255,255,0.65);
+  padding: 10px 10px; text-align: left;
 }
 
+.inv-table tbody tr { border-bottom: 1px solid #f1f5f9; }
+.inv-table tbody tr:last-child { border-bottom: 2px solid #e2e8f0; }
 .inv-table tbody tr.row-alt { background: #fafbff; }
 
-.inv-table td { padding: 7px 8px; font-size: 12px; color: #334155; border: 1px solid #cbd5e1; }
+.inv-table td { padding: 10px 10px; font-size: 12px; color: #334155; }
 
-.inv-table .th-no, .inv-table .td-no     { width: 32px; text-align: center; color: #94a3b8; font-size: 10px; }
+.inv-table .th-no, .inv-table .td-no {
+  width: 32px; text-align: center;
+  color: rgba(255,255,255,0.35); font-size: 10px;
+}
+.inv-table .td-no { color: #94a3b8; }
 .inv-table .th-center, .inv-table .td-center { text-align: center; }
 .inv-table .th-right, .inv-table .td-right   { text-align: right; }
-.inv-table .th-mrp   { width: 70px; text-align: right; }
-.inv-table .td-mrp   { color: #0f172a; font-size: 10px; text-align: right; }
+.inv-table .th-mrp   { width: 72px; text-align: right; }
+.inv-table .td-mrp   { color: #94a3b8; font-size: 10px; text-align: right; }
 .inv-table .td-desc  { font-weight: 600; color: #0f172a; }
 .inv-table .td-amount { font-weight: 700; color: #0f172a; }
 
 /* ─── Totals ─────────────────────────────────────────────────── */
 .totals-wrap {
   display: flex; justify-content: flex-end;
-  padding: 0 20px; margin-top: 6px;
+  padding: 12px 32px 0;
 }
-.totals-box { width: 240px; }
+.totals-box { width: 260px; }
 
 .t-row {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 5px 0; border-bottom: 1px solid #f1f5f9;
+  padding: 6px 0; border-bottom: 1px solid #f1f5f9;
 }
 .t-label { font-size: 11px; color: #64748b; }
 .t-val   { font-size: 11px; font-weight: 600; color: #1e293b; }
-.t-paid .t-val { color: #16a34a; }
-.t-disc .t-val, .disc-val { color: #d97706; }
-.t-net { border-top: 1px solid #e2e8f0; }
+.t-paid .t-val  { color: #16a34a; }
+.t-disc .t-val, .disc-val { color: #b45309; }
+.t-net  { border-top: 1px solid #e2e8f0; }
 
 .t-grand {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 9px 0; margin-top: 6px;
-  border-top: 2px solid #1e1b4b;
+  padding: 12px 14px; margin-top: 8px;
+  background: #0f172a; border-radius: 4px;
 }
 .t-grand-label {
-  font-size: 9px; font-weight: 700; color: #64748b;
-  text-transform: uppercase; letter-spacing: 0.5px;
+  font-size: 8.5px; font-weight: 700; color: rgba(255,255,255,0.5);
+  text-transform: uppercase; letter-spacing: 0.8px;
 }
-.t-grand-val { font-size: 17px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; }
+.t-grand-val { font-size: 18px; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
 
 /* ─── Footer ─────────────────────────────────────────────────── */
-.inv-footer { margin-top: 16px; }
+.inv-footer { margin-top: 20px; }
 
 .sig-row {
   display: flex; justify-content: flex-start;
-  padding: 0 20px; margin-bottom: 14px;
+  padding: 0 32px; margin-bottom: 0;
 }
-.sig-block { width: 180px; }
-.sig-space { height: 28px; }
+.sig-block { width: 190px; }
+.sig-space { height: 32px; }
 .sig-line { border: none; border-top: 1px solid #334155; margin-bottom: 5px; }
 .sig-line-dashed { border-top-style: dashed; border-top-color: #94a3b8; }
-.sig-label { font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #64748b; }
+.sig-label { font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; }
 .sig-sub   { font-size: 9.5px; color: #94a3b8; margin-top: 2px; }
 
 .footer-strip {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 8px 20px;
-  background: #0f172a;
+  padding: 12px 32px;
+  margin-top: 16px;
+  border-top: 1px solid #e8ecf0;
+  background: #f8fafc;
 }
-.footer-thanks  { font-size: 10px; color: #475569; font-style: italic; }
-.footer-contact { display: flex; gap: 14px; font-size: 9.5px; color: #475569; }
+.footer-thanks  { font-size: 10px; color: #94a3b8; font-style: italic; }
+.footer-contact { display: flex; gap: 16px; font-size: 9.5px; color: #94a3b8; }
 
 /* ─── Responsive ─────────────────────────────────────────────── */
 @media screen and (max-width: 640px) {
-  .inv-head     { flex-direction: column; align-items: flex-start; padding: 12px 14px; gap: 8px; }
+  .inv-head     { flex-direction: column; align-items: flex-start; padding: 20px 20px 18px; gap: 12px; }
   .inv-label-block { text-align: left; }
   .inv-meta-row { justify-content: flex-start; }
   .inv-status-row { text-align: left; }
+  .inv-word     { font-size: 20px; letter-spacing: 2px; }
   .bill-section { flex-direction: column; }
-  .bill-block   { padding: 8px 14px; }
-  .bill-block-right { border-left: none; border-top: 1px solid #e2e8f0; }
-  .table-section { padding: 10px 14px 0; }
-  .totals-wrap  { padding: 0 14px; }
+  .bill-block   { padding: 12px 20px; }
+  .bill-block-right { border-left: none; border-top: 1px solid #e8ecf0; }
+  .table-section { padding: 14px 20px 0; }
+  .totals-wrap  { padding: 10px 20px 0; }
   .totals-box   { width: 100%; }
-  .sig-row      { padding: 0 14px; }
-  .footer-strip { padding: 8px 14px; flex-direction: column; gap: 4px; align-items: flex-start; }
+  .sig-row      { padding: 0 20px; }
+  .footer-strip { padding: 10px 20px; flex-direction: column; gap: 4px; align-items: flex-start; }
 }
 
 /* ─── Print ──────────────────────────────────────────────────── */
 @media print {
   @page { size: A4; margin: 8mm 10mm; }
 
-  /* No color forcing — let browser render in B&W naturally */
-  * { color: #000 !important; background: transparent !important; box-shadow: none !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
-  .no-print, .toolbar, .footer-strip, .accent-bar { display: none !important; }
+  .no-print, .toolbar { display: none !important; }
 
   .invoice-doc {
+    box-shadow: none !important;
     border-radius: 0 !important;
     max-width: 100% !important;
     width: 100% !important;
-    border: none !important;
   }
 
-  /* Header */
-  .inv-head { padding: 6px 10px !important; border-bottom: 1px solid #000 !important; }
-  .company-name { font-size: 11px !important; font-weight: 800 !important; }
-  .company-sub  { font-size: 8px !important; }
-  .inv-word     { font-size: 10px !important; font-weight: 800 !important; }
-  .inv-meta-label { font-size: 8px !important; }
-  .inv-meta-val   { font-size: 8px !important; font-weight: 700 !important; }
+  /* Header: solid black */
+  .inv-head { padding: 16px 20px 14px !important; background: #000 !important; }
+  .company-name { font-size: 14px !important; color: #fff !important; }
+  .company-sub  { font-size: 8px !important; color: rgba(255,255,255,0.6) !important; }
+  .company-info::after { background: #fff !important; width: 28px !important; margin-top: 7px !important; }
+  .inv-word     { font-size: 20px !important; letter-spacing: 3px !important; color: rgba(255,255,255,0.2) !important; margin-bottom: 6px !important; }
+  .inv-meta-label { font-size: 7.5px !important; color: rgba(255,255,255,0.45) !important; }
+  .inv-meta-val   { font-size: 7.5px !important; color: #fff !important; }
+  .status-pill  { font-size: 6.5px !important; padding: 2px 6px !important; background: rgba(255,255,255,0.15) !important; color: #fff !important; border-color: rgba(255,255,255,0.3) !important; }
 
-  /* Status pill — border only, no background */
-  .status-pill  { font-size: 7px !important; padding: 1px 5px !important; border: 1px solid #000 !important; border-radius: 2px !important; }
+  /* Gold bar */
+  .gold-bar { height: 2px !important; background: #888 !important; }
 
   /* Bill section */
-  .bill-section { border-bottom: 1px solid #000 !important; }
-  .bill-block   { padding: 5px 10px !important; }
-  .bill-block-right { border-left: 1px solid #000 !important; }
-  .bill-label   { font-size: 7px !important; }
-  .bill-name    { font-size: 9px !important; }
-  .bill-line    { font-size: 8px !important; }
+  .bill-section { background: #f5f5f5 !important; border-bottom: 1px solid #ccc !important; }
+  .bill-block   { padding: 10px 20px !important; }
+  .bill-block-right { border-left: 1px solid #ccc !important; }
+  .bill-label   { font-size: 7px !important; color: #333 !important; }
+  .bill-name    { font-size: 10px !important; color: #000 !important; }
+  .bill-line    { font-size: 8.5px !important; color: #555 !important; }
 
   /* Table */
-  .table-section { padding: 6px 10px 0 !important; }
-  .inv-table th  { font-size: 8px !important; padding: 5px 6px !important; letter-spacing: 0 !important; font-weight: 800 !important; border: 1px solid #000 !important; }
-  .inv-table td  { font-size: 10px !important; padding: 4px 6px !important; border: 1px solid #000 !important; }
-  .inv-table tbody tr.row-alt { background: transparent !important; }
-  .inv-table .th-no, .inv-table .td-no { font-size: 8px !important; width: 24px !important; }
-  .inv-table .td-mrp { font-size: 8px !important; }
-  .inv-table .td-desc { font-size: 10px !important; font-weight: 700 !important; }
-  .inv-table .td-amount { font-weight: 800 !important; }
+  .table-section { padding: 10px 20px 0 !important; }
+  .inv-table thead tr { background: #000 !important; }
+  .inv-table th  { font-size: 7.5px !important; padding: 7px 8px !important; color: rgba(255,255,255,0.8) !important; letter-spacing: 0.4px !important; }
+  .inv-table td  { font-size: 10px !important; padding: 6px 8px !important; color: #1a1a1a !important; }
+  .inv-table tbody tr { border-bottom: 1px solid #ddd !important; page-break-inside: avoid; }
+  .inv-table tbody tr:last-child { border-bottom: 2px solid #999 !important; }
+  .inv-table tbody tr.row-alt { background: #f9f9f9 !important; }
+  .inv-table .td-no  { color: #888 !important; font-size: 8px !important; }
+  .inv-table .td-mrp { font-size: 8px !important; color: #666 !important; }
+  .inv-table .td-desc { color: #000 !important; }
+  .inv-table .td-amount { color: #000 !important; }
 
   /* Totals */
-  .totals-wrap  { padding: 0 10px !important; margin-top: 4px !important; page-break-inside: avoid; }
-  .totals-box   { width: 200px !important; }
-  .t-row        { padding: 3px 0 !important; border-bottom: 1px solid #ccc !important; }
-  .t-label, .t-val { font-size: 9px !important; }
-  .t-grand      { padding: 6px 0 !important; margin-top: 4px !important; border-top: 2px solid #000 !important; }
-  .t-grand-label { font-size: 8px !important; }
-  .t-grand-val  { font-size: 14px !important; font-weight: 800 !important; }
+  .totals-wrap  { padding: 8px 20px 0 !important; page-break-inside: avoid; }
+  .totals-box   { width: 210px !important; }
+  .t-row        { padding: 4px 0 !important; border-bottom: 1px solid #e0e0e0 !important; }
+  .t-label, .t-val { font-size: 9px !important; color: #333 !important; }
+  .t-paid .t-val  { color: #333 !important; }
+  .t-disc .t-val, .disc-val { color: #333 !important; }
+
+  /* Grand total: black box */
+  .t-grand      { background: #000 !important; border-radius: 3px !important; padding: 8px 12px !important; margin-top: 6px !important; }
+  .t-grand-label { color: rgba(255,255,255,0.55) !important; font-size: 7.5px !important; }
+  .t-grand-val  { color: #fff !important; font-size: 14px !important; }
 
   /* Signature */
-  .sig-row   { padding: 0 10px !important; margin-bottom: 8px !important; }
-  .sig-block { width: 140px !important; }
+  .sig-row   { padding: 0 20px !important; margin-bottom: 0 !important; }
+  .sig-block { width: 150px !important; }
   .sig-space { height: 22px !important; }
-  .sig-line  { border-top: 1px solid #000 !important; }
-  .sig-line-dashed { border-top-style: dashed !important; }
-  .sig-label { font-size: 7px !important; }
-  .sig-sub   { font-size: 7.5px !important; }
+  .sig-line  { border-top-color: #000 !important; }
+  .sig-line-dashed { border-top-color: #777 !important; }
+  .sig-label { font-size: 7px !important; color: #444 !important; }
+  .sig-sub   { font-size: 7.5px !important; color: #666 !important; }
 
   /* Footer */
-  .inv-footer { margin-top: 10px !important; page-break-inside: avoid; }
+  .footer-strip   { background: #f5f5f5 !important; border-top: 1px solid #ccc !important; padding: 8px 20px !important; margin-top: 12px !important; }
+  .footer-thanks  { color: #666 !important; font-size: 9px !important; }
+  .footer-contact { color: #666 !important; font-size: 8.5px !important; }
+
+  .inv-footer { margin-top: 14px !important; page-break-inside: avoid; }
 }
