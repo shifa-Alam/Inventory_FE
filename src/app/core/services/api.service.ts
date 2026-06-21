@@ -23,6 +23,10 @@ export class ApiService {
         return this.http.put(this.baseUrl + url, data);
     }
 
+    patch(url: string, data: any) {
+        return this.http.patch(this.baseUrl + url, data);
+    }
+
     delete(url: string) {
         return this.http.delete(this.baseUrl + url);
     }

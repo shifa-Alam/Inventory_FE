@@ -1,1 +1,11 @@
-/* no component-specific overrides */
+.row-inactive td, .row-inactive .mc-title, .row-inactive .mc-val, .row-inactive .mc-sub {
+  opacity: 0.45;
+}
+.row-inactive { background: var(--bg) !important; }
+
+.inactive-tag {
+  display: inline-block;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+  color: #dc2626; background: #fef2f2; border: 1px solid #fecaca;
+  padding: 1px 6px; border-radius: 4px; margin-left: 6px; vertical-align: middle;
+}

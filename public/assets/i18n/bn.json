@@ -243,6 +243,12 @@
     "filter_name": "নাম বা SKU দিয়ে খুঁজুন…",
     "filter_all_categories": "সকল বিভাগ",
     "filter_all_status": "সকল অবস্থা",
+    "filter_all_active": "সব",
+    "filter_active": "সক্রিয়",
+    "filter_inactive": "নিষ্ক্রিয়",
+    "inactive": "নিষ্ক্রিয়",
+    "activate": "সক্রিয় করুন",
+    "deactivate": "নিষ্ক্রিয় করুন",
     "edit": "সম্পাদনা",
     "delete": "মুছুন",
     "empty": "কোনো পণ্য পাওয়া যায়নি।"

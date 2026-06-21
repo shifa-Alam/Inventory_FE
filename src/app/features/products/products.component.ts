@@ -21,6 +21,7 @@ export class ProductsComponent implements OnInit {
   filterName = '';
   filterCategoryId = 0;
   filterStatus = '';
+  filterActive = '';
 
   page = 1;
   pages = 1;
@@ -41,6 +42,7 @@ export class ProductsComponent implements OnInit {
     if (this.filterName.trim()) params.push(`name=${encodeURIComponent(this.filterName.trim())}`);
     if (+this.filterCategoryId > 0) params.push(`category_id=${this.filterCategoryId}`);
     if (this.filterStatus) params.push(`status=${this.filterStatus}`);
+    if (this.filterActive !== '') params.push(`is_active=${this.filterActive}`);
 
     this.loading = true;
     this.api.get(`/products/?${params.join('&')}`).subscribe({
@@ -62,7 +64,7 @@ export class ProductsComponent implements OnInit {
   }
 
   applyFilter() { this.page = 1; this.load(); }
-  clearFilter() { this.filterName = ''; this.filterCategoryId = 0; this.filterStatus = ''; this.applyFilter(); }
+  clearFilter() { this.filterName = ''; this.filterCategoryId = 0; this.filterStatus = ''; this.filterActive = ''; this.applyFilter(); }
   onPageChange(p: number) { this.page = p; this.load(); }
 
   save() { this.newProduct.id ? this.update() : this.create(); }
@@ -85,6 +87,13 @@ export class ProductsComponent implements OnInit {
   }
 
   edit(item: any) { this.newProduct = { ...item }; }
+
+  toggleActive(p: any) {
+    this.api.patch(`/products/${p.id}/toggle-active`, {}).subscribe({
+      next: (res: any) => { p.is_active = res.is_active; },
+      error: () => this.toast.error('Failed to update product status')
+    });
+  }
 
   delete(id: number) {
     if (confirm('Delete this product?')) {

@@ -243,6 +243,12 @@
     "filter_name": "Search by name or SKU…",
     "filter_all_categories": "All Categories",
     "filter_all_status": "All Status",
+    "filter_all_active": "All",
+    "filter_active": "Active",
+    "filter_inactive": "Inactive",
+    "inactive": "Inactive",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
     "edit": "Edit",
     "delete": "Delete",
     "empty": "No products found."

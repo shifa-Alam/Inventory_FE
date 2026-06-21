@@ -1,4 +1,4 @@
-﻿<div class="page">
+<div class="page">
 
   <div class="page-header">
     <div>
@@ -69,6 +69,11 @@
           <option value="OK">OK</option>
           <option value="LOW">LOW</option>
         </select>
+        <select [(ngModel)]="filterActive">
+          <option value="">{{ 'products.filter_all_active' | translate }}</option>
+          <option value="true">{{ 'products.filter_active' | translate }}</option>
+          <option value="false">{{ 'products.filter_inactive' | translate }}</option>
+        </select>
         <button class="btn btn-primary btn-sm" (click)="applyFilter()">{{ 'common.filter' | translate }}</button>
         <button class="btn btn-ghost btn-sm" (click)="clearFilter()">{{ 'common.clear' | translate }}</button>
       </div>
@@ -89,9 +94,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let p of products; let i = index">
+          <tr *ngFor="let p of products; let i = index" [class.row-inactive]="!p.is_active">
             <td class="muted">{{ (page - 1) * pageSize + i + 1 }}</td>
-            <td class="bold">{{ p.name }}</td>
+            <td class="bold">
+              {{ p.name }}
+              <span class="inactive-tag" *ngIf="!p.is_active">{{ 'products.inactive' | translate }}</span>
+            </td>
             <td class="muted">{{ p.sku }}</td>
             <td>{{ p.purchase_price | number }}</td>
             <td>{{ p.sale_price | number }}</td>
@@ -103,6 +111,10 @@
             <td>
               <div class="row-actions">
                 <button class="btn btn-warning btn-sm" (click)="edit(p)">{{ 'products.edit' | translate }}</button>
+                <button class="btn btn-sm" [ngClass]="p.is_active ? 'btn-ghost' : 'btn-success'"
+                  (click)="toggleActive(p)">
+                  {{ p.is_active ? ('products.deactivate' | translate) : ('products.activate' | translate) }}
+                </button>
                 <button class="btn btn-danger btn-sm" (click)="delete(p.id)">{{ 'products.delete' | translate }}</button>
               </div>
             </td>
@@ -127,12 +139,15 @@
     </div>
     <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
     <div class="mobile-empty" *ngIf="!loading && products.length === 0"><p>{{ 'products.empty' | translate }}</p></div>
-    <div class="mobile-card" *ngFor="let p of products; let i = index">
+    <div class="mobile-card" *ngFor="let p of products; let i = index" [class.row-inactive]="!p.is_active">
       <div class="mc-top">
         <div class="mc-name-wrap">
           <span class="mc-num">{{ (page-1)*pageSize+i+1 }}</span>
           <div>
-            <div class="mc-title">{{ p.name }}</div>
+            <div class="mc-title">
+              {{ p.name }}
+              <span class="inactive-tag" *ngIf="!p.is_active">{{ 'products.inactive' | translate }}</span>
+            </div>
             <div class="mc-sub">{{ p.sku }}</div>
           </div>
         </div>
@@ -158,6 +173,10 @@
       </div>
       <div class="mc-actions">
         <button class="btn btn-warning btn-sm" (click)="edit(p)">{{ 'products.edit' | translate }}</button>
+        <button class="btn btn-sm" [ngClass]="p.is_active ? 'btn-ghost' : 'btn-success'"
+          (click)="toggleActive(p)">
+          {{ p.is_active ? ('products.deactivate' | translate) : ('products.activate' | translate) }}
+        </button>
         <button class="btn btn-danger btn-sm" (click)="delete(p.id)">{{ 'products.delete' | translate }}</button>
       </div>
     </div>
