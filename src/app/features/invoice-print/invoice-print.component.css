@@ -241,8 +241,9 @@
     box-shadow: none !important;
     border-radius: 0 !important;
     border: none !important;
-    max-width: 100% !important;
-    width: 100% !important;
+    max-width: 160mm !important;
+    width: 160mm !important;
+    margin: 0 auto !important;
   }
 
   /* Top bar */
