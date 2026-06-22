@@ -421,7 +421,8 @@ tbody tr:hover { background: var(--surface-hover); }
 td.bold  { font-weight: 600; }
 td.muted { color: var(--text-muted); }
 td.right { text-align: right; font-weight: 500; }
-th.right { text-align: right; }
+th.right { text-align: center; }
+td.right { text-align: center !important; }
 
 .row-actions { display: flex; gap: 5px; }
 
