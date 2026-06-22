@@ -8,6 +8,7 @@ import { Subject, EMPTY } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
+import { localDateStr } from '../../shared/utils/date.utils';
 
 @Component({
   selector: 'app-sales',
@@ -24,7 +25,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   customer_id: number = 0;
   paid_amount: number = 0;
   discount: number = 0;
-  delivery_date: string = '';
+  delivery_date: string = localDateStr();
 
   // Dropdown
   selectedCustomer: any = null;
@@ -303,7 +304,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.toast.stopSaving();
         this.paid_amount = 0;
         this.discount = 0;
-        this.delivery_date = '';
+        this.delivery_date = localDateStr();
         this.items = [];
         this.selectedCustomer = null;
         this.customer_id = 0;
