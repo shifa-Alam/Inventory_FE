@@ -24,7 +24,7 @@
     <p class="card-title">{{ 'suppliers.add_title' | translate }}</p>
     <div class="form-grid">
       <div class="form-group">
-        <label>{{ 'suppliers.name_label' | translate }}</label>
+        <label>{{ 'suppliers.name_label' | translate }} <span class="req">*</span></label>
         <input [placeholder]="'suppliers.name_placeholder' | translate" [(ngModel)]="newSupplier.name" />
       </div>
       <div class="form-group">

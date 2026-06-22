@@ -12,7 +12,7 @@
     <p class="card-title">{{ newProduct.id ? ('products.edit_title' | translate) : ('products.add_title' | translate) }}</p>
     <div class="form-grid">
       <div class="form-group">
-        <label>{{ 'products.name_placeholder' | translate }}</label>
+        <label>{{ 'products.name_placeholder' | translate }} <span class="req">*</span></label>
         <input [placeholder]="'products.name_placeholder' | translate" [(ngModel)]="newProduct.name" />
       </div>
       <div class="form-group">
@@ -27,11 +27,11 @@
         </select>
       </div>
       <div class="form-group">
-        <label>{{ 'products.purchase_price_placeholder' | translate }}</label>
+        <label>{{ 'products.purchase_price_placeholder' | translate }} <span class="req">*</span></label>
         <input type="number" [placeholder]="'products.purchase_price_placeholder' | translate" [(ngModel)]="newProduct.purchase_price" />
       </div>
       <div class="form-group">
-        <label>{{ 'products.sale_price_placeholder' | translate }}</label>
+        <label>{{ 'products.sale_price_placeholder' | translate }} <span class="req">*</span></label>
         <input type="number" [placeholder]="'products.sale_price_placeholder' | translate" [(ngModel)]="newProduct.sale_price" />
       </div>
       <div class="form-group">

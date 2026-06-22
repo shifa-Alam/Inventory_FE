@@ -24,7 +24,7 @@
     <p class="card-title">{{ newCustomer.id ? ('customers.edit_title' | translate) : ('customers.add_title' | translate) }}</p>
     <div class="form-grid">
       <div class="form-group">
-        <label>{{ 'customers.name_label' | translate }}</label>
+        <label>{{ 'customers.name_label' | translate }} <span class="req">*</span></label>
         <input [placeholder]="'customers.name_placeholder' | translate" [(ngModel)]="newCustomer.name" />
       </div>
       <div class="form-group">

@@ -12,7 +12,7 @@
     <p class="card-title">{{ newCategory.id ? ('categories.edit_title' | translate) : ('categories.add_title' | translate) }}</p>
     <div class="inline-form">
       <div class="form-group" style="flex:1;max-width:360px">
-        <label>{{ 'categories.name_placeholder' | translate }}</label>
+        <label>{{ 'categories.name_placeholder' | translate }} <span class="req">*</span></label>
         <input [placeholder]="'categories.name_placeholder' | translate" [(ngModel)]="newCategory.name" />
       </div>
       <button class="btn btn-primary" (click)="save()" style="margin-top:15px">
