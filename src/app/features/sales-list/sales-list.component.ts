@@ -39,9 +39,13 @@ export class SalesListComponent implements OnInit {
 
   /* inline panel state */
   selectedSale: any = null;
-  activePanel: 'payment' | null = null;
+  activePanel: 'payment' | 'edit' | null = null;
   successMsg = '';
   errorMsg = '';
+
+  /* edit form */
+  editDeliveryDate = '';
+  saving = false;
 
   /* payment form */
   payAmount: number | null = null;
@@ -167,6 +171,34 @@ export class SalesListComponent implements OnInit {
     this.selectedSale = null;
     this.activePanel = null;
     this.payAmount = null; this.payDiscount = null; this.payNote = '';
+    this.editDeliveryDate = ''; this.saving = false;
+  }
+
+  openEdit(sale: any) {
+    if (this.selectedSale?.id === sale.id && this.activePanel === 'edit') { this.closePanel(); return; }
+    this.closePanel();
+    this.selectedSale = sale;
+    this.activePanel = 'edit';
+    this.editDeliveryDate = sale.delivery_date ? sale.delivery_date.substring(0, 10) : '';
+    this.successMsg = ''; this.errorMsg = '';
+  }
+
+  submitEdit() {
+    if (!this.selectedSale || this.saving) return;
+    this.saving = true; this.errorMsg = '';
+    this.api.patch(`/sales/${this.selectedSale.id}/delivery-date`, {
+      delivery_date: this.editDeliveryDate || null
+    }).subscribe({
+      next: (res: any) => {
+        this.saving = false;
+        this.successMsg = 'Delivery date updated.';
+        const idx = this.sales.findIndex(s => s.id === this.selectedSale.id);
+        if (idx > -1) this.sales[idx].delivery_date = res.delivery_date;
+        this.selectedSale.delivery_date = res.delivery_date;
+        setTimeout(() => { this.successMsg = ''; this.closePanel(); }, 2000);
+      },
+      error: (err: any) => { this.errorMsg = err?.error?.detail || 'Update failed.'; this.saving = false; }
+    });
   }
 
   /* ── Payment getters ── */

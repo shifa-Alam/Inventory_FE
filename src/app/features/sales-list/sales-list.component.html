@@ -117,12 +117,47 @@
                   <button class="btn btn-outline btn-sm" (click)="viewInvoice(s)" [title]="'sales_list.view_print' | translate">
                     <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   </button>
+                  <button class="btn btn-secondary btn-sm"
+                    [class.btn-ghost]="selectedSale?.id === s.id && activePanel === 'edit'"
+                    (click)="openEdit(s)" title="Edit delivery date">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
                   <button class="btn btn-success btn-sm" *ngIf="s.due_amount > 0"
                     [class.btn-ghost]="selectedSale?.id === s.id && activePanel === 'payment'"
                     (click)="openPayment(s)" [title]="'sales_list.panel_collect' | translate">
                     <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                     {{ 'sales_list.pay_btn' | translate }}
                   </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- EDIT PANEL -->
+            <tr *ngIf="selectedSale?.id === s.id && activePanel === 'edit'" class="panel-row">
+              <td colspan="10">
+                <div class="inline-panel pay-panel-wrap">
+                  <div class="panel-header">
+                    <span class="panel-title">Edit Delivery Date — {{ s.invoice_no }}</span>
+                    <button class="panel-close" (click)="closePanel()">×</button>
+                  </div>
+                  <div class="panel-body">
+                    <div class="pay-fields-row">
+                      <div class="form-group">
+                        <label>Delivery Date</label>
+                        <input type="date" [(ngModel)]="editDeliveryDate" />
+                      </div>
+                      <div class="form-group" style="justify-content:flex-end">
+                        <label>&nbsp;</label>
+                        <div class="pay-actions">
+                          <button class="btn btn-primary" (click)="submitEdit()" [disabled]="saving">
+                            <span *ngIf="saving" class="spinner"></span>
+                            {{ saving ? 'Saving...' : 'Save' }}
+                          </button>
+                          <button class="btn btn-ghost" (click)="closePanel()">Cancel</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </td>
             </tr>
@@ -311,10 +346,27 @@
       </div>
       <div class="mc-actions">
         <button class="btn btn-outline btn-sm" (click)="viewInvoice(s)">{{ 'sales_list.view_btn' | translate }}</button>
+        <button class="btn btn-secondary btn-sm" (click)="openEdit(s)"
+          [class.btn-ghost]="selectedSale?.id === s.id && activePanel === 'edit'">Edit</button>
         <button class="btn btn-success btn-sm" *ngIf="s.due_amount > 0" (click)="openPayment(s)"
           [class.btn-ghost]="selectedSale?.id === s.id && activePanel === 'payment'">
           {{ selectedSale?.id === s.id && activePanel === 'payment' ? ('common.cancel' | translate) : ('sales_list.pay_btn' | translate) }}
         </button>
+      </div>
+
+      <!-- Mobile Edit Panel -->
+      <div class="mobile-inline-panel" *ngIf="selectedSale?.id === s.id && activePanel === 'edit'">
+        <div class="mip-title">Edit Delivery Date</div>
+        <div class="form-group">
+          <label>Delivery Date</label>
+          <input type="date" [(ngModel)]="editDeliveryDate" />
+        </div>
+        <div class="pay-actions" style="margin-top:8px">
+          <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" (click)="submitEdit()" [disabled]="saving">
+            <span *ngIf="saving" class="spinner"></span>{{ saving ? 'Saving...' : 'Save' }}
+          </button>
+          <button class="btn btn-ghost btn-sm" (click)="closePanel()">Cancel</button>
+        </div>
       </div>
 
       <!-- Mobile Payment Panel -->
