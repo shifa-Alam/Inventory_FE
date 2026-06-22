@@ -53,6 +53,10 @@
           <span class="inv-meta-label">{{ 'invoice.date' | translate }}</span>
           <span class="inv-meta-val">{{ invoice?.created_at | date:'dd MMM yyyy' }}</span>
         </div>
+        <div class="inv-meta-row" *ngIf="invoice?.delivery_date">
+          <span class="inv-meta-label">Delivery Date</span>
+          <span class="inv-meta-val">{{ invoice?.delivery_date | date:'dd MMM yyyy' }}</span>
+        </div>
         <div class="inv-status-row">
           <span class="status-pill" [class.paid]="(invoice?.due_amount ?? 1) <= 0">
             {{ (invoice?.due_amount ?? 1) <= 0 ? ('invoice.status_paid' | translate) : ('invoice.status_due' | translate) }}

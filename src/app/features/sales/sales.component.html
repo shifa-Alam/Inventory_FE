@@ -148,6 +148,11 @@
         </div>
 
         <div class="summary-row">
+          <span class="s-label">Delivery Date</span>
+          <input type="date" [(ngModel)]="delivery_date" />
+        </div>
+
+        <div class="summary-row">
           <span class="s-label">{{ 'sales.paid_amount' | translate }}</span>
           <input type="number" [(ngModel)]="paid_amount" placeholder="0" min="0" />
         </div>

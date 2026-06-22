@@ -24,6 +24,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   customer_id: number = 0;
   paid_amount: number = 0;
   discount: number = 0;
+  delivery_date: string = '';
 
   // Dropdown
   selectedCustomer: any = null;
@@ -292,6 +293,9 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.customer_id > 0) {
       payload.customer_id = +this.customer_id;
     }
+    if (this.delivery_date) {
+      payload.delivery_date = this.delivery_date;
+    }
 
     this.toast.startSaving();
     this.api.post('/sales/', payload).subscribe({
@@ -299,6 +303,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.toast.stopSaving();
         this.paid_amount = 0;
         this.discount = 0;
+        this.delivery_date = '';
         this.items = [];
         this.selectedCustomer = null;
         this.customer_id = 0;
