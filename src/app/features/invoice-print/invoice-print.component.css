@@ -21,6 +21,7 @@
 /* ─── Document shell ─────────────────────────────────────────── */
 .invoice-doc {
   max-width: 720px;
+  margin: 0 auto;
   background: #fff;
   border-radius: 6px;
   box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 20px 60px rgba(0,0,0,0.12);
