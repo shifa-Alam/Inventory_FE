@@ -28,15 +28,23 @@ export class AuthService {
         localStorage.removeItem('token');
     }
 
-    getCurrentUser(): { username: string; role: string } | null {
+    getCurrentUser(): { username: string; role: string; tenant_id: number | null } | null {
         const token = this.getToken();
         if (!token) return null;
         try {
             const payload = JSON.parse(atob(token.split('.')[1]));
-            return { username: payload.sub ?? '', role: payload.role ?? '' };
+            return {
+                username: payload.sub ?? '',
+                role: payload.role ?? '',
+                tenant_id: payload.tenant_id ?? null,
+            };
         } catch {
             return null;
         }
+    }
+
+    isSystemAdmin(): boolean {
+        return this.getCurrentUser()?.role === 'system_admin';
     }
 
     getRoleLabel(role: string): string {

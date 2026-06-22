@@ -1,0 +1,78 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2>Tenants</h2>
+      <p class="sub">Manage SaaS tenants (System Admin only)</p>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="card card-body" style="margin-bottom:10px">
+    <p class="card-title">Create New Tenant</p>
+
+    <div class="alert alert-success" *ngIf="successMsg">
+      <span class="alert-icon">✓</span> {{ successMsg }}
+    </div>
+    <div class="alert alert-error" *ngIf="errorMsg">
+      <span class="alert-icon">✕</span> {{ errorMsg }}
+    </div>
+
+    <div class="inline-form">
+      <div class="form-group">
+        <label>Tenant Name</label>
+        <input type="text" [(ngModel)]="name" placeholder="e.g. Acme Corp" maxlength="150" />
+      </div>
+      <div class="form-footer">
+        <button class="btn btn-primary" (click)="create()" [disabled]="!name.trim() || loading">
+          <span *ngIf="loading" class="spinner"></span>
+          {{ loading ? 'Saving...' : 'Create Tenant' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="card desktop-table">
+    <div class="card-header-row">
+      <div class="chr-left">
+        <span class="card-title" style="margin-bottom:0">All Tenants</span>
+        <span class="count-badge">{{ tenants.length }}</span>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of tenants; let i = index">
+            <td class="muted">{{ i + 1 }}</td>
+            <td class="bold">{{ t.name }}</td>
+            <td>
+              <span class="badge" [class.badge-success]="t.is_active" [class.badge-danger]="!t.is_active">
+                {{ t.is_active ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td class="muted">{{ t.created_at | date:'dd MMM yyyy' }}</td>
+            <td>
+              <button class="btn btn-danger btn-sm" *ngIf="t.is_active" (click)="deactivate(t)">Deactivate</button>
+              <span *ngIf="!t.is_active" class="muted">—</span>
+            </td>
+          </tr>
+          <tr *ngIf="loading" class="loading-row">
+            <td colspan="5"><div class="loading-spinner"></div><span class="loading-text">Loading...</span></td>
+          </tr>
+          <tr *ngIf="!loading && tenants.length === 0">
+            <td colspan="5" class="empty-row">No tenants found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

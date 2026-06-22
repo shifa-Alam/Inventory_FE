@@ -15,7 +15,7 @@ import { ToastComponent } from '../shared/components/toast/toast.component';
 })
 export class LayoutComponent {
   sidebarOpen = false;
-  currentUser: { username: string; role: string } | null = null;
+  currentUser: { username: string; role: string; tenant_id: number | null } | null = null;
 
   constructor(
     public lang: LanguageService,

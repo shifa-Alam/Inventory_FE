@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
+import { AuthService } from '../../core/services/auth.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
 
@@ -25,13 +26,23 @@ export class UsersComponent implements OnInit {
   username = '';
   password = '';
   confirmPassword = '';
-  role = 'system_admin';
+  role = 'staff';
   successMsg = '';
   errorMsg = '';
 
-  constructor(private api: ApiService) {}
+  tenants: any[] = [];
+  selectedTenantId: number | null = null;
 
-  ngOnInit() { this.load(); }
+  constructor(private api: ApiService, public authSvc: AuthService) {}
+
+  get isSystemAdmin(): boolean { return this.authSvc.isSystemAdmin(); }
+
+  ngOnInit() {
+    this.load();
+    if (this.isSystemAdmin) {
+      this.api.get('/tenants/').subscribe({ next: (res: any) => this.tenants = res, error: () => {} });
+    }
+  }
 
   load() {
     this.loading = true;
@@ -83,6 +94,7 @@ export class UsersComponent implements OnInit {
 
     this.loading = true;
     const payload: any = { username: this.username.trim(), role: this.role, password: this.password };
+    if (this.isSystemAdmin && this.selectedTenantId) payload['tenant_id'] = this.selectedTenantId;
 
     const req = this.isEditing
       ? this.api.put(`/auth/users/${this.editingId}`, payload)
@@ -120,7 +132,8 @@ export class UsersComponent implements OnInit {
     this.username = '';
     this.password = '';
     this.confirmPassword = '';
-    this.role = 'system_admin';
+    this.role = 'staff';
+    this.selectedTenantId = null;
     this.successMsg = '';
     this.errorMsg = '';
   }

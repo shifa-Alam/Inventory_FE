@@ -37,9 +37,16 @@
       <div class="form-group">
         <label>{{ 'users.role_label' | translate }}</label>
         <select [(ngModel)]="role">
-          <option value="system_admin">{{ 'users.role_system_admin' | translate }}</option>
-          <option value="admin">{{ 'users.role_admin' | translate }}</option>
+          <option *ngIf="isSystemAdmin" value="system_admin">{{ 'users.role_system_admin' | translate }}</option>
+          <option *ngIf="isSystemAdmin" value="admin">{{ 'users.role_admin' | translate }}</option>
           <option value="staff">{{ 'users.role_staff' | translate }}</option>
+        </select>
+      </div>
+      <div class="form-group" *ngIf="isSystemAdmin">
+        <label>Tenant</label>
+        <select [(ngModel)]="selectedTenantId">
+          <option [ngValue]="null">— Select Tenant —</option>
+          <option *ngFor="let t of tenants" [ngValue]="t.id">{{ t.name }}</option>
         </select>
       </div>
       <div class="form-footer">
