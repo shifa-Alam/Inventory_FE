@@ -98,8 +98,10 @@ export class SalesListComponent implements OnInit {
 
   setThisWeek() {
     const now = new Date();
-    const sun = new Date(now); sun.setDate(now.getDate() - now.getDay());
-    this.filterDateFrom = localDateStr(sun);
+    const dayOfWeek = now.getDay(); // 0=Sun
+    const daysToMon = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const mon = new Date(now); mon.setDate(now.getDate() - daysToMon);
+    this.filterDateFrom = localDateStr(mon);
     this.filterDateTo   = localDateStr(now);
     this.applyFilter();
   }
