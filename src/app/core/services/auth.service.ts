@@ -24,6 +24,18 @@ export class AuthService {
         return !!localStorage.getItem('token');
     }
 
+    isTokenValid(): boolean {
+        const token = this.getToken();
+        if (!token) return false;
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            if (!payload.exp) return true;
+            return payload.exp * 1000 > Date.now();
+        } catch {
+            return false;
+        }
+    }
+
     logout() {
         localStorage.removeItem('token');
     }
