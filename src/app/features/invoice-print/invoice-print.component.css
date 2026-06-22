@@ -147,18 +147,18 @@
 .inv-table tbody tr:last-child { border-bottom: 2px solid #e2e8f0; }
 .inv-table tbody tr.row-alt { background: #f8fafc; }
 
-.inv-table td { padding: 5px 8px; font-size: 13px; color: #334155; line-height: 1.3; }
+.inv-table td { padding: 3px 8px; font-size: 12px; color: #334155; line-height: 1.2; }
 
 .inv-table .th-no, .inv-table .td-no {
   width: 28px; text-align: center; font-size: 10px;
   color: #94a3b8;
 }
-.inv-table .th-center, .inv-table .td-center { text-align: center; font-size: 14px; font-weight: 700; }
-.inv-table .th-right, .inv-table .td-right   { text-align: right; font-size: 14px; font-weight: 700; }
+.inv-table .th-center, .inv-table .td-center { text-align: center; font-size: 11px; font-weight: 600; }
+.inv-table .th-right, .inv-table .td-right   { text-align: right; font-size: 11px; font-weight: 600; }
 .inv-table .th-mrp   { width: 72px; text-align: right; }
-.inv-table .td-mrp   { color: #0f172a; font-size: 13px; text-align: right; font-weight: 700; }
+.inv-table .td-mrp   { color: #0f172a; font-size: 11px; text-align: right; font-weight: 600; }
 .inv-table .td-desc  { font-weight: 600; color: #0f172a; }
-.inv-table .td-amount { font-weight: 800; color: #0f172a; font-size: 14px; }
+.inv-table .td-amount { font-weight: 700; color: #0f172a; font-size: 12px; }
 
 /* ─── Totals ─────────────────────────────────────────────────── */
 .totals-wrap {
