@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, DestroyRef, inject, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, DestroyRef, inject, HostListener, ViewChild, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -21,6 +21,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
 
   @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
+  @ViewChildren('qtyInput') qtyInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   customer_id: number = 0;
   paid_amount: number = 0;
@@ -232,6 +233,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
         rate: product.sale_price
       });
       this.showToast(`Added: ${product.name}`, 'success');
+      setTimeout(() => this.qtyInputs.first?.nativeElement.focus(), 0);
     }
   }
 

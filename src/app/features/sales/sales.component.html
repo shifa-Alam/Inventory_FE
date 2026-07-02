@@ -111,7 +111,7 @@
                 <td class="col-product bold">{{ item.product_name }}</td>
                 <td class="col-stock col-center"><span class="stock-chip">{{ item.stock }}</span></td>
                 <td class="col-mrp col-right mrp-ref">{{ item.mrp ? (item.mrp | number) : '—' }}</td>
-                <td class="col-qty"><input type="number" [(ngModel)]="item.quantity" min="1" [max]="item.stock"
+                <td class="col-qty"><input #qtyInput type="number" [(ngModel)]="item.quantity" min="1" [max]="item.stock"
                     (change)="clampQuantity(item)" /></td>
                 <td class="col-rate"><input type="number" [(ngModel)]="item.rate" min="0" /></td>
                 <td class="col-total col-right">{{ item.quantity * item.rate | number }}</td>
