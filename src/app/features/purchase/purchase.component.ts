@@ -133,11 +133,13 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
       existing.quantity++;
       this.showToast(`${product.name} × ${existing.quantity}`, 'success');
     } else {
+      const rate = product.purchase_price || 0;
       this.items.push({
         product_id: product.id,
         product_name: product.name,
         quantity: 1,
-        rate: product.purchase_price
+        rate: rate,
+        total: rate
       });
       this.showToast(`Added: ${product.name}`, 'success');
     }
@@ -154,21 +156,29 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
       this.toast.warning('Product already added!');
       return;
     }
+    const rate = product.purchase_price || 0;
     this.items.push({
       product_id: product.id,
       product_name: product.name,
       quantity: 1,
-      rate: product.purchase_price
+      rate: rate,
+      total: rate
     });
     this.filteredProducts = [];
     this.productSearch = '';
     this.selectedIndex = -1;
   }
 
+  onQtyOrTotalChange(item: any) {
+    const qty = +item.quantity || 0;
+    const total = +item.total || 0;
+    item.rate = qty > 0 ? total / qty : 0;
+  }
+
   removeRow(i: number) { this.items.splice(i, 1); }
 
   getTotal() {
-    return this.items.reduce((a, b) => a + (b.quantity * b.rate), 0);
+    return this.items.reduce((a, b) => a + (+b.total || 0), 0);
   }
 
   save() {
