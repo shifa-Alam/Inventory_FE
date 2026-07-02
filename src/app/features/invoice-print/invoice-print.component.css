@@ -152,7 +152,7 @@
 
 .inv-table .th-no, .inv-table .td-no {
   width: 28px; text-align: center; font-size: 10px;
-  color: #94a3b8;
+  color: #0f172a; font-weight: 600;
 }
 .inv-table .th-center, .inv-table .td-center { text-align: center; font-size: 11px; font-weight: 600; }
 .inv-table .th-right, .inv-table .td-right   { text-align: right; font-size: 11px; font-weight: 600; }
@@ -172,10 +172,10 @@
   display: flex; justify-content: space-between; align-items: center;
   padding: 6px 0; border-bottom: 1px solid #f1f5f9;
 }
-.t-label { font-size: 11px; color: #64748b; }
-.t-val   { font-size: 11px; font-weight: 600; color: #1e293b; }
-.t-paid .t-val  { color: #16a34a; }
-.t-disc .t-val, .disc-val { color: #b45309; }
+.t-label { font-size: 11px; color: #0f172a; font-weight: 700; }
+.t-val   { font-size: 11px; font-weight: 800; color: #0f172a; }
+.t-paid .t-val  { color: #0f172a; }
+.t-disc .t-val, .disc-val { color: #0f172a; }
 .t-net  { border-top: 1px solid #e2e8f0; }
 
 .t-grand {
@@ -275,7 +275,7 @@
   .inv-table tbody tr { border-bottom: 1px solid #ddd !important; page-break-inside: avoid; }
   .inv-table tbody tr:last-child { border-bottom: 2px solid #999 !important; }
   .inv-table tbody tr.row-alt { background: #f9f9f9 !important; }
-  .inv-table .td-no  { color: #888 !important; font-size: 8px !important; }
+  .inv-table .td-no  { color: #000 !important; font-size: 8px !important; font-weight: 600 !important; }
   .inv-table .td-center { font-size: 12px !important; font-weight: 700 !important; }
   .inv-table .td-right  { font-size: 12px !important; font-weight: 700 !important; }
   .inv-table .td-mrp { font-size: 11px !important; font-weight: 700 !important; color: #000 !important; }
@@ -285,9 +285,10 @@
   .totals-wrap { padding: 8px 20px 0 !important; page-break-inside: avoid; }
   .totals-box  { width: 210px !important; }
   .t-row       { padding: 4px 0 !important; border-bottom: 1px solid #e0e0e0 !important; }
-  .t-label, .t-val { font-size: 9px !important; color: #333 !important; }
-  .t-paid .t-val  { color: #333 !important; }
-  .t-disc .t-val, .disc-val { color: #333 !important; }
+  .t-label { font-size: 9px !important; color: #000 !important; font-weight: 700 !important; }
+  .t-val   { font-size: 9px !important; color: #000 !important; font-weight: 800 !important; }
+  .t-paid .t-val  { color: #000 !important; }
+  .t-disc .t-val, .disc-val { color: #000 !important; }
   .t-grand     { border-top: 2px solid #000 !important; padding: 8px 0 !important; margin-top: 4px !important; }
   .t-grand-label { font-size: 7.5px !important; color: #555 !important; }
   .t-grand-val { font-size: 15px !important; color: #000 !important; }
