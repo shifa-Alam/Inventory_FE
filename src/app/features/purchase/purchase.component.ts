@@ -169,10 +169,14 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedIndex = -1;
   }
 
-  onQtyOrTotalChange(item: any) {
+  onQtyChange(item: any) {
     const qty = +item.quantity || 0;
-    const total = +item.total || 0;
-    item.rate = qty > 0 ? total / qty : 0;
+    item.total = qty * (+item.rate || 0);
+  }
+
+  onTotalChange(item: any) {
+    const qty = +item.quantity || 0;
+    item.rate = qty > 0 ? (+item.total || 0) / qty : 0;
   }
 
   removeRow(i: number) { this.items.splice(i, 1); }
