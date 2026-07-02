@@ -274,6 +274,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filteredProducts = [];
     this.productSearch = '';
     this.selectedIndex = -1;
+    setTimeout(() => this.qtyInputs.first?.nativeElement.focus(), 50);
   }
 
   removeRow(i: number) { this.items.splice(i, 1); }
