@@ -134,7 +134,7 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
       this.showToast(`${product.name} × ${existing.quantity}`, 'success');
     } else {
       const rate = product.purchase_price || 0;
-      this.items.push({
+      this.items.unshift({
         product_id: product.id,
         product_name: product.name,
         quantity: 1,
@@ -157,7 +157,7 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     const rate = product.purchase_price || 0;
-    this.items.push({
+    this.items.unshift({
       product_id: product.id,
       product_name: product.name,
       quantity: 1,
