@@ -223,7 +223,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
       existing.quantity++;
       this.showToast(`${product.name} × ${existing.quantity}`, 'success');
     } else {
-      this.items.push({
+      this.items.unshift({
         product_id: product.id,
         product_name: product.name,
         stock: product.current_stock,
@@ -261,7 +261,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.selectedIndex = -1;
       return;
     }
-    this.items.push({
+    this.items.unshift({
       product_id: product.id,
       product_name: product.name,
       stock: product.current_stock,
