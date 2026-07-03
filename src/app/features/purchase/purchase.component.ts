@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, DestroyRef, inject, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, DestroyRef, inject, HostListener, ViewChild, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { CommonModule } from '@angular/common';
@@ -19,6 +19,7 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
 
   @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
+  @ViewChildren('qtyInput') qtyInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   supplier_id = 0;
   suppliers: any[] = [];
@@ -26,12 +27,14 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
   productSearch = '';
   filteredProducts: any[] = [];
   selectedIndex = -1;
+  searching = false;
   items: any[] = [];
 
   searchSubject = new Subject<string>();
 
   scanToast: { message: string; type: 'success' | 'error' } | null = null;
   private toastTimer: any;
+  private scanInProgress = false;
 
   constructor(private api: ApiService, private toast: ToastService) {}
 
@@ -42,10 +45,12 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (res: any) => {
+        if (this.scanInProgress) return;
         this.filteredProducts = res;
         this.selectedIndex = this.filteredProducts.length === 1 ? 0 : -1;
+        this.searching = false;
       },
-      error: (err) => console.error('Product search failed', err)
+      error: (err) => { if (!this.scanInProgress) this.searching = false; console.error('Product search failed', err); }
     });
     this.loadSupplier();
   }
@@ -78,8 +83,11 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedIndex = -1;
     if (!value || value.length < 2) {
       this.filteredProducts = [];
+      this.searching = false;
       return;
     }
+    if (this.scanInProgress) return;
+    this.searching = true;
     this.searchSubject.next(value);
   }
 
@@ -102,8 +110,10 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
         this.selectProduct(this.filteredProducts[this.selectedIndex]);
       } else if (this.productSearch.trim().length >= 2) {
         const code = this.productSearch.trim();
+        this.scanInProgress = true;
         this.productSearch = '';
         this.filteredProducts = [];
+        this.searching = false;
         this.searchSubject.next(''); // cancel pending debounce
         this.lookupBarcode(code);
       }
@@ -116,6 +126,9 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
   private lookupBarcode(sku: string) {
     this.api.get(`/products/search?q=${encodeURIComponent(sku)}`).subscribe({
       next: (res: any) => {
+        this.scanInProgress = false;
+        this.searching = false;
+        this.filteredProducts = [];
         if (!res?.length) {
           this.showToast(`Not found: ${sku}`, 'error');
           return;
@@ -123,7 +136,12 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
         const product = res.find((p: any) => p.sku === sku) ?? res[0];
         this.addOrIncrement(product);
       },
-      error: () => this.showToast(`Not found: ${sku}`, 'error')
+      error: () => {
+        this.scanInProgress = false;
+        this.searching = false;
+        this.filteredProducts = [];
+        this.showToast(`Not found: ${sku}`, 'error');
+      }
     });
   }
 
@@ -167,6 +185,7 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filteredProducts = [];
     this.productSearch = '';
     this.selectedIndex = -1;
+    setTimeout(() => this.qtyInputs.first?.nativeElement.focus(), 50);
   }
 
   onQtyChange(item: any) {

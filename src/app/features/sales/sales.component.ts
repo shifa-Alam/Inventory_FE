@@ -43,12 +43,14 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   productSearch = '';
   filteredProducts: any[] = [];
   selectedIndex = -1;
+  searching = false;
   items: any[] = [];
 
   searchSubject = new Subject<string>();
 
   scanToast: { message: string; type: 'success' | 'error' } | null = null;
   private toastTimer: any;
+  private scanInProgress = false;
 
   constructor(private api: ApiService, private toast: ToastService, private router: Router) { }
 
@@ -60,10 +62,12 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (res: any) => {
+        if (this.scanInProgress) return;
         this.filteredProducts = res;
         this.selectedIndex = this.filteredProducts.length === 1 ? 0 : -1;
+        this.searching = false;
       },
-      error: (err) => console.error('Product search failed', err)
+      error: (err) => { if (!this.scanInProgress) this.searching = false; console.error('Product search failed', err); }
     });
   }
 
@@ -159,8 +163,11 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedIndex = -1;
     if (!value || value.length < 2) {
       this.filteredProducts = [];
+      this.searching = false;
       return;
     }
+    if (this.scanInProgress) return;
+    this.searching = true;
     this.searchSubject.next(value);
   }
 
@@ -185,8 +192,10 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
       } else if (this.productSearch.trim().length >= 2) {
         // Barcode scanner: immediate lookup, bypass debounce
         const code = this.productSearch.trim();
+        this.scanInProgress = true;
         this.productSearch = '';
         this.filteredProducts = [];
+        this.searching = false;
         this.searchSubject.next(''); // cancel any pending debounced search
         this.lookupBarcode(code);
       }
@@ -199,6 +208,9 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   private lookupBarcode(sku: string) {
     this.api.get(`/products/search?q=${encodeURIComponent(sku)}`).subscribe({
       next: (res: any) => {
+        this.scanInProgress = false;
+        this.searching = false;
+        this.filteredProducts = [];
         if (!res?.length) {
           this.showToast(`Not found: ${sku}`, 'error');
           return;
@@ -206,7 +218,12 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
         const product = res.find((p: any) => p.sku === sku) ?? res[0];
         this.addOrIncrement(product);
       },
-      error: () => this.showToast(`Not found: ${sku}`, 'error')
+      error: () => {
+        this.scanInProgress = false;
+        this.searching = false;
+        this.filteredProducts = [];
+        this.showToast(`Not found: ${sku}`, 'error');
+      }
     });
   }
 

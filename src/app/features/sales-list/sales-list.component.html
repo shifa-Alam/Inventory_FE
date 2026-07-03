@@ -15,16 +15,16 @@
         <!-- Date range -->
         <div class="sl-fg">
           <label class="sl-lbl">{{ 'sales_list.filter_from' | translate }}</label>
-          <input type="date" class="sl-inp" [(ngModel)]="filterDateFrom" (change)="applyFilter()" />
+          <input type="date" class="sl-inp" [(ngModel)]="filterDateFrom" (change)="onDateChange()" />
         </div>
         <div class="sl-fg">
           <label class="sl-lbl">{{ 'sales_list.filter_to' | translate }}</label>
-          <input type="date" class="sl-inp" [(ngModel)]="filterDateTo" (change)="applyFilter()" />
+          <input type="date" class="sl-inp" [(ngModel)]="filterDateTo" (change)="onDateChange()" />
         </div>
         <!-- Invoice -->
         <div class="sl-fg sl-fg-grow">
           <label class="sl-lbl">{{ 'sales_list.filter_invoice' | translate }}</label>
-          <input class="sl-inp" [placeholder]="'sales_list.filter_invoice_ph' | translate" [(ngModel)]="filterInvoice" (keyup.enter)="applyFilter()" />
+          <input class="sl-inp" [placeholder]="'sales_list.filter_invoice_ph' | translate" [(ngModel)]="filterInvoice" (ngModelChange)="onInvoiceInput()" />
         </div>
         <!-- Status -->
         <div class="sl-fg">
@@ -57,10 +57,10 @@
       <div class="sl-quick-row">
         <span class="sl-count">{{ total }} {{ 'sales_list.records' | translate }}</span>
         <div class="sl-qbts">
-          <button class="sl-qb" (click)="setToday()">{{ 'sales_list.btn_today' | translate }}</button>
-          <button class="sl-qb" (click)="setThisWeek()">{{ 'sales_list.btn_week' | translate }}</button>
-          <button class="sl-qb" (click)="setThisMonth()">{{ 'sales_list.btn_month' | translate }}</button>
-          <button class="sl-qb" (click)="setAllTime()">{{ 'sales_list.btn_all' | translate }}</button>
+          <button class="sl-qb" [class.sl-qb-active]="activeQuick === 'today'" (click)="setToday()">{{ 'sales_list.btn_today' | translate }}</button>
+          <button class="sl-qb" [class.sl-qb-active]="activeQuick === 'week'"  (click)="setThisWeek()">{{ 'sales_list.btn_week' | translate }}</button>
+          <button class="sl-qb" [class.sl-qb-active]="activeQuick === 'month'" (click)="setThisMonth()">{{ 'sales_list.btn_month' | translate }}</button>
+          <button class="sl-qb" [class.sl-qb-active]="activeQuick === 'all'"   (click)="setAllTime()">{{ 'sales_list.btn_all' | translate }}</button>
           <button class="sl-qb sl-qb-clear" (click)="clearFilter()">{{ 'sales_list.btn_reset' | translate }}</button>
         </div>
       </div>
@@ -267,15 +267,15 @@
       <div class="sl-filter-row">
         <div class="sl-fg">
           <label class="sl-lbl">{{ 'sales_list.filter_from' | translate }}</label>
-          <input type="date" class="sl-inp" [(ngModel)]="filterDateFrom" (change)="applyFilter()" />
+          <input type="date" class="sl-inp" [(ngModel)]="filterDateFrom" (change)="onDateChange()" />
         </div>
         <div class="sl-fg">
           <label class="sl-lbl">{{ 'sales_list.filter_to' | translate }}</label>
-          <input type="date" class="sl-inp" [(ngModel)]="filterDateTo" (change)="applyFilter()" />
+          <input type="date" class="sl-inp" [(ngModel)]="filterDateTo" (change)="onDateChange()" />
         </div>
         <div class="sl-fg sl-fg-grow">
           <label class="sl-lbl">{{ 'sales_list.filter_invoice' | translate }}</label>
-          <input class="sl-inp" [placeholder]="'sales_list.filter_invoice_ph' | translate" [(ngModel)]="filterInvoice" (keyup.enter)="applyFilter()" />
+          <input class="sl-inp" [placeholder]="'sales_list.filter_invoice_ph' | translate" [(ngModel)]="filterInvoice" (ngModelChange)="onInvoiceInput()" />
         </div>
         <div class="sl-fg">
           <label class="sl-lbl">{{ 'sales_list.filter_status' | translate }}</label>
@@ -304,10 +304,10 @@
       </div>
       <div class="sl-quick-row">
         <div class="sl-qbts">
-          <button class="sl-qb" (click)="setToday()">{{ 'sales_list.btn_today' | translate }}</button>
-          <button class="sl-qb" (click)="setThisWeek()">{{ 'sales_list.btn_week_short' | translate }}</button>
-          <button class="sl-qb" (click)="setThisMonth()">{{ 'sales_list.btn_month_short' | translate }}</button>
-          <button class="sl-qb" (click)="setAllTime()">{{ 'sales_list.btn_all_short' | translate }}</button>
+          <button class="sl-qb" [class.sl-qb-active]="activeQuick === 'today'" (click)="setToday()">{{ 'sales_list.btn_today' | translate }}</button>
+          <button class="sl-qb" [class.sl-qb-active]="activeQuick === 'week'"  (click)="setThisWeek()">{{ 'sales_list.btn_week_short' | translate }}</button>
+          <button class="sl-qb" [class.sl-qb-active]="activeQuick === 'month'" (click)="setThisMonth()">{{ 'sales_list.btn_month_short' | translate }}</button>
+          <button class="sl-qb" [class.sl-qb-active]="activeQuick === 'all'"   (click)="setAllTime()">{{ 'sales_list.btn_all_short' | translate }}</button>
           <button class="sl-qb sl-qb-clear" (click)="clearFilter()">{{ 'sales_list.btn_reset' | translate }}</button>
         </div>
       </div>

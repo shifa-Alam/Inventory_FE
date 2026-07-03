@@ -141,20 +141,42 @@
 
   <!-- ── Return History ── -->
   <div class="card" style="margin-top:24px">
-    <div class="card-header-row">
-      <span class="card-title">{{ 'sale_return.history_title' | translate }}</span>
-      <span class="count-badge">{{ returns.length }}</span>
+    <div class="rh-filter-bar">
+      <div class="rh-filter-row">
+        <div class="rh-fg">
+          <label class="rh-lbl">From</label>
+          <input type="date" class="rh-inp" [(ngModel)]="filterDateFrom" (change)="onDateChange()" />
+        </div>
+        <div class="rh-fg">
+          <label class="rh-lbl">To</label>
+          <input type="date" class="rh-inp" [(ngModel)]="filterDateTo" (change)="onDateChange()" />
+        </div>
+        <div class="rh-fg rh-fg-grow">
+          <label class="rh-lbl">Return No</label>
+          <input class="rh-inp" placeholder="e.g. RET-001" [(ngModel)]="filterReturnNo" (ngModelChange)="applyFilter()" />
+        </div>
+      </div>
+      <div class="rh-quick-row">
+        <span class="rh-count">{{ historyTotal }} {{ 'sale_return.history_title' | translate }}</span>
+        <div class="rh-qbts">
+          <button class="rh-qb" [class.rh-qb-active]="activeQuick === 'today'" (click)="setToday()">Today</button>
+          <button class="rh-qb" [class.rh-qb-active]="activeQuick === 'week'"  (click)="setThisWeek()">This Week</button>
+          <button class="rh-qb" [class.rh-qb-active]="activeQuick === 'month'" (click)="setThisMonth()">This Month</button>
+          <button class="rh-qb" [class.rh-qb-active]="activeQuick === 'all'"   (click)="setAllTime()">All Time</button>
+          <button class="rh-qb rh-qb-clear" (click)="clearFilter()">Reset</button>
+        </div>
+      </div>
     </div>
     <div class="table-wrapper">
       <table>
         <thead>
           <tr>
+            <th>{{ 'sale_return.col_date' | translate }}</th>
             <th>{{ 'sale_return.col_return_no' | translate }}</th>
             <th>{{ 'sale_return.col_sale_id' | translate }}</th>
             <th>{{ 'sale_return.col_customer' | translate }}</th>
             <th>{{ 'sale_return.col_reason' | translate }}</th>
             <th class="col-right">{{ 'sale_return.col_amount' | translate }}</th>
-            <th>{{ 'sale_return.col_date' | translate }}</th>
           </tr>
         </thead>
         <tbody>
@@ -162,12 +184,12 @@
             <td colspan="6" class="empty-row"><div class="loading-spinner"></div></td>
           </tr>
           <tr *ngFor="let r of returns">
+            <td class="muted">{{ r.created_at | date:'dd MMM yyyy, hh:mm a' }}</td>
             <td><span class="ref-badge">{{ r.return_no }}</span></td>
             <td class="muted">{{ r.invoice_no || ('#' + r.sale_id) }}</td>
             <td class="bold">{{ r.customer_name || '—' }}</td>
             <td class="muted small">{{ r.reason || '—' }}</td>
             <td class="col-right"><span class="amount-return">৳{{ r.total_amount | number:'1.0-2' }}</span></td>
-            <td class="muted">{{ r.created_at | date:'dd MMM yyyy' }}</td>
           </tr>
           <tr *ngIf="!loadingReturns && returns.length === 0">
             <td colspan="6" class="empty-row">{{ 'sale_return.history_empty' | translate }}</td>
@@ -175,6 +197,7 @@
         </tbody>
       </table>
     </div>
+    <app-paginator [page]="page" [pages]="pages" [total]="historyTotal" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
   </div>
 
 </div>

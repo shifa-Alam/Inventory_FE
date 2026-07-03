@@ -5,6 +5,7 @@ import { ApiService } from '../../core/services/api.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
 import { ToastService } from '../../shared/services/toast.service';
+import { ConfirmService } from '../../shared/services/confirm.service';
 
 @Component({
   selector: 'app-products',
@@ -22,15 +23,17 @@ export class ProductsComponent implements OnInit {
   filterCategoryId = 0;
   filterStatus = '';
   filterActive = '';
+  private filterTimer: any;
 
   page = 1;
   pages = 1;
   total = 0;
   pageSize = 20;
 
+  showForm = false;
   newProduct = { id: 0, name: '', sku: '', category_id: 0, purchase_price: 0, sale_price: 0, mrp: 0, current_stock: 0 };
 
-  constructor(private api: ApiService, private toast: ToastService) {}
+  constructor(private api: ApiService, private toast: ToastService, private confirmSvc: ConfirmService) {}
 
   ngOnInit() {
     this.load();
@@ -64,6 +67,7 @@ export class ProductsComponent implements OnInit {
   }
 
   applyFilter() { this.page = 1; this.load(); }
+  onSearchInput() { clearTimeout(this.filterTimer); this.filterTimer = setTimeout(() => this.applyFilter(), 400); }
   clearFilter() { this.filterName = ''; this.filterCategoryId = 0; this.filterStatus = ''; this.filterActive = ''; this.applyFilter(); }
   onPageChange(p: number) { this.page = p; this.load(); }
 
@@ -86,7 +90,9 @@ export class ProductsComponent implements OnInit {
     });
   }
 
-  edit(item: any) { this.newProduct = { ...item }; }
+  openAdd() { this.resetFields(); this.showForm = true; }
+  cancelForm() { this.resetFields(); this.showForm = false; }
+  edit(item: any) { this.newProduct = { ...item }; this.showForm = true; }
 
   toggleActive(p: any) {
     this.api.patch(`/products/${p.id}/toggle-active`, {}).subscribe({
@@ -95,16 +101,17 @@ export class ProductsComponent implements OnInit {
     });
   }
 
-  delete(id: number) {
-    if (confirm('Delete this product?')) {
-      this.api.delete(`/products/${id}`).subscribe({
-        next: () => this.load(),
-        error: (err) => console.error('Failed to delete product', err)
-      });
-    }
+  async delete(id: number) {
+    if (!await this.confirmSvc.open('Delete this product? This cannot be undone.')) return;
+    this.api.delete(`/products/${id}`).subscribe({
+      next: () => this.load(),
+      error: () => this.toast.error('Failed to delete product.')
+    });
   }
 
-  reset() {
+  resetFields() {
     this.newProduct = { id: 0, name: '', sku: '', category_id: 0, purchase_price: 0, sale_price: 0, mrp: 0, current_stock: 0 };
   }
+
+  reset() { this.cancelForm(); }
 }

@@ -22,15 +22,23 @@
 
   <!-- SEARCH -->
   <div class="card card-body search-wrap" style="margin-bottom:16px">
-    <input
-      #searchInput
-      type="text"
-      [placeholder]="'purchase.search_placeholder' | translate"
-      [(ngModel)]="productSearch"
-      (ngModelChange)="onSearchChange($event)"
-      (keydown)="onKeyDown($event)"
-    />
-    <div class="dropdown" *ngIf="filteredProducts.length > 0">
+    <div class="search-input-row">
+      <svg class="search-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input
+        #searchInput
+        type="text"
+        [placeholder]="'purchase.search_placeholder' | translate"
+        [(ngModel)]="productSearch"
+        (ngModelChange)="onSearchChange($event)"
+        (keydown)="onKeyDown($event)"
+      />
+      <div class="search-spinner" *ngIf="searching"></div>
+    </div>
+    <div class="search-progress" *ngIf="searching"></div>
+    <div class="dropdown" *ngIf="filteredProducts.length > 0 || searching">
+      <div class="dp-loading" *ngIf="searching && filteredProducts.length === 0">
+        <span class="dp-loading-dot"></span><span class="dp-loading-dot"></span><span class="dp-loading-dot"></span>
+      </div>
       <div
         class="dropdown-item"
         *ngFor="let p of filteredProducts; let i = index"
@@ -43,8 +51,8 @@
     </div>
   </div>
 
-  <!-- ITEMS TABLE -->
-  <div class="card" style="margin-bottom:16px">
+  <!-- ITEMS TABLE — desktop -->
+  <div class="card hide-mobile" style="margin-bottom:16px">
     <div class="table-wrapper">
       <table>
         <thead>
@@ -61,7 +69,7 @@
           <tr *ngFor="let item of items; let i = index">
             <td class="muted">{{ i + 1 }}</td>
             <td class="bold">{{ item.product_name }}</td>
-            <td><input type="number" [(ngModel)]="item.quantity" min="1" (ngModelChange)="onQtyChange(item)" /></td>
+            <td><input #qtyInput type="number" [(ngModel)]="item.quantity" min="1" (ngModelChange)="onQtyChange(item)" /></td>
             <td><input type="number" [(ngModel)]="item.total" min="0" (ngModelChange)="onTotalChange(item)" /></td>
             <td class="muted">{{ item.rate | number:'1.0-2' }}</td>
             <td>
@@ -73,6 +81,34 @@
           </tr>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- ITEMS — mobile cards -->
+  <div class="mobile-items show-mobile" style="margin-bottom:16px">
+    <div class="mobile-empty" *ngIf="items.length === 0">{{ 'purchase.empty' | translate }}</div>
+    <div class="mobile-item-card" *ngFor="let item of items; let i = index">
+      <div class="mic-top">
+        <span class="mic-num">{{ i + 1 }}</span>
+        <span class="mic-name">{{ item.product_name }}</span>
+        <button class="mic-remove" (click)="removeRow(i)">✕</button>
+      </div>
+      <div class="mic-row">
+        <div class="mic-field">
+          <span class="mic-lbl">{{ 'purchase.col_qty' | translate }}</span>
+          <input #qtyInput type="number" [(ngModel)]="item.quantity" min="1"
+            (ngModelChange)="onQtyChange(item)" class="mic-input" />
+        </div>
+        <div class="mic-field">
+          <span class="mic-lbl">{{ 'purchase.col_total' | translate }}</span>
+          <input type="number" [(ngModel)]="item.total" min="0"
+            (ngModelChange)="onTotalChange(item)" class="mic-input" />
+        </div>
+        <div class="mic-field">
+          <span class="mic-lbl">{{ 'purchase.col_rate' | translate }}</span>
+          <span class="mic-rate">{{ item.rate | number:'1.0-2' }}</span>
+        </div>
+      </div>
     </div>
   </div>
 

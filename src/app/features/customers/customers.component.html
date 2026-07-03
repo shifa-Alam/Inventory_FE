@@ -5,6 +5,11 @@
       <h2>{{ 'customers.title' | translate }}</h2>
       <p class="sub">{{ 'customers.subtitle' | translate }}</p>
     </div>
+    <button class="btn" [class.btn-primary]="!showForm" [class.btn-ghost]="showForm" (click)="showForm && !newCustomer.id ? cancelForm() : openAdd()">
+      <svg *ngIf="!showForm || newCustomer.id" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <svg *ngIf="showForm && !newCustomer.id" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      {{ showForm && !newCustomer.id ? ('customers.cancel' | translate) : ('customers.add_title' | translate) }}
+    </button>
   </div>
 
   <!-- SUMMARY -->
@@ -20,8 +25,11 @@
   </div>
 
   <!-- FORM -->
-  <div class="card card-body form-card" style="margin-bottom:10px">
-    <p class="card-title">{{ newCustomer.id ? ('customers.edit_title' | translate) : ('customers.add_title' | translate) }}</p>
+  <div class="card card-body form-card" *ngIf="showForm" style="margin-bottom:10px">
+    <div class="form-card-header">
+      <p class="card-title">{{ newCustomer.id ? ('customers.edit_title' | translate) : ('customers.add_title' | translate) }}</p>
+      <button class="close-btn" (click)="cancelForm()">✕</button>
+    </div>
     <div class="form-grid">
       <div class="form-group">
         <label>{{ 'customers.name_label' | translate }} <span class="req">*</span></label>
@@ -48,7 +56,7 @@
       <button class="btn btn-primary" (click)="save()">
         {{ newCustomer.id ? ('customers.update' | translate) : ('customers.save' | translate) }}
       </button>
-      <button class="btn btn-ghost" *ngIf="newCustomer.id" (click)="cancel()">{{ 'customers.cancel' | translate }}</button>
+      <button class="btn btn-ghost" (click)="cancelForm()">{{ 'customers.cancel' | translate }}</button>
     </div>
   </div>
 
@@ -60,13 +68,12 @@
         <span class="count-badge">{{ total }} total</span>
       </div>
       <div class="chr-toolbar">
-        <input [placeholder]="'customers.filter_name' | translate" [(ngModel)]="filterName" (keyup.enter)="applyFilter()" />
-        <select [(ngModel)]="filterHasDue">
+        <input [placeholder]="'customers.filter_name' | translate" [(ngModel)]="filterName" (ngModelChange)="onSearchInput()" />
+        <select [(ngModel)]="filterHasDue" (ngModelChange)="applyFilter()">
           <option value="">{{ 'customers.filter_all' | translate }}</option>
           <option value="true">{{ 'customers.filter_has_due' | translate }}</option>
           <option value="false">{{ 'customers.filter_no_due' | translate }}</option>
         </select>
-        <button class="btn btn-primary btn-sm" (click)="applyFilter()">{{ 'common.filter' | translate }}</button>
         <button class="btn btn-ghost btn-sm" (click)="clearFilter()">{{ 'common.clear' | translate }}</button>
       </div>
     </div>

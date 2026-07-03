@@ -26,6 +26,7 @@ export class PaymentLedgerComponent implements OnInit {
   customerResults: any[] = [];
   customerSearchTimer: any;
   showCustomerDropdown = false;
+  searchingCustomer = false;
 
   /* summary */
   summary: any = {
@@ -118,6 +119,7 @@ export class PaymentLedgerComponent implements OnInit {
       this.showCustomerDropdown = false;
       return;
     }
+    this.searchingCustomer = true;
     this.customerSearchTimer = setTimeout(() => this.searchCustomers(), 300);
   }
 
@@ -127,8 +129,9 @@ export class PaymentLedgerComponent implements OnInit {
       next: (res: any) => {
         this.customerResults = res.data ?? res;
         this.showCustomerDropdown = this.customerResults.length > 0;
+        this.searchingCustomer = false;
       },
-      error: () => {}
+      error: () => { this.searchingCustomer = false; }
     });
   }
 

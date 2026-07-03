@@ -45,9 +45,7 @@ export class DashboardComponent implements OnInit {
   }
 
   fmt(n: number): string {
-    if (n >= 100000) return (n / 100000).toFixed(1) + 'L';
-    if (n >= 1000)   return (n / 1000).toFixed(1) + 'K';
-    return Math.round(n).toString();
+    return Math.round(n).toLocaleString('en-US');
   }
 
   topBarWidth(rev: number): number {
@@ -61,5 +59,36 @@ export class DashboardComponent implements OnInit {
     return Math.max(2, Math.round((stock / max) * 100));
   }
 
-  get profitPositive(): boolean { return (this.data.profit ?? 0) >= 0; }
+  get profitPositive(): boolean      { return (this.data.profit ?? 0) >= 0; }
+  get grossProfitPositive(): boolean { return (this.data.gross_profit ?? 0) >= 0; }
+  get netProfitPositive(): boolean   { return (this.data.net_profit ?? 0) >= 0; }
+
+  expenseCatLabel(cat: string): string {
+    const map: Record<string, string> = {
+      carrying: 'Carrying', delivery: 'Delivery', rent: 'Rent',
+      utility: 'Utility', salary: 'Salary', maintenance: 'Maintenance',
+      marketing: 'Marketing', other: 'Other',
+    };
+    return map[cat] ?? cat;
+  }
+
+  expenseCatClass(cat: string): string {
+    const map: Record<string, string> = {
+      carrying: 'ec-purple', delivery: 'ec-blue', rent: 'ec-orange',
+      utility: 'ec-yellow', salary: 'ec-green', maintenance: 'ec-teal',
+      marketing: 'ec-pink',  other: 'ec-gray',
+    };
+    return map[cat] ?? 'ec-gray';
+  }
+
+  expenseCatEntries(): { key: string; label: string; amount: number; cls: string; pct: number }[] {
+    const map: Record<string, number> = this.data.expense_by_category ?? {};
+    const total = this.data.month_expenses || 1;
+    return Object.entries(map)
+      .map(([k, v]) => ({
+        key: k, label: this.expenseCatLabel(k), amount: v as number,
+        cls: this.expenseCatClass(k), pct: Math.round(((v as number) / total) * 100)
+      }))
+      .sort((a, b) => b.amount - a.amount);
+  }
 }

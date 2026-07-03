@@ -5,6 +5,7 @@ import { ApiService } from '../../core/services/api.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
 import { ToastService } from '../../shared/services/toast.service';
+import { ConfirmService } from '../../shared/services/confirm.service';
 
 @Component({
   selector: 'app-customers',
@@ -25,9 +26,10 @@ export class CustomersComponent implements OnInit {
   total = 0;
   pageSize = 20;
 
+  showForm = false;
   newCustomer = { id: 0, name: '', phone: '', address: '', credit_limit: 0, current_due: 0 };
 
-  constructor(private api: ApiService, private toast: ToastService) {}
+  constructor(private api: ApiService, private toast: ToastService, private confirmSvc: ConfirmService) {}
 
   ngOnInit() { this.load(); }
 
@@ -50,45 +52,51 @@ export class CustomersComponent implements OnInit {
 
   applyFilter() { this.page = 1; this.load(); }
   clearFilter() { this.filterName = ''; this.filterHasDue = ''; this.applyFilter(); }
+  private filterTimer: any;
+  onSearchInput() { clearTimeout(this.filterTimer); this.filterTimer = setTimeout(() => this.applyFilter(), 400); }
   onPageChange(p: number) { this.page = p; this.load(); }
 
   save() { this.newCustomer.id > 0 ? this.updateCustomer() : this.createCustomer(); }
 
+  openAdd() { this.resetFields(); this.showForm = true; }
+  cancelForm() { this.resetFields(); this.showForm = false; }
+
   createCustomer() {
     this.toast.startSaving();
     this.api.post('/customers/', this.newCustomer).subscribe({
-      next: () => { this.toast.stopSaving(); this.toast.success('Customer Added'); this.load(); this.reset(); },
+      next: () => { this.toast.stopSaving(); this.toast.success('Customer Added'); this.load(); this.cancelForm(); },
       error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to create customer'); console.error(err); }
     });
   }
 
-  edit(c: any) { this.newCustomer = { ...c }; }
+  edit(c: any) { this.newCustomer = { ...c }; this.showForm = true; }
 
   updateCustomer() {
     const { name, phone, address, credit_limit, current_due } = this.newCustomer;
     this.toast.startSaving();
     this.api.put(`/customers/${this.newCustomer.id}`, { name, phone, address, credit_limit, current_due }).subscribe({
-      next: () => { this.toast.stopSaving(); this.toast.success('Customer Updated'); this.load(); this.reset(); },
+      next: () => { this.toast.stopSaving(); this.toast.success('Customer Updated'); this.load(); this.cancelForm(); },
       error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to update customer'); console.error(err); }
     });
   }
 
-  delete(id: number) {
-    if (confirm('Delete customer?')) {
-      this.api.delete(`/customers/${id}`).subscribe({
-        next: () => this.load(),
-        error: (err) => console.error('Failed to delete customer', err)
-      });
-    }
+  async delete(id: number) {
+    if (!await this.confirmSvc.open('Delete this customer? This cannot be undone.')) return;
+    this.api.delete(`/customers/${id}`).subscribe({
+      next: () => this.load(),
+      error: () => this.toast.error('Failed to delete customer.')
+    });
   }
 
-  cancel() { this.reset(); }
+  cancel() { this.cancelForm(); }
 
   totalDue(): number {
     return this.customers.reduce((sum, c) => sum + (c.current_due || 0), 0);
   }
 
-  private reset() {
+  private resetFields() {
     this.newCustomer = { id: 0, name: '', phone: '', address: '', credit_limit: 0, current_due: 0 };
   }
+
+  private reset() { this.cancelForm(); }
 }

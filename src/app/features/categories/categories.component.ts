@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
+import { ConfirmService } from '../../shared/services/confirm.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-categories',
@@ -23,9 +25,10 @@ export class CategoriesComponent implements OnInit {
   total = 0;
   pageSize = 20;
 
+  showForm = false;
   newCategory: any = { id: 0, name: '' };
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private confirmSvc: ConfirmService, private toast: ToastService) {}
 
   ngOnInit() { this.load(); }
 
@@ -54,32 +57,35 @@ export class CategoriesComponent implements OnInit {
 
   applyFilter() { this.page = 1; this.load(); }
   clearFilter() { this.filterName = ''; this.applyFilter(); }
+  private filterTimer: any;
+  onSearchInput() { clearTimeout(this.filterTimer); this.filterTimer = setTimeout(() => this.applyFilter(), 400); }
   onPageChange(p: number) { this.page = p; this.load(); }
 
   save() { this.newCategory.id > 0 ? this.updateCategory() : this.createCategory(); }
 
   createCategory() {
     this.api.post('/categories/', this.newCategory).subscribe({
-      next: () => { this.load(); this.newCategory = { id: 0, name: '' }; },
+      next: () => { this.load(); this.cancelForm(); },
       error: (err) => console.error('Failed to create category', err)
     });
   }
 
-  edit(c: any) { this.newCategory = { ...c }; }
+  openAdd() { this.newCategory = { id: 0, name: '' }; this.showForm = true; }
+  cancelForm() { this.newCategory = { id: 0, name: '' }; this.showForm = false; }
+  edit(c: any) { this.newCategory = { ...c }; this.showForm = true; }
 
   updateCategory() {
     this.api.put(`/categories/${this.newCategory.id}`, this.newCategory).subscribe({
-      next: () => { this.load(); this.newCategory = { id: 0, name: '' }; },
+      next: () => { this.load(); this.cancelForm(); },
       error: (err) => console.error('Failed to update category', err)
     });
   }
 
-  delete(id: number) {
-    if (confirm('Are you sure to delete this category?')) {
-      this.api.delete(`/categories/${id}`).subscribe({
-        next: () => this.load(),
-        error: (err) => console.error('Failed to delete category', err)
-      });
-    }
+  async delete(id: number) {
+    if (!await this.confirmSvc.open('Delete this category? This cannot be undone.')) return;
+    this.api.delete(`/categories/${id}`).subscribe({
+      next: () => this.load(),
+      error: () => this.toast.error('Failed to delete category.')
+    });
   }
 }

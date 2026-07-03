@@ -5,11 +5,19 @@
       <h2>{{ 'products.title' | translate }}</h2>
       <p class="sub">{{ 'products.subtitle' | translate }}</p>
     </div>
+    <button class="btn" [class.btn-primary]="!showForm" [class.btn-ghost]="showForm" (click)="showForm && !newProduct.id ? cancelForm() : openAdd()">
+      <svg *ngIf="!showForm || newProduct.id" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <svg *ngIf="showForm && !newProduct.id" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      {{ showForm && !newProduct.id ? ('products.cancel' | translate) : ('products.add_title' | translate) }}
+    </button>
   </div>
 
   <!-- FORM -->
-  <div class="card card-body" style="margin-bottom:10px">
-    <p class="card-title">{{ newProduct.id ? ('products.edit_title' | translate) : ('products.add_title' | translate) }}</p>
+  <div class="card card-body form-card" *ngIf="showForm">
+    <div class="form-card-header">
+      <p class="card-title">{{ newProduct.id ? ('products.edit_title' | translate) : ('products.add_title' | translate) }}</p>
+      <button class="close-btn" (click)="cancelForm()">✕</button>
+    </div>
     <div class="form-grid">
       <div class="form-group">
         <label>{{ 'products.name_placeholder' | translate }} <span class="req">*</span></label>
@@ -47,7 +55,7 @@
       <button class="btn btn-primary" (click)="save()">
         {{ newProduct.id ? ('products.update' | translate) : ('products.save' | translate) }}
       </button>
-      <button class="btn btn-ghost" *ngIf="newProduct.id" (click)="reset()">{{ 'products.cancel' | translate }}</button>
+      <button class="btn btn-ghost" (click)="cancelForm()">{{ 'products.cancel' | translate }}</button>
     </div>
   </div>
 
@@ -59,22 +67,21 @@
         <span class="count-badge">{{ total }} total</span>
       </div>
       <div class="chr-toolbar">
-        <input [placeholder]="'products.filter_name' | translate" [(ngModel)]="filterName" (keyup.enter)="applyFilter()" />
-        <select [(ngModel)]="filterCategoryId">
+        <input placeholder="Name or Barcode" [(ngModel)]="filterName" (ngModelChange)="onSearchInput()" />
+        <select [(ngModel)]="filterCategoryId" (ngModelChange)="applyFilter()">
           <option value="0">{{ 'products.filter_all_categories' | translate }}</option>
           <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
         </select>
-        <select [(ngModel)]="filterStatus">
+        <select [(ngModel)]="filterStatus" (ngModelChange)="applyFilter()">
           <option value="">{{ 'products.filter_all_status' | translate }}</option>
           <option value="OK">OK</option>
           <option value="LOW">LOW</option>
         </select>
-        <select [(ngModel)]="filterActive">
+        <select [(ngModel)]="filterActive" (ngModelChange)="applyFilter()">
           <option value="">{{ 'products.filter_all_active' | translate }}</option>
           <option value="true">{{ 'products.filter_active' | translate }}</option>
           <option value="false">{{ 'products.filter_inactive' | translate }}</option>
         </select>
-        <button class="btn btn-primary btn-sm" (click)="applyFilter()">{{ 'common.filter' | translate }}</button>
         <button class="btn btn-ghost btn-sm" (click)="clearFilter()">{{ 'common.clear' | translate }}</button>
       </div>
     </div>
@@ -133,6 +140,19 @@
 
   <!-- MOBILE LIST -->
   <div class="mobile-list">
+    <div class="mobile-filter">
+      <input placeholder="Name or Barcode" [(ngModel)]="filterName" (ngModelChange)="onSearchInput()" />
+      <select [(ngModel)]="filterCategoryId" (ngModelChange)="applyFilter()">
+        <option value="0">{{ 'products.filter_all_categories' | translate }}</option>
+        <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
+      </select>
+      <select [(ngModel)]="filterActive" (ngModelChange)="applyFilter()">
+        <option value="">{{ 'products.filter_all_active' | translate }}</option>
+        <option value="true">{{ 'products.filter_active' | translate }}</option>
+        <option value="false">{{ 'products.filter_inactive' | translate }}</option>
+      </select>
+      <button class="btn btn-ghost btn-sm" (click)="clearFilter()">{{ 'common.clear' | translate }}</button>
+    </div>
     <div class="mobile-meta">
       <span class="mobile-title">{{ 'products.title' | translate }}</span>
       <span class="count-badge">{{ total }}</span>

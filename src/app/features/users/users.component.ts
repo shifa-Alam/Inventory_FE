@@ -5,6 +5,7 @@ import { ApiService } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
+import { ConfirmService } from '../../shared/services/confirm.service';
 
 @Component({
   selector: 'app-users',
@@ -22,6 +23,7 @@ export class UsersComponent implements OnInit {
   total = 0;
   pageSize = 20;
 
+  showForm = false;
   editingId: number | null = null;
   username = '';
   password = '';
@@ -33,7 +35,7 @@ export class UsersComponent implements OnInit {
   tenants: any[] = [];
   selectedTenantId: number | null = null;
 
-  constructor(private api: ApiService, public authSvc: AuthService) {}
+  constructor(private api: ApiService, public authSvc: AuthService, private confirmSvc: ConfirmService) {}
 
   get isSystemAdmin(): boolean { return this.authSvc.isSystemAdmin(); }
 
@@ -77,6 +79,9 @@ export class UsersComponent implements OnInit {
     return this.confirmPassword.length > 0 && this.password !== this.confirmPassword;
   }
 
+  openAdd() { this.reset(); this.showForm = true; }
+  cancelForm() { this.reset(); this.showForm = false; }
+
   edit(u: any) {
     this.editingId = u.id;
     this.username = u.username;
@@ -85,6 +90,7 @@ export class UsersComponent implements OnInit {
     this.role = u.role;
     this.successMsg = '';
     this.errorMsg = '';
+    this.showForm = true;
   }
 
   save() {
@@ -116,16 +122,15 @@ export class UsersComponent implements OnInit {
     });
   }
 
-  delete(id: number) {
-    if (confirm('Delete this user?')) {
-      this.api.delete(`/auth/users/${id}`).subscribe({
-        next: () => this.load(),
-        error: (err) => console.error('Failed to delete user', err)
-      });
-    }
+  async delete(id: number) {
+    if (!await this.confirmSvc.open('Delete this user? This cannot be undone.')) return;
+    this.api.delete(`/auth/users/${id}`).subscribe({
+      next: () => this.load(),
+      error: () => {}
+    });
   }
 
-  cancel() { this.reset(); }
+  cancel() { this.cancelForm(); }
 
   private reset() {
     this.editingId = null;
@@ -136,5 +141,6 @@ export class UsersComponent implements OnInit {
     this.selectedTenantId = null;
     this.successMsg = '';
     this.errorMsg = '';
+    this.showForm = false;
   }
 }

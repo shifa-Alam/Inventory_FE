@@ -24,7 +24,8 @@ export class SuppliersComponent implements OnInit {
   total = 0;
   pageSize = 20;
 
-  newSupplier = { name: '', phone: '', address: '', opening_due: 0 };
+  showForm = false;
+  newSupplier = { id: 0, name: '', phone: '', address: '', opening_due: 0 };
 
   constructor(private api: ApiService, private toast: ToastService) {}
 
@@ -48,18 +49,28 @@ export class SuppliersComponent implements OnInit {
 
   applyFilter() { this.page = 1; this.load(); }
   clearFilter() { this.filterName = ''; this.applyFilter(); }
+  private filterTimer: any;
+  onSearchInput() { clearTimeout(this.filterTimer); this.filterTimer = setTimeout(() => this.applyFilter(), 400); }
   onPageChange(p: number) { this.page = p; this.load(); }
 
   totalDue(): number {
     return this.suppliers.reduce((sum, s) => sum + (s.opening_due || 0), 0);
   }
 
+  openAdd() { this.newSupplier = { id: 0, name: '', phone: '', address: '', opening_due: 0 }; this.showForm = true; }
+  cancelForm() { this.newSupplier = { id: 0, name: '', phone: '', address: '', opening_due: 0 }; this.showForm = false; }
+  edit(s: any) { this.newSupplier = { ...s }; this.showForm = true; }
+
   save() {
     this.toast.startSaving();
-    this.api.post('/suppliers/', this.newSupplier).subscribe({
+    const req = this.newSupplier.id
+      ? this.api.put(`/suppliers/${this.newSupplier.id}`, this.newSupplier)
+      : this.api.post('/suppliers/', this.newSupplier);
+    req.subscribe({
       next: () => {
-        this.toast.stopSaving(); this.toast.success('Supplier Added');
-        this.newSupplier = { name: '', phone: '', address: '', opening_due: 0 };
+        this.toast.stopSaving();
+        this.toast.success(this.newSupplier.id ? 'Supplier Updated' : 'Supplier Added');
+        this.cancelForm();
         this.load();
       },
       error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to save supplier'); console.error(err); }

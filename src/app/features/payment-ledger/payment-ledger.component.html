@@ -12,21 +12,22 @@
     <div class="filter-row">
       <div class="filter-group">
         <label class="filter-label">{{ 'common.from' | translate }}</label>
-        <input type="date" [(ngModel)]="dateFrom" />
+        <input type="date" [(ngModel)]="dateFrom" (change)="applyFilter()" />
       </div>
       <div class="filter-group">
         <label class="filter-label">{{ 'common.to' | translate }}</label>
-        <input type="date" [(ngModel)]="dateTo" />
+        <input type="date" [(ngModel)]="dateTo" (change)="applyFilter()" />
       </div>
       <div class="filter-group">
         <label class="filter-label">{{ 'payment_ledger.filter_type' | translate }}</label>
-        <select [(ngModel)]="filterType">
+        <select [(ngModel)]="filterType" (ngModelChange)="applyFilter()">
           <option *ngFor="let t of TYPES" [value]="t.value">{{ t.key | translate }}</option>
         </select>
       </div>
       <div class="filter-group customer-group">
         <label class="filter-label">{{ 'payment_ledger.filter_customer' | translate }}</label>
         <div class="customer-input-wrap">
+          <svg class="search-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input
             type="text"
             [(ngModel)]="customerSearch"
@@ -35,8 +36,13 @@
             [placeholder]="'payment_ledger.search_customer_ph' | translate"
             [class.has-value]="selectedCustomer"
           />
-          <button class="clear-customer" *ngIf="selectedCustomer" (click)="clearCustomer()" title="Clear">×</button>
-          <div class="customer-dropdown" *ngIf="showCustomerDropdown">
+          <div class="search-spinner" *ngIf="searchingCustomer"></div>
+          <button class="clear-customer" *ngIf="selectedCustomer && !searchingCustomer" (click)="clearCustomer()" title="Clear">×</button>
+          <div class="search-progress-h" *ngIf="searchingCustomer"></div>
+          <div class="customer-dropdown" *ngIf="showCustomerDropdown || searchingCustomer">
+            <div class="dp-loading" *ngIf="searchingCustomer && customerResults.length === 0">
+              <span class="dp-loading-dot"></span><span class="dp-loading-dot"></span><span class="dp-loading-dot"></span>
+            </div>
             <div
               class="cd-item"
               *ngFor="let c of customerResults"
@@ -49,7 +55,6 @@
         </div>
       </div>
       <div class="filter-actions">
-        <button class="btn btn-primary btn-sm" (click)="applyFilter()">{{ 'common.apply' | translate }}</button>
         <button class="btn btn-ghost btn-sm" (click)="clearFilter()">{{ 'common.today' | translate }}</button>
       </div>
     </div>

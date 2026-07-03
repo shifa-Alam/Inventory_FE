@@ -79,6 +79,7 @@
     "operations": "Operations",
     "product_waste": "Product Waste",
     "stock_ledger": "Stock Ledger",
+    "expenses": "Expenses",
     "users": "Users",
     "admin": "Admin",
     "administrator": "Administrator",
@@ -156,7 +157,20 @@
     "in_stock": "in stock",
     "no_sales_badge": "No sales",
     "sold_label": "sold",
-    "all_selling": "All products are selling well!"
+    "all_selling": "All products are selling well!",
+    "gross_profit": "Gross Profit",
+    "month_expenses": "Month Expenses",
+    "no_expenses": "No expenses this month",
+    "margin_label": "margin",
+    "net_margin_label": "net margin",
+    "revenue_label": "Revenue",
+    "cogs_label": "Cost of Goods",
+    "expenses_label": "Expenses",
+    "gross_label": "Gross",
+    "pnl_title": "P&L Summary",
+    "pnl_sub": "Month-to-date income statement",
+    "expense_breakdown": "Expense Breakdown",
+    "expense_breakdown_sub": "By category this month"
   },
   "categories": {
     "title": "Categories",
@@ -729,5 +743,20 @@
     "edit": "Edit",
     "delete": "Delete",
     "empty": "No users found."
+  },
+  "expenses": {
+    "title": "Expenses",
+    "subtitle": "Track business expenses like carrying cost, delivery, rent, and more.",
+    "add_btn": "Add Expense",
+    "add_title": "Record New Expense",
+    "edit_title": "Edit Expense",
+    "type_label": "Expense Type",
+    "type_placeholder": "Select type…",
+    "notes_label": "Notes",
+    "notes_placeholder": "Optional description…",
+    "all_types": "All Types",
+    "total_expenses": "Total Expenses",
+    "list_title": "Expense History",
+    "empty": "No expenses recorded yet."
   }
 }

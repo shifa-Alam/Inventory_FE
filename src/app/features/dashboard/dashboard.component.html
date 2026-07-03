@@ -21,9 +21,10 @@
 
   <ng-container *ngIf="!loading">
 
-    <!-- ── ROW 1: KPI cards ──────────────────────────────────── -->
+    <!-- ── ROW 1: KPI cards (4 × 2) ─────────────────────────── -->
     <div class="kpi-row">
 
+      <!-- Today Sales -->
       <div class="kpi-card blue">
         <div class="kpi-top">
           <div class="kpi-icon">
@@ -38,18 +39,7 @@
         <div class="kpi-sub">{{ data.today_invoices ?? 0 }} {{ 'dashboard.invoices' | translate }} · {{ 'dashboard.vs_yesterday' | translate }} ৳{{ fmt(data.yesterday_sales ?? 0) }}</div>
       </div>
 
-      <div class="kpi-card green">
-        <div class="kpi-top">
-          <div class="kpi-icon">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-          </div>
-          <span class="rate-badge">{{ data.collection_rate ?? 0 | number:'1.0-1' }}% collected</span>
-        </div>
-        <div class="kpi-val">৳{{ fmt(data.month_collections ?? 0) }}</div>
-        <div class="kpi-lbl">{{ 'dashboard.today_collections' | translate }}</div>
-        <div class="kpi-sub">{{ 'dashboard.today_label' | translate }} ৳{{ fmt(data.today_collections ?? 0) }} · {{ 'dashboard.month_total' | translate }}</div>
-      </div>
-
+      <!-- Month Sales -->
       <div class="kpi-card violet">
         <div class="kpi-top">
           <div class="kpi-icon">
@@ -64,18 +54,67 @@
         <div class="kpi-sub">{{ data.month_invoices ?? 0 }} {{ 'dashboard.invoices' | translate }} · {{ 'dashboard.avg_label' | translate }} ৳{{ fmt(data.avg_order_value ?? 0) }}</div>
       </div>
 
-      <div class="kpi-card" [ngClass]="profitPositive ? 'teal' : 'rose'">
+      <!-- Gross Profit -->
+      <div class="kpi-card" [ngClass]="grossProfitPositive ? 'teal' : 'rose'">
+        <div class="kpi-top">
+          <div class="kpi-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+          </div>
+          <span class="margin-badge">{{ data.gross_profit_margin ?? 0 | number:'1.0-1' }}% {{ 'dashboard.margin_label' | translate }}</span>
+        </div>
+        <div class="kpi-val">{{ grossProfitPositive ? '+' : '' }}৳{{ fmt(data.gross_profit ?? 0) }}</div>
+        <div class="kpi-lbl">{{ 'dashboard.gross_profit' | translate }}</div>
+        <div class="kpi-sub">{{ 'dashboard.revenue_label' | translate }} − {{ 'dashboard.purchase_label' | translate }} ৳{{ fmt(data.total_purchase ?? 0) }}</div>
+      </div>
+
+      <!-- Net Profit -->
+      <div class="kpi-card" [ngClass]="netProfitPositive ? 'emerald' : 'rose'">
         <div class="kpi-top">
           <div class="kpi-icon">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
           </div>
-          <span class="margin-badge">{{ data.profit_margin ?? 0 | number:'1.0-1' }}% margin</span>
+          <span class="net-margin-badge" [class.positive]="netProfitPositive" [class.negative]="!netProfitPositive">
+            {{ data.net_profit_margin ?? 0 | number:'1.0-1' }}% {{ 'dashboard.net_margin_label' | translate }}
+          </span>
         </div>
-        <div class="kpi-val">{{ profitPositive ? '+' : '' }}৳{{ fmt(data.profit ?? 0) }}</div>
+        <div class="kpi-val">{{ netProfitPositive ? '+' : '' }}৳{{ fmt(data.net_profit ?? 0) }}</div>
         <div class="kpi-lbl">{{ 'dashboard.net_profit' | translate }}</div>
-        <div class="kpi-sub">{{ 'dashboard.purchase_label' | translate }} ৳{{ fmt(data.total_purchase ?? 0) }} · {{ 'dashboard.this_month' | translate }}</div>
+        <div class="kpi-sub">{{ 'dashboard.gross_label' | translate }} ৳{{ fmt(data.gross_profit ?? 0) }} − {{ 'dashboard.expenses_label' | translate }} ৳{{ fmt(data.month_expenses ?? 0) }}</div>
       </div>
 
+      <!-- Collections -->
+      <div class="kpi-card green">
+        <div class="kpi-top">
+          <div class="kpi-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          <span class="rate-badge">{{ data.collection_rate ?? 0 | number:'1.0-1' }}% collected</span>
+        </div>
+        <div class="kpi-val">৳{{ fmt(data.month_collections ?? 0) }}</div>
+        <div class="kpi-lbl">{{ 'dashboard.today_collections' | translate }}</div>
+        <div class="kpi-sub">{{ 'dashboard.today_label' | translate }} ৳{{ fmt(data.today_collections ?? 0) }} · {{ 'dashboard.month_total' | translate }}</div>
+      </div>
+
+      <!-- Month Expenses -->
+      <div class="kpi-card expense-card">
+        <div class="kpi-top">
+          <div class="kpi-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <button class="link-btn" (click)="router.navigate(['/expenses'])">{{ 'dashboard.view_all' | translate }}</button>
+        </div>
+        <div class="kpi-val exp-val">৳{{ fmt(data.month_expenses ?? 0) }}</div>
+        <div class="kpi-lbl">{{ 'dashboard.month_expenses' | translate }}</div>
+        <div class="kpi-sub">
+          <ng-container *ngIf="expenseCatEntries().length > 0">
+            {{ expenseCatEntries()[0].label }}: ৳{{ fmt(expenseCatEntries()[0].amount) }}
+            <ng-container *ngIf="expenseCatEntries().length > 1"> · {{ expenseCatEntries()[1].label }}: ৳{{ fmt(expenseCatEntries()[1].amount) }}</ng-container>
+          </ng-container>
+          <ng-container *ngIf="expenseCatEntries().length === 0">{{ 'dashboard.no_expenses' | translate }}</ng-container>
+        </div>
+      </div>
+
+      <!-- Outstanding Due -->
       <div class="kpi-card amber">
         <div class="kpi-top">
           <div class="kpi-icon">
@@ -88,6 +127,7 @@
         <div class="kpi-sub">{{ 'dashboard.all_customers' | translate }}</div>
       </div>
 
+      <!-- Stock Value -->
       <div class="kpi-card slate">
         <div class="kpi-top">
           <div class="kpi-icon">
@@ -134,7 +174,85 @@
       <div class="empty-note" *ngIf="!chartBars.length">{{ 'dashboard.no_chart_data' | translate }}</div>
     </div>
 
-    <!-- ── ROW 3: Top Products + Due Customers ───────────────── -->
+    <!-- ── ROW 3: P&L Summary + Expense Breakdown ────────────── -->
+    <div class="pnl-row">
+
+      <!-- P&L Income Statement -->
+      <div class="card pnl-card">
+        <div class="card-head">
+          <div>
+            <span class="card-ttl">{{ 'dashboard.pnl_title' | translate }}</span>
+            <span class="card-sub">{{ 'dashboard.pnl_sub' | translate }}</span>
+          </div>
+        </div>
+
+        <div class="pnl-line">
+          <span class="pnl-lbl">{{ 'dashboard.revenue_label' | translate }}</span>
+          <span class="pnl-val revenue">৳{{ fmt(data.month_sales ?? 0) }}</span>
+        </div>
+        <div class="pnl-line deduct">
+          <span class="pnl-lbl">− {{ 'dashboard.cogs_label' | translate }}</span>
+          <span class="pnl-val cost">৳{{ fmt(data.total_purchase ?? 0) }}</span>
+        </div>
+        <div class="pnl-divider"></div>
+        <div class="pnl-line result">
+          <span class="pnl-lbl bold">= {{ 'dashboard.gross_profit' | translate }}</span>
+          <span class="pnl-val bold" [class.positive]="grossProfitPositive" [class.negative]="!grossProfitPositive">
+            {{ grossProfitPositive ? '+' : '' }}৳{{ fmt(data.gross_profit ?? 0) }}
+            <span class="pct-tag">{{ data.gross_profit_margin ?? 0 | number:'1.0-1' }}%</span>
+          </span>
+        </div>
+        <div class="pnl-line deduct">
+          <span class="pnl-lbl">− {{ 'dashboard.expenses_label' | translate }}</span>
+          <span class="pnl-val cost">৳{{ fmt(data.month_expenses ?? 0) }}</span>
+        </div>
+        <div class="pnl-divider final-divider"></div>
+        <div class="pnl-line result net-result">
+          <span class="pnl-lbl bold">= {{ 'dashboard.net_profit' | translate }}</span>
+          <span class="pnl-val bold net-val" [class.positive]="netProfitPositive" [class.negative]="!netProfitPositive">
+            {{ netProfitPositive ? '+' : '' }}৳{{ fmt(data.net_profit ?? 0) }}
+            <span class="pct-tag net-pct">{{ data.net_profit_margin ?? 0 | number:'1.0-1' }}%</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Expense Breakdown -->
+      <div class="card expense-breakdown-card">
+        <div class="card-head">
+          <div>
+            <span class="card-ttl">{{ 'dashboard.expense_breakdown' | translate }}</span>
+            <span class="card-sub">{{ 'dashboard.expense_breakdown_sub' | translate }}</span>
+          </div>
+          <button class="link-btn" (click)="router.navigate(['/expenses'])">{{ 'dashboard.view_all' | translate }}</button>
+        </div>
+
+        <ng-container *ngIf="expenseCatEntries().length > 0">
+          <div class="exp-item" *ngFor="let e of expenseCatEntries()">
+            <div class="exp-label-row">
+              <span class="exp-cat-dot" [ngClass]="e.cls"></span>
+              <span class="exp-cat-name">{{ e.label }}</span>
+              <span class="exp-pct">{{ e.pct }}%</span>
+              <span class="exp-amount">৳{{ fmt(e.amount) }}</span>
+            </div>
+            <div class="exp-bar-wrap">
+              <div class="exp-bar-fill" [ngClass]="e.cls" [style.width.%]="e.pct"></div>
+            </div>
+          </div>
+          <div class="exp-total-row">
+            <span class="exp-total-lbl">{{ 'dashboard.month_expenses' | translate }}</span>
+            <span class="exp-total-val">৳{{ fmt(data.month_expenses ?? 0) }}</span>
+          </div>
+        </ng-container>
+
+        <div class="all-good" *ngIf="expenseCatEntries().length === 0">
+          <svg width="28" height="28" fill="none" stroke="#22c55e" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <span>{{ 'dashboard.no_expenses' | translate }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── ROW 4: Top Products + Due Customers + Low Stock ───── -->
     <div class="mid-row">
 
       <div class="card">
@@ -217,7 +335,7 @@
 
     </div>
 
-    <!-- ── ROW 3b: Slow-moving items ───────────────────────────── -->
+    <!-- ── ROW 5: Slow-moving items ─────────────────────────── -->
     <div class="card slow-card">
       <div class="card-head">
         <div>
@@ -245,11 +363,11 @@
       </div>
     </div>
 
-    <!-- ── ROW 4: Recent Sales ───────────────────────────────── -->
+    <!-- ── ROW 6: Recent Sales ───────────────────────────────── -->
     <div class="card recent-card">
       <div class="card-head">
         <span class="card-ttl">{{ 'dashboard.recent_sales' | translate }}</span>
-        <button class="link-btn" (click)="router.navigate(['/sales-list'])">{{ 'dashboard.view_all' | translate }}</button>
+        <button class="link-btn" (click)="router.navigate(['/sales'])">{{ 'dashboard.view_all' | translate }}</button>
       </div>
       <table class="db-table">
         <thead>

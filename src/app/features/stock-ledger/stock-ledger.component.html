@@ -29,23 +29,36 @@
 
   <!-- DESKTOP TABLE -->
   <div class="card desktop-table">
-    <div class="card-header-row">
-      <div class="chr-left">
-        <span class="card-title" style="margin-bottom:0">{{ 'stock_ledger.list_title' | translate }}</span>
-        <span class="count-badge">{{ total }} {{ 'stock_ledger.entries_label' | translate }}</span>
+    <div class="st-filter-bar">
+      <div class="st-filter-row">
+        <div class="st-fg">
+          <label class="st-lbl">{{ 'sales_list.filter_from' | translate }}</label>
+          <input type="date" class="st-inp" [(ngModel)]="filterDateFrom" (change)="onDateChange()" />
+        </div>
+        <div class="st-fg">
+          <label class="st-lbl">{{ 'sales_list.filter_to' | translate }}</label>
+          <input type="date" class="st-inp" [(ngModel)]="filterDateTo" (change)="onDateChange()" />
+        </div>
+        <div class="st-fg st-fg-grow">
+          <label class="st-lbl">{{ 'stock_ledger.col_type' | translate }}</label>
+          <select class="st-inp" [(ngModel)]="filterType" (ngModelChange)="onFilterChange()">
+            <option value="">{{ 'stock_ledger.filter_all' | translate }}</option>
+            <option value="PURCHASE">{{ 'stock_ledger.type_purchase' | translate }}</option>
+            <option value="SALE">{{ 'stock_ledger.type_sale' | translate }}</option>
+            <option value="RETURN">{{ 'stock_ledger.type_return' | translate }}</option>
+            <option value="WASTE">{{ 'stock_ledger.type_waste' | translate }}</option>
+          </select>
+        </div>
       </div>
-      <div class="chr-toolbar">
-        <select [(ngModel)]="filterType" (ngModelChange)="onFilterChange()">
-          <option value="">{{ 'stock_ledger.filter_all' | translate }}</option>
-          <option value="PURCHASE">{{ 'stock_ledger.type_purchase' | translate }}</option>
-          <option value="SALE">{{ 'stock_ledger.type_sale' | translate }}</option>
-          <option value="RETURN">{{ 'stock_ledger.type_return' | translate }}</option>
-          <option value="WASTE">{{ 'stock_ledger.type_waste' | translate }}</option>
-        </select>
-        <input type="date" [(ngModel)]="filterDateFrom" />
-        <input type="date" [(ngModel)]="filterDateTo" />
-        <button class="btn btn-primary btn-sm" (click)="applyFilter()">{{ 'common.filter' | translate }}</button>
-        <button class="btn btn-ghost btn-sm" (click)="clearFilter()">{{ 'common.clear' | translate }}</button>
+      <div class="st-quick-row">
+        <span class="st-count">{{ total }} {{ 'stock_ledger.entries_label' | translate }}</span>
+        <div class="st-qbts">
+          <button class="st-qb" [class.st-qb-active]="activeQuick === 'today'" (click)="setToday()">{{ 'sales_list.btn_today' | translate }}</button>
+          <button class="st-qb" [class.st-qb-active]="activeQuick === 'week'"  (click)="setThisWeek()">{{ 'sales_list.btn_week' | translate }}</button>
+          <button class="st-qb" [class.st-qb-active]="activeQuick === 'month'" (click)="setThisMonth()">{{ 'sales_list.btn_month' | translate }}</button>
+          <button class="st-qb" [class.st-qb-active]="activeQuick === 'all'"   (click)="setAllTime()">{{ 'sales_list.btn_all' | translate }}</button>
+          <button class="st-qb st-qb-clear" (click)="clearFilter()">{{ 'sales_list.btn_reset' | translate }}</button>
+        </div>
       </div>
     </div>
     <div class="table-wrapper">
@@ -89,6 +102,37 @@
 
   <!-- MOBILE LIST -->
   <div class="mobile-list">
+    <div class="st-filter-bar" style="margin-bottom:8px">
+      <div class="st-filter-row">
+        <div class="st-fg">
+          <label class="st-lbl">{{ 'sales_list.filter_from' | translate }}</label>
+          <input type="date" class="st-inp" [(ngModel)]="filterDateFrom" (change)="onDateChange()" />
+        </div>
+        <div class="st-fg">
+          <label class="st-lbl">{{ 'sales_list.filter_to' | translate }}</label>
+          <input type="date" class="st-inp" [(ngModel)]="filterDateTo" (change)="onDateChange()" />
+        </div>
+        <div class="st-fg st-fg-grow">
+          <label class="st-lbl">{{ 'stock_ledger.col_type' | translate }}</label>
+          <select class="st-inp" [(ngModel)]="filterType" (ngModelChange)="onFilterChange()">
+            <option value="">{{ 'stock_ledger.filter_all' | translate }}</option>
+            <option value="PURCHASE">{{ 'stock_ledger.type_purchase' | translate }}</option>
+            <option value="SALE">{{ 'stock_ledger.type_sale' | translate }}</option>
+            <option value="RETURN">{{ 'stock_ledger.type_return' | translate }}</option>
+            <option value="WASTE">{{ 'stock_ledger.type_waste' | translate }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="st-quick-row">
+        <div class="st-qbts">
+          <button class="st-qb" [class.st-qb-active]="activeQuick === 'today'" (click)="setToday()">Today</button>
+          <button class="st-qb" [class.st-qb-active]="activeQuick === 'week'"  (click)="setThisWeek()">Week</button>
+          <button class="st-qb" [class.st-qb-active]="activeQuick === 'month'" (click)="setThisMonth()">Month</button>
+          <button class="st-qb" [class.st-qb-active]="activeQuick === 'all'"   (click)="setAllTime()">All</button>
+          <button class="st-qb st-qb-clear" (click)="clearFilter()">Reset</button>
+        </div>
+      </div>
+    </div>
     <div class="mobile-meta">
       <span class="mobile-title">{{ 'stock_ledger.list_title' | translate }}</span>
       <span class="count-badge">{{ total }}</span>

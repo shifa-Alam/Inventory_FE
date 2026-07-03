@@ -1,18 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { TranslatePipe } from '@ngx-translate/core';
+import { PaginatorComponent } from '../../shared/paginator/paginator.component';
 
 @Component({
   selector: 'app-sale-return',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe, PaginatorComponent],
   templateUrl: './sale-return.component.html',
   styleUrls: ['./sale-return.component.css']
 })
-export class SaleReturnComponent implements OnInit {
+export class SaleReturnComponent implements OnInit, OnDestroy {
 
   // Invoice search
   invoiceQuery = '';
@@ -24,13 +25,33 @@ export class SaleReturnComponent implements OnInit {
   returnItems: ReturnRow[] = [];
   reason = '';
 
+  // History filters
+  filterDateFrom = '';
+  filterDateTo = '';
+  filterReturnNo = '';
+  activeQuick = 'today';
+  page = 1;
+  pages = 1;
+  historyTotal = 0;
+  pageSize = 20;
+
   // History
   returns: any[] = [];
   loadingReturns = false;
 
+  private filterTimer: any;
+  private today() { return new Date().toISOString().slice(0, 10); }
+
   constructor(private api: ApiService, private toast: ToastService) {}
 
-  ngOnInit() { this.loadReturns(); }
+  ngOnInit() {
+    this.filterDateFrom = this.today();
+    this.filterDateTo = this.today();
+    this.activeQuick = 'today';
+    this.loadReturns();
+  }
+
+  ngOnDestroy() { clearTimeout(this.filterTimer); }
 
   // ── Invoice search ────────────────────────────────────────────
   searchInvoice() {
@@ -141,10 +162,53 @@ export class SaleReturnComponent implements OnInit {
   // ── History ───────────────────────────────────────────────────
   loadReturns() {
     this.loadingReturns = true;
-    this.api.get('/sale-returns/').subscribe({
-      next: (res: any) => { this.returns = res.data ?? res; this.loadingReturns = false; },
+    const params: string[] = [`page=${this.page}`, `page_size=${this.pageSize}`];
+    if (this.filterDateFrom) params.push(`date_from=${this.filterDateFrom}`);
+    if (this.filterDateTo)   params.push(`date_to=${this.filterDateTo}`);
+    if (this.filterReturnNo.trim()) params.push(`return_no=${encodeURIComponent(this.filterReturnNo.trim())}`);
+    this.api.get(`/sale-returns/?${params.join('&')}`).subscribe({
+      next: (res: any) => {
+        this.returns = res.data ?? res;
+        this.historyTotal = res.total ?? this.returns.length;
+        this.pages = res.pages ?? 1;
+        this.loadingReturns = false;
+      },
       error: () => { this.loadingReturns = false; }
     });
+  }
+
+  applyFilter() {
+    this.page = 1;
+    clearTimeout(this.filterTimer);
+    this.filterTimer = setTimeout(() => this.loadReturns(), 300);
+  }
+
+  onDateChange() { this.activeQuick = ''; this.applyFilter(); }
+  onPageChange(p: number) { this.page = p; this.loadReturns(); }
+
+  setToday() {
+    const d = this.today();
+    this.filterDateFrom = d; this.filterDateTo = d; this.activeQuick = 'today'; this.page = 1; this.loadReturns();
+  }
+  setThisWeek() {
+    const now = new Date();
+    const mon = new Date(now); mon.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+    this.filterDateFrom = mon.toISOString().slice(0, 10);
+    this.filterDateTo = this.today();
+    this.activeQuick = 'week'; this.page = 1; this.loadReturns();
+  }
+  setThisMonth() {
+    const now = new Date();
+    this.filterDateFrom = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+    this.filterDateTo = this.today();
+    this.activeQuick = 'month'; this.page = 1; this.loadReturns();
+  }
+  setAllTime() {
+    this.filterDateFrom = ''; this.filterDateTo = ''; this.activeQuick = 'all'; this.page = 1; this.loadReturns();
+  }
+  clearFilter() {
+    this.filterDateFrom = ''; this.filterDateTo = ''; this.filterReturnNo = '';
+    this.activeQuick = ''; this.page = 1; this.loadReturns();
   }
 }
 

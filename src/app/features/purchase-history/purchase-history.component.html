@@ -1,4 +1,4 @@
-﻿<div class="page">
+<div class="page">
 
   <div class="page-header">
     <div>
@@ -9,22 +9,41 @@
 
   <!-- DESKTOP TABLE -->
   <div class="card desktop-table">
-    <div class="card-header-row">
-      <div class="chr-left">
-        <span class="card-title" style="margin-bottom:0">{{ 'purchase_history.title' | translate }}</span>
-        <span class="count-badge">{{ total }} total</span>
+    <!-- Filter bar -->
+    <div class="ph-filter-bar">
+      <div class="ph-filter-row">
+        <div class="ph-fg">
+          <label class="ph-lbl">{{ 'sales_list.filter_from' | translate }}</label>
+          <input type="date" class="ph-inp" [(ngModel)]="filterDateFrom" (change)="onDateChange()" />
+        </div>
+        <div class="ph-fg">
+          <label class="ph-lbl">{{ 'sales_list.filter_to' | translate }}</label>
+          <input type="date" class="ph-inp" [(ngModel)]="filterDateTo" (change)="onDateChange()" />
+        </div>
+        <div class="ph-fg ph-fg-grow">
+          <label class="ph-lbl">{{ 'purchase_history.col_invoice' | translate }}</label>
+          <input class="ph-inp" placeholder="e.g. PUR-001" [(ngModel)]="filterInvoice" (ngModelChange)="onInvoiceInput()" />
+        </div>
+        <div class="ph-fg ph-fg-grow">
+          <label class="ph-lbl">{{ 'purchase_history.col_supplier' | translate }}</label>
+          <select class="ph-inp" [(ngModel)]="filterSupplierId" (ngModelChange)="applyFilter()">
+            <option [value]="0">{{ 'purchase_history.filter_all_suppliers' | translate }}</option>
+            <option *ngFor="let s of suppliers" [value]="s.id">{{ s.name }}</option>
+          </select>
+        </div>
       </div>
-      <div class="chr-toolbar">
-        <select [(ngModel)]="filterSupplierId">
-          <option value="0">{{ 'purchase_history.filter_all_suppliers' | translate }}</option>
-          <option *ngFor="let s of suppliers" [value]="s.id">{{ s.name }}</option>
-        </select>
-        <input type="date" [(ngModel)]="filterDateFrom" />
-        <input type="date" [(ngModel)]="filterDateTo" />
-        <button class="btn btn-primary btn-sm" (click)="applyFilter()">{{ 'common.filter' | translate }}</button>
-        <button class="btn btn-ghost btn-sm" (click)="clearFilter()">{{ 'common.clear' | translate }}</button>
+      <div class="ph-quick-row">
+        <span class="ph-count">{{ total }} {{ 'sales_list.records' | translate }}</span>
+        <div class="ph-qbts">
+          <button class="ph-qb" [class.ph-qb-active]="activeQuick === 'today'" (click)="setToday()">{{ 'sales_list.btn_today' | translate }}</button>
+          <button class="ph-qb" [class.ph-qb-active]="activeQuick === 'week'"  (click)="setThisWeek()">{{ 'sales_list.btn_week' | translate }}</button>
+          <button class="ph-qb" [class.ph-qb-active]="activeQuick === 'month'" (click)="setThisMonth()">{{ 'sales_list.btn_month' | translate }}</button>
+          <button class="ph-qb" [class.ph-qb-active]="activeQuick === 'all'"   (click)="setAllTime()">{{ 'sales_list.btn_all' | translate }}</button>
+          <button class="ph-qb ph-qb-clear" (click)="clearFilter()">{{ 'sales_list.btn_reset' | translate }}</button>
+        </div>
       </div>
     </div>
+
     <div class="table-wrapper">
       <table>
         <thead>
@@ -42,12 +61,17 @@
             <td class="muted">{{ p.created_at | date:'dd MMM yyyy' }}</td>
             <td class="bold">{{ p.invoice_no }}</td>
             <td>{{ p.supplier_name }}</td>
-            <td class="right">{{ p.total_amount | number }}</td>
+            <td class="right fw7">৳{{ p.total_amount | number:'1.0-2' }}</td>
             <td><span class="badge badge-info">{{ 'purchase_history.status_purchased' | translate }}</span></td>
-            <td><button class="btn btn-outline btn-sm" (click)="view(p.id)">{{ 'purchase_history.view' | translate }}</button></td>
+            <td>
+              <button class="btn btn-outline btn-sm" (click)="view(p.id)">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                {{ 'purchase_history.view' | translate }}
+              </button>
+            </td>
           </tr>
           <tr *ngIf="loading" class="loading-row">
-            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
           </tr>
           <tr *ngIf="!loading && purchases.length === 0">
             <td colspan="6" class="empty-row">{{ 'purchase_history.empty' | translate }}</td>
@@ -64,6 +88,38 @@
       <span class="mobile-title">{{ 'purchase_history.title' | translate }}</span>
       <span class="count-badge">{{ total }}</span>
     </div>
+    <div class="ph-filter-bar" style="margin-bottom:8px">
+      <div class="ph-filter-row">
+        <div class="ph-fg">
+          <label class="ph-lbl">{{ 'sales_list.filter_from' | translate }}</label>
+          <input type="date" class="ph-inp" [(ngModel)]="filterDateFrom" (change)="onDateChange()" />
+        </div>
+        <div class="ph-fg">
+          <label class="ph-lbl">{{ 'sales_list.filter_to' | translate }}</label>
+          <input type="date" class="ph-inp" [(ngModel)]="filterDateTo" (change)="onDateChange()" />
+        </div>
+        <div class="ph-fg ph-fg-grow">
+          <label class="ph-lbl">{{ 'purchase_history.col_invoice' | translate }}</label>
+          <input class="ph-inp" placeholder="e.g. PUR-001" [(ngModel)]="filterInvoice" (ngModelChange)="onInvoiceInput()" />
+        </div>
+        <div class="ph-fg ph-fg-grow">
+          <label class="ph-lbl">{{ 'purchase_history.col_supplier' | translate }}</label>
+          <select class="ph-inp" [(ngModel)]="filterSupplierId" (ngModelChange)="applyFilter()">
+            <option [value]="0">{{ 'purchase_history.filter_all_suppliers' | translate }}</option>
+            <option *ngFor="let s of suppliers" [value]="s.id">{{ s.name }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="ph-quick-row">
+        <div class="ph-qbts">
+          <button class="ph-qb" [class.ph-qb-active]="activeQuick === 'today'" (click)="setToday()">Today</button>
+          <button class="ph-qb" [class.ph-qb-active]="activeQuick === 'week'"  (click)="setThisWeek()">Week</button>
+          <button class="ph-qb" [class.ph-qb-active]="activeQuick === 'month'" (click)="setThisMonth()">Month</button>
+          <button class="ph-qb" [class.ph-qb-active]="activeQuick === 'all'"   (click)="setAllTime()">All</button>
+          <button class="ph-qb ph-qb-clear" (click)="clearFilter()">Reset</button>
+        </div>
+      </div>
+    </div>
     <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
     <div class="mobile-empty" *ngIf="!loading && purchases.length === 0"><p>{{ 'purchase_history.empty' | translate }}</p></div>
     <div class="mobile-card" *ngFor="let p of purchases">
@@ -78,11 +134,11 @@
       </div>
       <div class="mc-grid">
         <div class="mc-field">
-          <span class="mc-lbl">Total</span>
-          <span class="mc-val fw7">{{ p.total_amount | number }}</span>
+          <span class="mc-lbl">{{ 'purchase_history.col_total' | translate }}</span>
+          <span class="mc-val fw7">৳{{ p.total_amount | number:'1.0-2' }}</span>
         </div>
         <div class="mc-field">
-          <span class="mc-lbl">Supplier</span>
+          <span class="mc-lbl">{{ 'purchase_history.col_supplier' | translate }}</span>
           <span class="mc-val muted">{{ p.supplier_name }}</span>
         </div>
       </div>

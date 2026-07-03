@@ -78,9 +78,17 @@
 
       <!-- Search -->
       <div class="card card-body search-wrap" style="margin-bottom:16px">
-        <input #searchInput type="text" [placeholder]="'sales.search_placeholder' | translate"
-          [(ngModel)]="productSearch" (ngModelChange)="onSearchChange($event)" (keydown)="onKeyDown($event)" />
-        <div class="dropdown" *ngIf="filteredProducts.length > 0">
+        <div class="search-input-row">
+          <svg class="search-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input #searchInput type="text" [placeholder]="'sales.search_placeholder' | translate"
+            [(ngModel)]="productSearch" (ngModelChange)="onSearchChange($event)" (keydown)="onKeyDown($event)" />
+          <div class="search-spinner" *ngIf="searching"></div>
+        </div>
+        <div class="search-progress" *ngIf="searching"></div>
+        <div class="dropdown" *ngIf="filteredProducts.length > 0 || searching">
+          <div class="dp-loading" *ngIf="searching && filteredProducts.length === 0">
+            <span class="dp-loading-dot"></span><span class="dp-loading-dot"></span><span class="dp-loading-dot"></span>
+          </div>
           <div class="dropdown-item" *ngFor="let p of filteredProducts; let i = index"
             [class.active]="i === selectedIndex" (click)="selectProduct(p)">
             <span class="dp-name">{{ p.name }}</span>
@@ -89,8 +97,8 @@
         </div>
       </div>
 
-      <!-- Items table -->
-      <div class="card">
+      <!-- Items table — desktop -->
+      <div class="card hide-mobile">
         <div class="table-wrapper">
           <table>
             <thead>
@@ -122,6 +130,41 @@
               </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- Items — mobile cards -->
+      <div class="mobile-items show-mobile">
+        <div class="mobile-empty" *ngIf="items.length === 0">{{ 'sales.empty' | translate }}</div>
+        <div class="mobile-item-card" *ngFor="let item of items; let i = index">
+          <div class="mic-top">
+            <span class="mic-num">{{ i + 1 }}</span>
+            <span class="mic-name">{{ item.product_name }}</span>
+            <button class="mic-remove" (click)="removeRow(i)">✕</button>
+          </div>
+          <div class="mic-row">
+            <div class="mic-field">
+              <span class="mic-lbl">{{ 'sales.col_stock' | translate }}</span>
+              <span class="stock-chip">{{ item.stock }}</span>
+            </div>
+            <div class="mic-field">
+              <span class="mic-lbl">{{ 'sales.col_mrp' | translate }}</span>
+              <span class="mrp-ref">{{ item.mrp ? (item.mrp | number) : '—' }}</span>
+            </div>
+            <div class="mic-field">
+              <span class="mic-lbl">{{ 'sales.col_qty' | translate }}</span>
+              <input #qtyInput type="number" [(ngModel)]="item.quantity" min="1" [max]="item.stock"
+                (change)="clampQuantity(item)" class="mic-input" />
+            </div>
+            <div class="mic-field">
+              <span class="mic-lbl">{{ 'sales.col_rate' | translate }}</span>
+              <input type="number" [(ngModel)]="item.rate" min="0" class="mic-input" />
+            </div>
+            <div class="mic-field">
+              <span class="mic-lbl">{{ 'sales.col_total' | translate }}</span>
+              <span class="mic-total">{{ item.quantity * item.rate | number }}</span>
+            </div>
+          </div>
         </div>
       </div>
 

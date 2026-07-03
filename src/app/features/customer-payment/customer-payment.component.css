@@ -32,7 +32,7 @@
   flex-wrap: wrap;
   flex-shrink: 0;
   padding: 10px 16px;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--primary-mid);
   border-radius: var(--radius-sm);
 }
@@ -110,7 +110,7 @@
   gap: 6px;
   font-size: 12.5px;
   padding: 7px 12px;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--primary-mid);
   border-radius: var(--radius-sm);
   flex-wrap: wrap;
@@ -127,7 +127,7 @@
 .inv-hist {
   border-top: 1px solid var(--primary-mid);
   padding: 12px 20px 14px;
-  background: #fff;
+  background: var(--surface);
 }
 
 .inv-hist-title {

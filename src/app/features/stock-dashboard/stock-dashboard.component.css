@@ -13,7 +13,7 @@
   width: 34px; height: 34px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  background: #fff;
+  background: var(--surface);
   color: var(--text-muted);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
@@ -34,7 +34,7 @@
 }
 
 .stat-card {
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 14px;
@@ -119,7 +119,7 @@
   font-size: 13px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
@@ -142,7 +142,7 @@
   font-size: 13px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   outline: none;
   cursor: pointer;
@@ -219,8 +219,8 @@
 .dot-low { background: var(--warning-light); color: var(--warning-text); }
 .dot-out { background: var(--danger-light);  color: var(--danger-text); }
 
-.row-low td { background: #fffef5; }
-.row-out td { background: #fff8f8; }
+.row-low td { background: rgba(251,191,36,0.05); }
+.row-out td { background: rgba(239,68,68,0.05); }
 
 /* ── Mobile Cards ──────────────────────────────────────────────── */
 .mobile-loading {
@@ -237,7 +237,7 @@
 }
 
 .mobile-card {
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 14px;

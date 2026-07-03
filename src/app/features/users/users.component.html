@@ -5,11 +5,19 @@
       <h2>{{ 'users.title' | translate }}</h2>
       <p class="sub">{{ 'users.subtitle' | translate }}</p>
     </div>
+    <button class="btn" [class.btn-primary]="!showForm" [class.btn-ghost]="showForm" (click)="showForm && !isEditing ? cancelForm() : openAdd()">
+      <svg *ngIf="!showForm || isEditing" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <svg *ngIf="showForm && !isEditing" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      {{ showForm && !isEditing ? ('users.cancel' | translate) : ('users.form_title' | translate) }}
+    </button>
   </div>
 
   <!-- FORM -->
-  <div class="card card-body" style="margin-bottom:10px">
-    <p class="card-title">{{ isEditing ? ('users.form_title_edit' | translate) : ('users.form_title' | translate) }}</p>
+  <div class="card card-body form-card" *ngIf="showForm">
+    <div class="form-card-header">
+      <p class="card-title">{{ isEditing ? ('users.form_title_edit' | translate) : ('users.form_title' | translate) }}</p>
+      <button class="close-btn" (click)="cancelForm()">✕</button>
+    </div>
 
     <div class="alert alert-success" *ngIf="successMsg">
       <span class="alert-icon">✓</span> {{ successMsg }}
@@ -54,7 +62,7 @@
           <span *ngIf="loading" class="spinner"></span>
           {{ loading ? ('users.saving' | translate) : (isEditing ? ('users.update' | translate) : ('users.create' | translate)) }}
         </button>
-        <button class="btn btn-ghost" *ngIf="isEditing || username || password || confirmPassword" (click)="cancel()">{{ 'users.cancel' | translate }}</button>
+        <button class="btn btn-ghost" (click)="cancelForm()">{{ 'users.cancel' | translate }}</button>
       </div>
     </div>
   </div>

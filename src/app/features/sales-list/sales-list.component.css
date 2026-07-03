@@ -1,5 +1,5 @@
 /* ── Sales History filter bar ── */
-.sl-filter-bar { padding: 10px 14px 0; border-bottom: 1px solid var(--border); background: var(--bg-card); }
+.sl-filter-bar { padding: 10px 14px 0; border-bottom: 1px solid var(--border); background: var(--surface); }
 
 .sl-filter-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 8px; }
 
@@ -12,7 +12,7 @@
 .sl-ac-wrap { position: relative; }
 .sl-ac-field { position: relative; }
 .sl-ac-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 14px; color: var(--text-light); cursor: pointer; line-height: 1; padding: 0; }
-.sl-ac-drop { position: absolute; z-index: 200; left: 0; right: 0; top: calc(100% + 2px); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); box-shadow: 0 4px 12px rgba(0,0,0,.1); max-height: 180px; overflow-y: auto; }
+.sl-ac-drop { position: absolute; z-index: 200; left: 0; right: 0; top: calc(100% + 2px); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); box-shadow: 0 4px 12px rgba(0,0,0,.1); max-height: 180px; overflow-y: auto; }
 .sl-ac-item { padding: 6px 10px; font-size: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
 .sl-ac-item:hover { background: var(--primary-light); }
 .sl-ac-sub { font-size: 10.5px; color: var(--text-light); }
@@ -22,6 +22,7 @@
 .sl-qbts { display: flex; gap: 4px; flex-wrap: wrap; }
 .sl-qb { padding: 3px 9px; font-size: 11px; font-weight: 500; border: 1px solid var(--border); border-radius: 20px; background: var(--bg); color: var(--text); cursor: pointer; transition: background .15s; }
 .sl-qb:hover { background: var(--primary-light); border-color: var(--primary-mid); color: var(--primary-dark); }
+.sl-qb-active { background: var(--primary-light) !important; border-color: var(--primary) !important; color: var(--primary-dark) !important; font-weight: 700; }
 .sl-qb-clear { border-color: var(--danger-mid); color: var(--danger-text); }
 .sl-qb-clear:hover { background: var(--danger-light); }
 
@@ -32,7 +33,7 @@
 .row-selected td { background: var(--primary-light) !important; }
 
 /* Discount chip */
-.disc-chip { display: inline-block; background: #fef3c7; color: #92400e; border-radius: 4px; padding: 1px 5px; font-size: 11px; font-weight: 600; }
+.disc-chip { display: inline-block; background: var(--warning-light); color: var(--warning-text); border-radius: 4px; padding: 1px 5px; font-size: 11px; font-weight: 600; }
 .disc-col { min-width: 90px; }
 .disc-val { color: #d97706 !important; }
 .pis-val.muted { color: var(--text-light) !important; font-weight: 500; }
@@ -63,13 +64,13 @@
 .panel-body { padding: 10px 14px 12px; }
 
 /* ── Payment panel ── */
-.pay-panel-wrap { background: #f0f9ff; border-top: 2px solid #38bdf8; }
-.pay-panel-wrap .panel-header { background: #e0f2fe; }
+.pay-panel-wrap { background: var(--info-light); border-top: 2px solid var(--info); }
+.pay-panel-wrap .panel-header { background: var(--info-light); border-bottom: 1px solid var(--info-mid); }
 
 .pay-info-strip {
   display: flex; gap: 16px; flex-wrap: wrap;
   margin-bottom: 10px; padding: 6px 10px;
-  background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
 }
 .pis-item { display: flex; flex-direction: column; gap: 0; }
 .pis-lbl { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-light); }
@@ -89,7 +90,7 @@
 .breakdown {
   display: flex; align-items: center; gap: 5px; margin-top: 6px;
   font-size: 11.5px; padding: 4px 9px;
-  background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm); flex-wrap: wrap;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); flex-wrap: wrap;
 }
 .bd-sep   { color: var(--text-light); font-weight: 600; }
 .bd-disc  { color: #0284c7; font-weight: 700; }
@@ -99,8 +100,8 @@
 .hint-error { color: var(--danger-text); font-size: 11px; margin: 4px 0 0; display: block; }
 
 /* ── Return panel ── */
-.ret-panel-wrap { background: #fff5f5; border-top: 2px solid var(--danger-mid); }
-.ret-panel-wrap .panel-header { background: #fee2e2; }
+.ret-panel-wrap { background: var(--danger-light); border-top: 2px solid var(--danger-mid); }
+.ret-panel-wrap .panel-header { background: var(--danger-light); border-bottom: 1px solid var(--danger-mid); }
 
 .return-items-table { overflow-x: auto; margin-bottom: 10px; }
 
@@ -108,14 +109,14 @@
 .inner-table th {
   padding: 4px 8px; font-size: 10px; font-weight: 600; text-transform: uppercase;
   letter-spacing: 0.3px; color: var(--text-light); border-bottom: 1px solid var(--border);
-  text-align: left; background: #fff;
+  text-align: left; background: var(--bg-alt);
 }
 .inner-table th.right, .inner-table td.right { text-align: right; }
 .inner-table td { padding: 5px 8px; border-bottom: 1px solid var(--border-light, #f1f5f9); }
 .inner-table tr:last-child td { border-bottom: none; }
 
 .qty-input { width: 70px; text-align: right; padding: 3px 5px; font-size: 12px; }
-.qty-input.qty-error { border-color: var(--danger-text) !important; background: #fff5f5; }
+.qty-input.qty-error { border-color: var(--danger-text) !important; background: var(--danger-light); }
 
 .ret-amount { color: var(--danger-text); font-weight: 700; }
 
@@ -126,7 +127,7 @@
 
 .ret-total-wrap {
   display: flex; flex-direction: column; gap: 1px;
-  padding: 5px 10px; background: #fff;
+  padding: 5px 10px; background: var(--surface);
   border: 1px solid var(--danger-mid); border-radius: var(--radius-sm);
   min-width: 110px; flex-shrink: 0;
 }
@@ -138,7 +139,7 @@
 
 .mobile-inline-panel {
   margin-top: 8px; padding: 8px 10px;
-  background: #f8faff; border: 1px solid var(--primary-mid); border-radius: var(--radius-sm);
+  background: var(--surface-active); border: 1px solid var(--primary-mid); border-radius: var(--radius-sm);
 }
 .mip-title { font-size: 11.5px; font-weight: 700; color: var(--primary-dark); margin-bottom: 7px; }
 

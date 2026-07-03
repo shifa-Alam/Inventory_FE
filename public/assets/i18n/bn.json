@@ -79,6 +79,7 @@
     "operations": "অপারেশন",
     "product_waste": "পণ্য অপচয়",
     "stock_ledger": "স্টক লেজার",
+    "expenses": "খরচ",
     "users": "ব্যবহারকারী",
     "admin": "প্রশাসন",
     "administrator": "প্রশাসক",
@@ -156,7 +157,20 @@
     "in_stock": "স্টকে আছে",
     "no_sales_badge": "বিক্রি নেই",
     "sold_label": "বিক্রি",
-    "all_selling": "সব পণ্য ভালোভাবে বিক্রি হচ্ছে!"
+    "all_selling": "সব পণ্য ভালোভাবে বিক্রি হচ্ছে!",
+    "gross_profit": "মোট মুনাফা",
+    "month_expenses": "মাসের খরচ",
+    "no_expenses": "এই মাসে কোনো খরচ নেই",
+    "margin_label": "মার্জিন",
+    "net_margin_label": "নিট মার্জিন",
+    "revenue_label": "রাজস্ব",
+    "cogs_label": "পণ্যের ক্রয় মূল্য",
+    "expenses_label": "খরচ",
+    "gross_label": "মোট",
+    "pnl_title": "লাভ-ক্ষতির সারসংক্ষেপ",
+    "pnl_sub": "মাসিক আয় বিবরণী",
+    "expense_breakdown": "খরচের বিভাজন",
+    "expense_breakdown_sub": "এই মাসে বিভাগ অনুযায়ী"
   },
   "categories": {
     "title": "বিভাগ",
@@ -729,5 +743,20 @@
     "edit": "সম্পাদনা",
     "delete": "মুছুন",
     "empty": "কোনো ব্যবহারকারী পাওয়া যায়নি।"
+  },
+  "expenses": {
+    "title": "খরচ",
+    "subtitle": "বহন খরচ, ডেলিভারি, ভাড়া এবং অন্যান্য ব্যবসায়িক খরচ ট্র্যাক করুন।",
+    "add_btn": "খরচ যোগ করুন",
+    "add_title": "নতুন খরচ নথিভুক্ত করুন",
+    "edit_title": "খরচ সম্পাদনা করুন",
+    "type_label": "খরচের ধরন",
+    "type_placeholder": "ধরন নির্বাচন করুন…",
+    "notes_label": "নোট",
+    "notes_placeholder": "ঐচ্ছিক বিবরণ…",
+    "all_types": "সব ধরন",
+    "total_expenses": "মোট খরচ",
+    "list_title": "খরচের ইতিহাস",
+    "empty": "এখনো কোনো খরচ নথিভুক্ত হয়নি।"
   }
 }

@@ -1,0 +1,180 @@
+<div class="page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h2>{{ 'expenses.title' | translate }}</h2>
+      <p class="sub">{{ 'expenses.subtitle' | translate }}</p>
+    </div>
+    <button class="btn" [class.btn-primary]="!showForm" [class.btn-ghost]="showForm" (click)="showForm && !form.id ? cancelForm() : openAdd()">
+      <svg *ngIf="!showForm || form.id" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <svg *ngIf="showForm && !form.id" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      {{ showForm && !form.id ? ('common.cancel' | translate) : ('expenses.add_btn' | translate) }}
+    </button>
+  </div>
+
+  <!-- SUMMARY CHIPS -->
+  <div class="summary-row" *ngIf="!loading">
+    <div class="summary-chip primary">
+      <span class="chip-label">{{ 'expenses.total_expenses' | translate }}</span>
+      <span class="chip-value">{{ summaryTotal | number:'1.2-2' }}</span>
+    </div>
+    <div class="summary-chip" *ngFor="let e of summaryEntries()" [ngClass]="e.cls">
+      <span class="chip-label">{{ e.label }}</span>
+      <span class="chip-value">{{ e.value | number:'1.2-2' }}</span>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT FORM -->
+  <div class="card card-body form-card" *ngIf="showForm">
+    <div class="form-card-header">
+      <p class="card-title">{{ form.id > 0 ? ('expenses.edit_title' | translate) : ('expenses.add_title' | translate) }}</p>
+      <button class="close-btn" (click)="cancelForm()">✕</button>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>{{ 'expenses.type_label' | translate }}</label>
+        <select [(ngModel)]="form.category">
+          <option value="">{{ 'expenses.type_placeholder' | translate }}</option>
+          <option *ngFor="let t of expenseTypes" [value]="t.value">{{ t.label }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>{{ 'common.amount' | translate }}</label>
+        <input type="number" [(ngModel)]="form.amount" min="0.01" step="0.01" placeholder="0.00" />
+      </div>
+
+      <div class="form-group">
+        <label>{{ 'common.date' | translate }}</label>
+        <input type="date" [(ngModel)]="form.date" />
+      </div>
+
+      <div class="form-group desc-group">
+        <label>{{ 'expenses.notes_label' | translate }}</label>
+        <input type="text" [(ngModel)]="form.description" [placeholder]="'expenses.notes_placeholder' | translate" />
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <button class="btn btn-primary" (click)="save()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        {{ form.id > 0 ? ('common.update' | translate) : ('common.save' | translate) }}
+      </button>
+      <button class="btn btn-ghost" (click)="cancelForm()">{{ 'common.cancel' | translate }}</button>
+    </div>
+  </div>
+
+  <!-- FILTER BAR (desktop) -->
+  <div class="card card-body filter-bar desktop-table">
+    <select [(ngModel)]="filterCategory" (ngModelChange)="applyFilter()">
+      <option value="">{{ 'expenses.all_types' | translate }}</option>
+      <option *ngFor="let t of expenseTypes" [value]="t.value">{{ t.label }}</option>
+    </select>
+    <div class="date-range">
+      <input type="date" [(ngModel)]="filterFrom" (change)="applyFilter()" />
+      <span class="range-sep">–</span>
+      <input type="date" [(ngModel)]="filterTo" (change)="applyFilter()" />
+    </div>
+    <button class="btn btn-ghost btn-sm" (click)="clearFilter()">{{ 'common.clear' | translate }}</button>
+  </div>
+
+  <!-- DESKTOP TABLE -->
+  <div class="card desktop-table">
+    <div class="card-header-row">
+      <span class="card-title" style="margin-bottom:0">{{ 'expenses.list_title' | translate }}</span>
+      <span class="count-badge">{{ total }} {{ 'common.records' | translate }}</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>{{ 'common.date' | translate }}</th>
+            <th>{{ 'expenses.type_label' | translate }}</th>
+            <th class="text-right">{{ 'common.amount' | translate }}</th>
+            <th>{{ 'expenses.notes_label' | translate }}</th>
+            <th>Ref</th>
+            <th>{{ 'common.actions' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of expenses; let i = index">
+            <td class="muted">{{ (page - 1) * pageSize + i + 1 }}</td>
+            <td class="muted">{{ e.date | date:'dd MMM yyyy' }}</td>
+            <td><span class="type-badge" [ngClass]="badgeClass(e.category)">{{ labelFor(e.category) }}</span></td>
+            <td class="text-right bold">{{ e.amount | number:'1.2-2' }}</td>
+            <td class="muted desc-cell">{{ e.description || '—' }}</td>
+            <td><span class="ref-no">{{ e.expense_no }}</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="icon-btn edit-btn" (click)="edit(e)" title="Edit">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button class="icon-btn delete-btn" (click)="delete(e.id)" title="Delete">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="!loading && expenses.length === 0">
+            <td colspan="7" class="empty-row"><div class="empty-icon">💸</div>{{ 'expenses.empty' | translate }}</td>
+          </tr>
+          <tr *ngIf="loading">
+            <td colspan="7" class="loading-row"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
+  </div>
+
+  <!-- MOBILE LIST -->
+  <div class="mobile-list">
+    <!-- Mobile filter bar -->
+    <div class="mobile-filter">
+      <select [(ngModel)]="filterCategory" style="flex:1" (ngModelChange)="applyFilter()">
+        <option value="">{{ 'expenses.all_types' | translate }}</option>
+        <option *ngFor="let t of expenseTypes" [value]="t.value">{{ t.label }}</option>
+      </select>
+      <input type="date" [(ngModel)]="filterFrom" style="flex:1" (change)="applyFilter()" />
+      <input type="date" [(ngModel)]="filterTo" style="flex:1" (change)="applyFilter()" />
+      <button class="btn btn-ghost btn-sm" (click)="clearFilter()">{{ 'common.clear' | translate }}</button>
+    </div>
+
+    <div class="mobile-meta">
+      <span class="mobile-title">{{ 'expenses.list_title' | translate }}</span>
+      <span class="count-badge">{{ total }}</span>
+    </div>
+
+    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
+    <div class="mobile-empty" *ngIf="!loading && expenses.length === 0"><div class="empty-icon">💸</div><p>{{ 'expenses.empty' | translate }}</p></div>
+
+    <div class="mobile-card" *ngFor="let e of expenses; let i = index">
+      <div class="mc-top">
+        <div class="mc-name-wrap">
+          <span class="mc-num">{{ (page-1)*pageSize+i+1 }}</span>
+          <div>
+            <div class="mc-title">{{ labelFor(e.category) }}</div>
+            <div class="mc-sub">{{ e.date | date:'dd MMM yyyy' }} · <span class="ref-no">{{ e.expense_no }}</span></div>
+          </div>
+        </div>
+        <span class="type-badge" [ngClass]="badgeClass(e.category)">{{ e.amount | number:'1.2-2' }}</span>
+      </div>
+      <div class="mc-grid" *ngIf="e.description">
+        <div class="mc-field" style="grid-column: span 3">
+          <span class="mc-lbl">{{ 'expenses.notes_label' | translate }}</span>
+          <span class="mc-val muted">{{ e.description }}</span>
+        </div>
+      </div>
+      <div class="mc-actions">
+        <button class="btn btn-warning btn-sm" (click)="edit(e)">{{ 'customers.edit' | translate }}</button>
+        <button class="btn btn-danger btn-sm" (click)="delete(e.id)">{{ 'customers.delete' | translate }}</button>
+      </div>
+    </div>
+
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
+  </div>
+
+</div>

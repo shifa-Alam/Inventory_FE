@@ -46,11 +46,11 @@
       <div class="inv-label-block">
         <div class="inv-word">INVOICE</div>
         <div class="inv-meta-row">
-          <span class="inv-meta-label">{{ 'invoice.invoice_no' | translate }}</span>
+          <span class="inv-meta-label">{{ 'invoice.invoice_no' | translate }}:</span>
           <span class="inv-meta-val">{{ invoice?.invoice_no }}</span>
         </div>
         <div class="inv-meta-row">
-          <span class="inv-meta-label">{{ invoice?.delivery_date ? 'Delivery Date' : ('invoice.date' | translate) }}</span>
+          <span class="inv-meta-label">{{ invoice?.delivery_date ? 'Delivery Date' : ('invoice.date' | translate) }}:</span>
           <span class="inv-meta-val">{{ (invoice?.delivery_date || invoice?.created_at) | date:'dd MMM yyyy' }}</span>
         </div>
         <div class="inv-status-row">
@@ -128,6 +128,8 @@
         </div>
       </div>
     </div>
+
+    <div class="footer-spacer"></div>
 
     <!-- ── Footer ── -->
     <div class="inv-footer">

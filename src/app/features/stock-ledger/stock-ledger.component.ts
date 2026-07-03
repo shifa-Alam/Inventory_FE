@@ -20,19 +20,22 @@ export class StockLedgerComponent implements OnInit {
   filterType = '';
   filterDateFrom = '';
   filterDateTo = '';
+  activeQuick = 'today';
 
   page = 1;
   pages = 1;
   total = 0;
   pageSize = 20;
 
-  constructor(private api: ApiService) {
-    const today = localDateStr();
-    this.filterDateFrom = today;
-    this.filterDateTo = today;
-  }
+  constructor(private api: ApiService) {}
 
-  ngOnInit() { this.load(); }
+  ngOnInit() {
+    const d = localDateStr();
+    this.filterDateFrom = d;
+    this.filterDateTo = d;
+    this.activeQuick = 'today';
+    this.load();
+  }
 
   load() {
     const params: string[] = [`page=${this.page}`, `page_size=${this.pageSize}`];
@@ -53,9 +56,39 @@ export class StockLedgerComponent implements OnInit {
   }
 
   applyFilter() { this.page = 1; this.load(); }
-  clearFilter() { this.filterType = ''; this.filterDateFrom = ''; this.filterDateTo = ''; this.applyFilter(); }
-  onPageChange(p: number) { this.page = p; this.load(); }
+  onDateChange() { this.activeQuick = ''; this.applyFilter(); }
   onFilterChange() { this.applyFilter(); }
+  onPageChange(p: number) { this.page = p; this.load(); }
+
+  setToday() {
+    const d = localDateStr();
+    this.filterDateFrom = d; this.filterDateTo = d; this.activeQuick = 'today'; this.applyFilter();
+  }
+
+  setThisWeek() {
+    const now = new Date();
+    const daysToMon = now.getDay() === 0 ? 6 : now.getDay() - 1;
+    const mon = new Date(now); mon.setDate(now.getDate() - daysToMon);
+    this.filterDateFrom = localDateStr(mon); this.filterDateTo = localDateStr(now);
+    this.activeQuick = 'week'; this.applyFilter();
+  }
+
+  setThisMonth() {
+    const now = new Date();
+    this.filterDateFrom = localDateStr(new Date(now.getFullYear(), now.getMonth(), 1));
+    this.filterDateTo = localDateStr(now); this.activeQuick = 'month'; this.applyFilter();
+  }
+
+  setAllTime() {
+    this.filterDateFrom = ''; this.filterDateTo = ''; this.activeQuick = 'all'; this.applyFilter();
+  }
+
+  clearFilter() {
+    this.filterType = '';
+    const d = localDateStr();
+    this.filterDateFrom = d; this.filterDateTo = d; this.activeQuick = 'today';
+    this.applyFilter();
+  }
 
   typeClass(type: string) {
     const map: any = { PURCHASE: 'type-purchase', SALE: 'type-sale', RETURN: 'type-return', WASTE: 'type-waste' };

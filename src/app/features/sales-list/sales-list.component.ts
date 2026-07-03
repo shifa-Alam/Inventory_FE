@@ -24,6 +24,7 @@ export class SalesListComponent implements OnInit {
   filterDateFrom = '';
   filterDateTo = '';
   filterStatus = '';           // '' | 'due' | 'paid'
+  activeQuick = 'today';
 
   /* customer autocomplete */
   customerSearch = '';
@@ -60,6 +61,7 @@ export class SalesListComponent implements OnInit {
     const today = localDateStr();
     this.filterDateFrom = today;
     this.filterDateTo   = today;
+    this.activeQuick = 'today';
     this.load();
   }
 
@@ -84,6 +86,9 @@ export class SalesListComponent implements OnInit {
   }
 
   applyFilter() { this.page = 1; this.closePanel(); this.load(); }
+  onDateChange() { this.activeQuick = ''; this.applyFilter(); }
+  private invoiceTimer: any;
+  onInvoiceInput() { clearTimeout(this.invoiceTimer); this.invoiceTimer = setTimeout(() => this.applyFilter(), 400); }
 
   clearFilter() {
     const today = localDateStr();
@@ -91,34 +96,35 @@ export class SalesListComponent implements OnInit {
     this.filterDateFrom = today;
     this.filterDateTo   = today;
     this.filterStatus = '';
+    this.activeQuick = 'today';
     this.clearCustomer();
     this.applyFilter();
   }
 
   setToday() {
     const t = localDateStr();
-    this.filterDateFrom = t; this.filterDateTo = t; this.applyFilter();
+    this.filterDateFrom = t; this.filterDateTo = t; this.activeQuick = 'today'; this.applyFilter();
   }
 
   setThisWeek() {
     const now = new Date();
-    const dayOfWeek = now.getDay(); // 0=Sun
+    const dayOfWeek = now.getDay();
     const daysToMon = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
     const mon = new Date(now); mon.setDate(now.getDate() - daysToMon);
     this.filterDateFrom = localDateStr(mon);
     this.filterDateTo   = localDateStr(now);
-    this.applyFilter();
+    this.activeQuick = 'week'; this.applyFilter();
   }
 
   setThisMonth() {
     const now = new Date();
     this.filterDateFrom = localDateStr(new Date(now.getFullYear(), now.getMonth(), 1));
     this.filterDateTo   = localDateStr(now);
-    this.applyFilter();
+    this.activeQuick = 'month'; this.applyFilter();
   }
 
   setAllTime() {
-    this.filterDateFrom = ''; this.filterDateTo = ''; this.applyFilter();
+    this.filterDateFrom = ''; this.filterDateTo = ''; this.activeQuick = 'all'; this.applyFilter();
   }
 
   onPageChange(p: number) { this.page = p; this.closePanel(); this.load(); }

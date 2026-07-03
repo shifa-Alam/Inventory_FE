@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
+import { ConfirmService } from '../../shared/services/confirm.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-tenants',
@@ -13,11 +15,12 @@ import { ApiService } from '../../core/services/api.service';
 export class TenantsComponent implements OnInit {
   tenants: any[] = [];
   loading = false;
+  showForm = false;
   name = '';
   successMsg = '';
   errorMsg = '';
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private confirmSvc: ConfirmService, private toast: ToastService) {}
 
   ngOnInit() { this.load(); }
 
@@ -29,6 +32,9 @@ export class TenantsComponent implements OnInit {
     });
   }
 
+  openAdd() { this.name = ''; this.successMsg = ''; this.errorMsg = ''; this.showForm = true; }
+  cancelForm() { this.name = ''; this.successMsg = ''; this.errorMsg = ''; this.showForm = false; }
+
   create() {
     this.successMsg = '';
     this.errorMsg = '';
@@ -38,6 +44,7 @@ export class TenantsComponent implements OnInit {
       next: () => {
         this.successMsg = `Tenant "${this.name.trim()}" created.`;
         this.name = '';
+        this.showForm = false;
         this.load();
       },
       error: (err: any) => {
@@ -47,11 +54,11 @@ export class TenantsComponent implements OnInit {
     });
   }
 
-  deactivate(t: any) {
-    if (!confirm(`Deactivate tenant "${t.name}"?`)) return;
+  async deactivate(t: any) {
+    if (!await this.confirmSvc.open(`Deactivate tenant "${t.name}"?`, { confirmLabel: 'Deactivate' })) return;
     this.api.delete(`/tenants/${t.id}/deactivate`).subscribe({
       next: () => this.load(),
-      error: (err: any) => alert(err?.error?.detail ?? 'Failed to deactivate.')
+      error: (err: any) => this.toast.error(err?.error?.detail ?? 'Failed to deactivate.')
     });
   }
 }

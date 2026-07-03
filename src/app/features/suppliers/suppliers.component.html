@@ -5,6 +5,11 @@
       <h2>{{ 'suppliers.title' | translate }}</h2>
       <p class="sub">{{ 'suppliers.subtitle' | translate }}</p>
     </div>
+    <button class="btn" [class.btn-primary]="!showForm" [class.btn-ghost]="showForm" (click)="showForm && !newSupplier.id ? cancelForm() : openAdd()">
+      <svg *ngIf="!showForm || newSupplier.id" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <svg *ngIf="showForm && !newSupplier.id" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      {{ showForm && !newSupplier.id ? ('suppliers.cancel' | translate) : ('suppliers.add_title' | translate) }}
+    </button>
   </div>
 
   <!-- SUMMARY -->
@@ -20,8 +25,11 @@
   </div>
 
   <!-- FORM -->
-  <div class="card card-body form-card" style="margin-bottom:10px">
-    <p class="card-title">{{ 'suppliers.add_title' | translate }}</p>
+  <div class="card card-body form-card" *ngIf="showForm">
+    <div class="form-card-header">
+      <p class="card-title">{{ newSupplier.id ? ('suppliers.edit_title' | translate) : ('suppliers.add_title' | translate) }}</p>
+      <button class="close-btn" (click)="cancelForm()">✕</button>
+    </div>
     <div class="form-grid">
       <div class="form-group">
         <label>{{ 'suppliers.name_label' | translate }} <span class="req">*</span></label>
@@ -41,7 +49,8 @@
       </div>
     </div>
     <div class="form-footer">
-      <button class="btn btn-primary" (click)="save()">{{ 'suppliers.save' | translate }}</button>
+      <button class="btn btn-primary" (click)="save()">{{ newSupplier.id ? ('suppliers.update' | translate) : ('suppliers.save' | translate) }}</button>
+      <button class="btn btn-ghost" (click)="cancelForm()">{{ 'suppliers.cancel' | translate }}</button>
     </div>
   </div>
 
@@ -53,8 +62,7 @@
         <span class="count-badge">{{ total }} total</span>
       </div>
       <div class="chr-toolbar">
-        <input [placeholder]="'suppliers.filter_name' | translate" [(ngModel)]="filterName" (keyup.enter)="applyFilter()" />
-        <button class="btn btn-primary btn-sm" (click)="applyFilter()">{{ 'common.filter' | translate }}</button>
+        <input [placeholder]="'suppliers.filter_name' | translate" [(ngModel)]="filterName" (ngModelChange)="onSearchInput()" />
         <button class="btn btn-ghost btn-sm" (click)="clearFilter()">{{ 'common.clear' | translate }}</button>
       </div>
     </div>
@@ -68,6 +76,7 @@
             <th>{{ 'suppliers.col_address' | translate }}</th>
             <th>{{ 'suppliers.col_due' | translate }}</th>
             <th>{{ 'suppliers.col_status' | translate }}</th>
+            <th>{{ 'common.actions' | translate }}</th>
           </tr>
         </thead>
         <tbody>
@@ -82,6 +91,7 @@
                 {{ s.opening_due > 0 ? ('suppliers.status_due' | translate) : ('suppliers.status_clear' | translate) }}
               </span>
             </td>
+            <td><button class="btn btn-warning btn-sm" (click)="edit(s)">{{ 'customers.edit' | translate }}</button></td>
           </tr>
           <tr *ngIf="loading" class="loading-row">
             <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
@@ -125,6 +135,9 @@
           <span class="mc-lbl">Due</span>
           <span class="mc-val" [class.due]="s.opening_due > 0">৳{{ s.opening_due | number }}</span>
         </div>
+      </div>
+      <div class="mc-actions">
+        <button class="btn btn-warning btn-sm" (click)="edit(s)">{{ 'customers.edit' | translate }}</button>
       </div>
     </div>
     <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>

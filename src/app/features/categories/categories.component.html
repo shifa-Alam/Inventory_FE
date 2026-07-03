@@ -5,11 +5,19 @@
       <h2>{{ 'categories.title' | translate }}</h2>
       <p class="sub">{{ 'categories.subtitle' | translate }}</p>
     </div>
+    <button class="btn" [class.btn-primary]="!showForm" [class.btn-ghost]="showForm" (click)="showForm && !newCategory.id ? cancelForm() : openAdd()">
+      <svg *ngIf="!showForm || newCategory.id" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <svg *ngIf="showForm && !newCategory.id" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      {{ showForm && !newCategory.id ? ('categories.cancel' | translate) : ('categories.add_title' | translate) }}
+    </button>
   </div>
 
   <!-- FORM -->
-  <div class="card card-body" style="margin-bottom:10px">
-    <p class="card-title">{{ newCategory.id ? ('categories.edit_title' | translate) : ('categories.add_title' | translate) }}</p>
+  <div class="card card-body form-card" *ngIf="showForm">
+    <div class="form-card-header">
+      <p class="card-title">{{ newCategory.id ? ('categories.edit_title' | translate) : ('categories.add_title' | translate) }}</p>
+      <button class="close-btn" (click)="cancelForm()">✕</button>
+    </div>
     <div class="inline-form">
       <div class="form-group" style="flex:1;max-width:360px">
         <label>{{ 'categories.name_placeholder' | translate }} <span class="req">*</span></label>
@@ -18,7 +26,7 @@
       <button class="btn btn-primary" (click)="save()" style="margin-top:15px">
         {{ newCategory.id ? ('categories.update' | translate) : ('categories.save' | translate) }}
       </button>
-      <button class="btn btn-ghost" *ngIf="newCategory.id" (click)="newCategory = { id: 0, name: '' }" style="margin-top:15px">{{ 'categories.cancel' | translate }}</button>
+      <button class="btn btn-ghost" (click)="cancelForm()" style="margin-top:15px">{{ 'categories.cancel' | translate }}</button>
     </div>
   </div>
 
@@ -30,8 +38,7 @@
         <span class="count-badge">{{ total }} total</span>
       </div>
       <div class="chr-toolbar">
-        <input [placeholder]="'categories.filter_name' | translate" [(ngModel)]="filterName" (keyup.enter)="applyFilter()" />
-        <button class="btn btn-primary btn-sm" (click)="applyFilter()">{{ 'common.filter' | translate }}</button>
+        <input [placeholder]="'categories.filter_name' | translate" [(ngModel)]="filterName" (ngModelChange)="onSearchInput()" />
         <button class="btn btn-ghost btn-sm" (click)="clearFilter()">{{ 'common.clear' | translate }}</button>
       </div>
     </div>

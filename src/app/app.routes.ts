@@ -21,6 +21,7 @@ import { CustomerPaymentComponent } from './features/customer-payment/customer-p
 import { PaymentLedgerComponent } from './features/payment-ledger/payment-ledger.component';
 import { OperatorSummaryComponent } from './features/operator-summary/operator-summary.component';
 import { TenantsComponent } from './features/tenants/tenants.component';
+import { ExpensesComponent } from './features/expenses/expenses.component';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
@@ -53,7 +54,8 @@ export const routes: Routes = [
             { path: 'customer-payment', component: CustomerPaymentComponent },
             { path: 'payment-ledger', component: PaymentLedgerComponent },
             { path: 'operator-summary', component: OperatorSummaryComponent },
-            { path: 'tenants', component: TenantsComponent }
+            { path: 'tenants', component: TenantsComponent },
+            { path: 'expenses', component: ExpensesComponent }
         ]
     }
 ];

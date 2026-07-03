@@ -32,6 +32,11 @@ import { ToastService } from '../../services/toast.service';
       50%  { width: 70%; margin-left: 15%; }
       100% { width: 0%; margin-left: 100%; }
     }
+    @media (max-width: 640px) {
+      .progress-bar {
+        top: auto; bottom: 62px; height: 3px;
+      }
+    }
     .toast-container {
       position: fixed; bottom: 24px; right: 24px;
       display: flex; flex-direction: column; gap: 10px; z-index: 9998;

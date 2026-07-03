@@ -4,11 +4,19 @@
       <h2>Tenants</h2>
       <p class="sub">Manage SaaS tenants (System Admin only)</p>
     </div>
+    <button class="btn" [class.btn-primary]="!showForm" [class.btn-ghost]="showForm" (click)="showForm ? cancelForm() : openAdd()">
+      <svg *ngIf="!showForm" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <svg *ngIf="showForm" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      {{ showForm ? 'Cancel' : 'New Tenant' }}
+    </button>
   </div>
 
   <!-- FORM -->
-  <div class="card card-body" style="margin-bottom:10px">
-    <p class="card-title">Create New Tenant</p>
+  <div class="card card-body form-card" *ngIf="showForm">
+    <div class="form-card-header">
+      <p class="card-title">Create New Tenant</p>
+      <button class="close-btn" (click)="cancelForm()">✕</button>
+    </div>
 
     <div class="alert alert-success" *ngIf="successMsg">
       <span class="alert-icon">✓</span> {{ successMsg }}
@@ -27,6 +35,7 @@
           <span *ngIf="loading" class="spinner"></span>
           {{ loading ? 'Saving...' : 'Create Tenant' }}
         </button>
+        <button class="btn btn-ghost" (click)="cancelForm()">Cancel</button>
       </div>
     </div>
   </div>

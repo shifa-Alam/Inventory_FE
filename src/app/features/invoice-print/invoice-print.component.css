@@ -29,7 +29,11 @@
   color: #0f172a;
   overflow: hidden;
   border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
 }
+
+.footer-spacer { flex: 1; }
 
 /* ─── Top accent bar ─────────────────────────────────────────── */
 .gold-bar {
@@ -244,6 +248,7 @@
     border: none !important;
     max-width: 100% !important;
     width: 100% !important;
+    min-height: calc(297mm - 16mm) !important;
   }
 
   /* Top bar */
