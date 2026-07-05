@@ -1,0 +1,119 @@
+:host { display: block; }
+
+.cpt-doc {
+  max-width: 680px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 20px 60px rgba(0,0,0,0.12);
+  color: #0f172a;
+  padding: 24px 28px;
+}
+
+/* ─── Header ─────────────────────────────────────────────────── */
+.cpt-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #0f172a;
+}
+.cpt-brand { display: flex; gap: 10px; align-items: flex-start; }
+.cpt-logo  { width: 40px; height: 40px; object-fit: contain; }
+.cpt-shop  { font-size: 17px; font-weight: 900; letter-spacing: -0.3px; line-height: 1.1; }
+.cpt-shop-line { font-size: 10px; color: #334155; margin-top: 2px; line-height: 1.4; }
+
+.cpt-meta { text-align: right; flex-shrink: 0; }
+.cpt-title { font-size: 15px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 4px; }
+.cpt-meta-line { font-size: 10px; margin-bottom: 2px; }
+.cpt-meta-line b { font-weight: 700; }
+
+.cpt-status {
+  display: inline-block; padding: 2px 8px; border-radius: 2px;
+  font-size: 8px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+  background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;
+}
+.cpt-status.paid { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
+
+/* ─── Customer ───────────────────────────────────────────────── */
+.cpt-customer {
+  padding: 8px 0;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 11px;
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline;
+}
+.cpt-cust-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
+.cpt-cust-name  { font-weight: 700; font-size: 12px; }
+.cpt-cust-extra { color: #334155; font-size: 10px; }
+
+/* ─── Table ──────────────────────────────────────────────────── */
+.cpt-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.cpt-table th {
+  font-size: 8.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px;
+  text-align: left; padding: 5px 6px; border-bottom: 1.5px solid #0f172a;
+}
+.cpt-table td { font-size: 11px; padding: 4px 6px; border-bottom: 1px solid #eef2f7; }
+.cpt-table tbody tr:last-child td { border-bottom: 1.5px solid #0f172a; }
+.cpt-table .c { text-align: center; }
+.cpt-table .r { text-align: right; }
+.cpt-table .amt { font-weight: 700; }
+
+/* ─── Totals ─────────────────────────────────────────────────── */
+.cpt-totals { margin-left: auto; width: 240px; margin-top: 10px; }
+.cpt-t-row {
+  display: flex; justify-content: space-between;
+  font-size: 11px; padding: 4px 0;
+}
+.cpt-t-total { font-weight: 800; border-top: 1px solid #e2e8f0; }
+.cpt-t-due {
+  font-weight: 900; font-size: 14px;
+  border-top: 2px solid #0f172a; margin-top: 4px; padding-top: 7px;
+}
+
+/* ─── Footer ─────────────────────────────────────────────────── */
+.cpt-footer {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-top: 36px; gap: 16px;
+}
+.cpt-sig { width: 170px; }
+.cpt-sig-line { border-top: 1px dashed #0f172a; margin-bottom: 4px; }
+.cpt-sig-label { font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+.cpt-note { text-align: right; font-size: 10px; font-style: italic; color: #334155; }
+.cpt-contact { display: flex; gap: 12px; justify-content: flex-end; font-size: 9px; font-style: normal; margin-top: 3px; }
+
+/* ─── Responsive ─────────────────────────────────────────────── */
+@media screen and (max-width: 640px) {
+  .cpt-doc { padding: 18px 16px; }
+  .cpt-head { flex-direction: column; }
+  .cpt-meta { text-align: left; }
+  .cpt-totals { width: 100%; }
+  .cpt-footer { flex-direction: column; align-items: flex-start; }
+  .cpt-note { text-align: left; }
+  .cpt-contact { justify-content: flex-start; }
+}
+
+/* ─── Print ──────────────────────────────────────────────────── */
+@media print {
+  @page { size: A4; margin: 10mm; }
+
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; color: #000 !important; }
+
+  .cpt-doc {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+  .cpt-head { border-bottom-color: #000 !important; }
+  .cpt-status { background: transparent !important; border: 1px solid #000 !important; }
+  .cpt-table th { border-bottom-color: #000 !important; }
+  .cpt-table tbody tr { page-break-inside: avoid; }
+  .cpt-table tbody tr:last-child td { border-bottom-color: #000 !important; }
+  .cpt-totals { page-break-inside: avoid; }
+  .cpt-t-due { border-top-color: #000 !important; }
+  .cpt-footer { page-break-inside: avoid; }
+  .cpt-sig-line { border-top-color: #000 !important; }
+}

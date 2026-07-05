@@ -22,135 +22,16 @@
     </div>
   </div>
 
-  <!-- Loading -->
-  <div *ngIf="loading" class="inv-loading">Loading invoice…</div>
+  <!-- Loading (invoice or tenant settings still on the way) -->
+  <div *ngIf="loading || !settings" class="inv-loading">Loading invoice…</div>
 
-  <!-- ══ Invoice Document ══ -->
-  <div class="invoice-doc" #invoiceBox *ngIf="!loading && invoice">
-
-    <!-- Gold accent line -->
-    <div class="gold-bar"></div>
-
-    <!-- ── Head ── -->
-    <div class="inv-head">
-
-      <!-- Company -->
-      <div class="company-block">
-        <div class="company-info">
-          <div class="company-name">{{ 'invoice.company' | translate }}</div>
-          <div class="company-sub">{{ 'invoice.company_sub' | translate }}</div>
-        </div>
-      </div>
-
-      <!-- Invoice meta -->
-      <div class="inv-label-block">
-        <div class="inv-word">INVOICE</div>
-        <div class="inv-meta-row">
-          <span class="inv-meta-label">{{ 'invoice.invoice_no' | translate }}:</span>
-          <span class="inv-meta-val">{{ invoice?.invoice_no }}</span>
-        </div>
-        <div class="inv-meta-row">
-          <span class="inv-meta-label">{{ invoice?.delivery_date ? 'Delivery Date' : ('invoice.date' | translate) }}:</span>
-          <span class="inv-meta-val">{{ (invoice?.delivery_date || invoice?.created_at) | date:'dd MMM yyyy' }}</span>
-        </div>
-        <div class="inv-status-row">
-          <span class="status-pill" [class.paid]="(invoice?.due_amount ?? 1) <= 0">
-            {{ (invoice?.due_amount ?? 1) <= 0 ? ('invoice.status_paid' | translate) : ('invoice.status_due' | translate) }}
-          </span>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- ── Bill Info ── -->
-    <div class="bill-section">
-      <div class="bill-block">
-        <div class="bill-label">{{ 'invoice.from' | translate }}</div>
-        <div class="bill-name">{{ 'invoice.company' | translate }}</div>
-        <div class="bill-line">{{ 'invoice.company_sub' | translate }}</div>
-      </div>
-      <div class="bill-block bill-block-right">
-        <div class="bill-label">{{ 'invoice.bill_to' | translate }}</div>
-        <div class="bill-name">{{ invoice?.customer_name || ('invoice.walk_in' | translate) }}</div>
-        <div class="bill-line" *ngIf="invoice?.customer_phone">{{ invoice?.customer_phone }}</div>
-        <div class="bill-line" *ngIf="invoice?.customer_address">{{ invoice?.customer_address }}</div>
-      </div>
-    </div>
-
-    <!-- ── Items Table ── -->
-    <div class="table-section">
-      <table class="inv-table">
-        <thead>
-          <tr>
-            <th class="th-no">#</th>
-            <th class="th-desc">{{ 'invoice.col_product' | translate }}</th>
-            <th class="th-center">{{ 'invoice.col_qty' | translate }}</th>
-            <th class="th-right th-mrp">{{ 'invoice.col_mrp' | translate }}</th>
-            <th class="th-right">{{ 'invoice.col_rate' | translate }}</th>
-            <th class="th-right">{{ 'invoice.col_amount' | translate }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of invoice?.items; let i = index" [class.row-alt]="i % 2 === 1">
-            <td class="td-no">{{ i + 1 }}</td>
-            <td class="td-desc">{{ item.product_name }}</td>
-            <td class="td-center">{{ item.quantity }}</td>
-            <td class="td-right td-mrp">{{ item.mrp ? ('৳ ' + (item.mrp | number)) : '—' }}</td>
-            <td class="td-right">৳&thinsp;{{ item.rate | number }}</td>
-            <td class="td-right td-amount">৳&thinsp;{{ item.quantity * item.rate | number }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- ── Totals ── -->
-    <div class="totals-wrap">
-      <div class="totals-box">
-        <div class="t-row" *ngIf="invoice?.discount_amount > 0">
-          <span class="t-label">{{ 'invoice.subtotal' | translate }}</span>
-          <span class="t-val">৳&thinsp;{{ invoice?.subtotal | number }}</span>
-        </div>
-        <div class="t-row t-disc" *ngIf="invoice?.discount_amount > 0">
-          <span class="t-label">{{ 'invoice.discount' | translate }}</span>
-          <span class="t-val disc-val">−&thinsp;৳&thinsp;{{ invoice?.discount_amount | number }}</span>
-        </div>
-        <div class="t-row" [class.t-net]="invoice?.discount_amount > 0">
-          <span class="t-label">{{ invoice?.discount_amount > 0 ? ('invoice.net_total' | translate) : ('invoice.subtotal' | translate) }}</span>
-          <span class="t-val">৳&thinsp;{{ invoice?.total_amount | number }}</span>
-        </div>
-        <div class="t-row t-paid">
-          <span class="t-label">{{ 'invoice.paid' | translate }}</span>
-          <span class="t-val">−&thinsp;৳&thinsp;{{ invoice?.paid_amount | number }}</span>
-        </div>
-        <div class="t-grand">
-          <span class="t-grand-label">{{ 'invoice.balance_due' | translate }}</span>
-          <span class="t-grand-val">৳&thinsp;{{ invoice?.due_amount | number }}</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="footer-spacer"></div>
-
-    <!-- ── Footer ── -->
-    <div class="inv-footer">
-
-      <div class="sig-row">
-        <div class="sig-block">
-          <div class="sig-space"></div>
-          <div class="sig-line sig-line-dashed"></div>
-          <div class="sig-label">{{ 'invoice.customer_sig' | translate }}</div>
-        </div>
-      </div>
-
-      <div class="footer-strip">
-        <span class="footer-thanks">{{ 'invoice.thank_you' | translate }}</span>
-        <div class="footer-contact">
-          <span>{{ 'invoice.company_phone' | translate }}</span>
-          <span>{{ 'invoice.company_email' | translate }}</span>
-        </div>
-      </div>
-
-    </div>
-
+  <!-- ══ Invoice Document — template picked per tenant ══ -->
+  <div #invoiceBox *ngIf="!loading && invoice && settings">
+    <ng-container [ngSwitch]="settings.invoice_template">
+      <app-invoice-thermal *ngSwitchCase="'thermal'" [invoice]="invoice" [settings]="settings"></app-invoice-thermal>
+      <app-invoice-compact *ngSwitchCase="'compact'" [invoice]="invoice" [settings]="settings"></app-invoice-compact>
+      <app-invoice-classic *ngSwitchDefault [invoice]="invoice" [settings]="settings"></app-invoice-classic>
+    </ng-container>
   </div>
+
 </div>

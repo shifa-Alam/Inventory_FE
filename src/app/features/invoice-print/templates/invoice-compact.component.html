@@ -1,0 +1,94 @@
+<div class="cpt-doc">
+
+  <!-- ── Header ── -->
+  <div class="cpt-head" [style.border-bottom-color]="settings.accent_color">
+    <div class="cpt-brand">
+      <img *ngIf="settings.logo_url" class="cpt-logo" [src]="settings.logo_url" alt="logo">
+      <div>
+        <div class="cpt-shop" [style.color]="settings.accent_color">{{ settings.shop_name || ('invoice.company' | translate) }}</div>
+        <div class="cpt-shop-line">{{ settings.shop_sub || ('invoice.company_sub' | translate) }}</div>
+        <div class="cpt-shop-line" *ngIf="settings.address">{{ settings.address }}</div>
+        <div class="cpt-shop-line" *ngIf="settings.phone">{{ settings.phone }}</div>
+      </div>
+    </div>
+    <div class="cpt-meta">
+      <div class="cpt-title">{{ 'invoice.badge' | translate }}</div>
+      <div class="cpt-meta-line"><b>{{ 'invoice.invoice_no' | translate }}:</b> {{ invoice?.invoice_no }}</div>
+      <div class="cpt-meta-line"><b>{{ invoice?.delivery_date ? 'Delivery' : ('invoice.date' | translate) }}:</b> {{ (invoice?.delivery_date || invoice?.created_at) | date:'dd/MM/yyyy' }}</div>
+      <div class="cpt-meta-line" *ngIf="settings.options.show_status">
+        <span class="cpt-status" [class.paid]="(invoice?.due_amount ?? 1) <= 0">
+          {{ (invoice?.due_amount ?? 1) <= 0 ? ('invoice.status_paid' | translate) : ('invoice.status_due' | translate) }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Customer ── -->
+  <div class="cpt-customer">
+    <span class="cpt-cust-label">{{ 'invoice.bill_to' | translate }}:</span>
+    <span class="cpt-cust-name">{{ invoice?.customer_name || ('invoice.walk_in' | translate) }}</span>
+    <span class="cpt-cust-extra" *ngIf="invoice?.customer_phone">· {{ invoice?.customer_phone }}</span>
+    <span class="cpt-cust-extra" *ngIf="invoice?.customer_address">· {{ invoice?.customer_address }}</span>
+  </div>
+
+  <!-- ── Items ── -->
+  <table class="cpt-table">
+    <thead>
+      <tr>
+        <th class="c">#</th>
+        <th>{{ 'invoice.col_product' | translate }}</th>
+        <th class="c">{{ 'invoice.col_qty' | translate }}</th>
+        <th class="r" *ngIf="settings.options.show_mrp">{{ 'invoice.col_mrp' | translate }}</th>
+        <th class="r">{{ 'invoice.col_rate' | translate }}</th>
+        <th class="r">{{ 'invoice.col_amount' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of invoice?.items; let i = index">
+        <td class="c">{{ i + 1 }}</td>
+        <td>{{ item.product_name }}</td>
+        <td class="c">{{ item.quantity }}</td>
+        <td class="r" *ngIf="settings.options.show_mrp">{{ item.mrp ? (item.mrp | number) : '—' }}</td>
+        <td class="r">{{ item.rate | number }}</td>
+        <td class="r amt">{{ item.quantity * item.rate | number }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ── Totals ── -->
+  <div class="cpt-totals">
+    <div class="cpt-t-row" *ngIf="invoice?.discount_amount > 0">
+      <span>{{ 'invoice.subtotal' | translate }}</span><span>৳ {{ invoice?.subtotal | number }}</span>
+    </div>
+    <div class="cpt-t-row" *ngIf="invoice?.discount_amount > 0">
+      <span>{{ 'invoice.discount' | translate }}</span><span>− ৳ {{ invoice?.discount_amount | number }}</span>
+    </div>
+    <div class="cpt-t-row cpt-t-total">
+      <span>{{ 'invoice.net_total' | translate }}</span><span>৳ {{ invoice?.total_amount | number }}</span>
+    </div>
+    <ng-container *ngIf="settings.options.show_paid_due">
+      <div class="cpt-t-row">
+        <span>{{ 'invoice.paid' | translate }}</span><span>− ৳ {{ invoice?.paid_amount | number }}</span>
+      </div>
+      <div class="cpt-t-row cpt-t-due" [style.border-top-color]="settings.accent_color">
+        <span>{{ 'invoice.balance_due' | translate }}</span><span>৳ {{ invoice?.due_amount | number }}</span>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="cpt-footer">
+    <div class="cpt-sig" *ngIf="settings.options.show_signature">
+      <div class="cpt-sig-line"></div>
+      <div class="cpt-sig-label">{{ 'invoice.customer_sig' | translate }}</div>
+    </div>
+    <div class="cpt-note">
+      {{ settings.footer_note || ('invoice.thank_you' | translate) }}
+      <div class="cpt-contact" *ngIf="settings.options.show_footer_contact">
+        <span *ngIf="settings.phone">{{ settings.phone }}</span>
+        <span *ngIf="settings.email">{{ settings.email }}</span>
+      </div>
+    </div>
+  </div>
+
+</div>

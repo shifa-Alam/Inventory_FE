@@ -187,7 +187,7 @@ body.dark {
 html, body {
   height: 100%;
   font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-  font-size: 13.5px;
+  font-size: 15px;
   line-height: 1.5;
   color: var(--text);
   background: var(--bg);
@@ -199,7 +199,7 @@ html, body {
    PAGE SHELL
 ═══════════════════════════════════════════════════════════════ */
 .page {
-  padding: 16px 22px;
+  padding: 20px 26px;
   min-height: 100%;
   background: var(--bg);
 }
@@ -216,7 +216,7 @@ html, body {
 }
 
 .page-header h2 {
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--text);
   letter-spacing: -0.3px;
@@ -224,7 +224,7 @@ html, body {
 }
 
 .page-header .sub {
-  font-size: 11.5px;
+  font-size: 13px;
   color: var(--text-muted);
   margin-top: 2px;
   font-weight: 400;
@@ -243,10 +243,10 @@ html, body {
   transition: box-shadow var(--transition);
 }
 
-.card-body { padding: 18px 20px; }
+.card-body { padding: 20px 22px; }
 
 .card-title {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text);
   margin-bottom: 14px;
@@ -260,7 +260,7 @@ html, body {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 10px 16px;
+  padding: 12px 18px;
   border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
   background: var(--surface);
@@ -284,9 +284,9 @@ html, body {
 
 .chr-toolbar input,
 .chr-toolbar select {
-  height: 32px;
-  padding: 0 10px;
-  font-size: 12.5px;
+  height: 38px;
+  padding: 0 12px;
+  font-size: 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--bg-alt);
@@ -315,18 +315,18 @@ html, body {
 }
 
 .chr-toolbar .btn {
-  height: 32px;
-  padding: 0 12px;
-  font-size: 12px;
+  height: 38px;
+  padding: 0 14px;
+  font-size: 13.5px;
 }
 
 .count-badge {
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 500;
   color: var(--text-muted);
   background: var(--bg-alt);
   border: 1px solid var(--border);
-  padding: 2px 9px;
+  padding: 3px 11px;
   border-radius: var(--radius-full);
   white-space: nowrap;
   letter-spacing: 0.1px;
@@ -349,8 +349,8 @@ html, body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 12px 16px;
-  min-width: 130px;
+  padding: 14px 18px;
+  min-width: 140px;
   box-shadow: var(--shadow-xs);
   flex: 1;
   transition: box-shadow var(--transition), transform var(--transition);
@@ -374,7 +374,7 @@ html, body {
 .summary-chip.info::before    { background: var(--info);    }
 
 .chip-label {
-  font-size: 10px;
+  font-size: 11.5px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.7px;
@@ -382,7 +382,7 @@ html, body {
 }
 
 .chip-value {
-  font-size: 21px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--text);
   letter-spacing: -0.5px;
@@ -405,7 +405,7 @@ html, body {
 }
 
 .form-group label {
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -450,27 +450,27 @@ html, body {
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
-  padding: 10px 16px !important;
+  padding: 12px 18px !important;
 }
 
 .filter-bar input,
 .filter-bar select {
   flex: 1 1 140px;
   min-width: 120px;
-  max-width: 200px;
-  height: 32px;
-  padding: 0 10px;
+  max-width: 220px;
+  height: 38px;
+  padding: 0 12px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  font-size: 12.5px;
+  font-size: 14px;
   background: var(--bg-alt);
   color: var(--text);
 }
 
 .filter-bar .btn-sm {
-  height: 32px;
-  padding: 0 14px;
-  font-size: 12.5px;
+  height: 38px;
+  padding: 0 16px;
+  font-size: 14px;
   flex-shrink: 0;
 }
 
@@ -479,10 +479,10 @@ html, body {
 ═══════════════════════════════════════════════════════════════ */
 input, select, textarea {
   width: 100%;
-  padding: 7px 11px;
+  padding: 10px 13px;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: 14.5px;
   font-family: inherit;
   color: var(--text);
   background: var(--surface);
@@ -522,11 +522,11 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: po
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  padding: 6px 14px;
+  gap: 6px;
+  padding: 9px 16px;
   border: 1.5px solid transparent;
   border-radius: var(--radius-sm);
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 500;
   font-family: inherit;
   line-height: 1;
@@ -589,9 +589,9 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: po
 }
 .btn-ghost:hover { background: var(--bg-alt); color: var(--text); border-color: var(--border-strong); }
 
-.btn-sm  { padding: 4px 10px; font-size: 11.5px; }
-.btn-lg  { padding: 9px 20px; font-size: 14px; border-radius: var(--radius); }
-.btn-icon { padding: 6px; width: 32px; height: 32px; border-radius: var(--radius-sm); }
+.btn-sm  { padding: 6px 12px; font-size: 13px; }
+.btn-lg  { padding: 12px 24px; font-size: 15.5px; border-radius: var(--radius); }
+.btn-icon { padding: 6px; width: 38px; height: 38px; border-radius: var(--radius-sm); }
 
 /* ═══════════════════════════════════════════════════════════════
    TABLE
@@ -606,8 +606,8 @@ thead tr {
 }
 
 th {
-  padding: 8px 14px;
-  font-size: 10.5px;
+  padding: 10px 14px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-muted);
   text-align: left;
@@ -617,8 +617,8 @@ th {
 }
 
 td {
-  padding: 9px 14px;
-  font-size: 13px;
+  padding: 12px 14px;
+  font-size: 14.5px;
   color: var(--text);
   border-bottom: 1px solid var(--border-light);
   vertical-align: middle;
@@ -641,7 +641,7 @@ th.right { text-align: right; }
   text-align: center;
   color: var(--text-muted);
   padding: 48px 20px !important;
-  font-size: 13px;
+  font-size: 14.5px;
 }
 
 .empty-icon {
@@ -668,7 +668,7 @@ th.right { text-align: right; }
 
 .loading-text {
   display: block;
-  font-size: 12.5px;
+  font-size: 14px;
   color: var(--text-muted);
   margin-top: 10px;
 }
@@ -681,9 +681,9 @@ th.right { text-align: right; }
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
+  padding: 3px 10px;
   border-radius: var(--radius-full);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.2px;
   white-space: nowrap;
@@ -701,7 +701,7 @@ th.right { text-align: right; }
 ═══════════════════════════════════════════════════════════════ */
 .amount-cell {
   font-weight: 600;
-  font-size: 13px;
+  font-size: 14.5px;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
@@ -717,8 +717,8 @@ th.right { text-align: right; }
   color: var(--primary);
   border: 1px solid var(--primary-mid);
   font-weight: 600;
-  font-size: 11.5px;
-  padding: 2px 8px;
+  font-size: 13px;
+  padding: 3px 10px;
   border-radius: var(--radius-full);
 }
 
@@ -726,9 +726,9 @@ th.right { text-align: right; }
    INLINE TABLE INPUTS
 ═══════════════════════════════════════════════════════════════ */
 td input[type="number"] {
-  width: 80px;
-  padding: 4px 7px;
-  font-size: 12.5px;
+  width: 92px;
+  padding: 6px 9px;
+  font-size: 14px;
   border-radius: var(--radius-sm);
   text-align: right;
 }
@@ -740,9 +740,9 @@ td input[type="number"] {
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 9px 13px;
+  padding: 11px 14px;
   border-radius: var(--radius-sm);
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 500;
   margin-bottom: 12px;
 }
@@ -754,7 +754,7 @@ td input[type="number"] {
 /* ═══════════════════════════════════════════════════════════════
    HINTS
 ═══════════════════════════════════════════════════════════════ */
-.hint       { font-size: 11px; color: var(--text-light); }
+.hint       { font-size: 12.5px; color: var(--text-light); }
 .hint-error { color: var(--danger-text); }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -793,8 +793,8 @@ td input[type="number"] {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 13px 14px;
-  margin-bottom: 8px;
+  padding: 15px 16px;
+  margin-bottom: 10px;
   box-shadow: var(--shadow-xs);
   transition: box-shadow var(--transition);
 }
@@ -827,13 +827,13 @@ td input[type="number"] {
 }
 
 .mc-title {
-  font-size: 13.5px; font-weight: 700;
+  font-size: 15px; font-weight: 700;
   color: var(--text); line-height: 1.25;
   margin-bottom: 1px;
 }
 
 .mc-sub {
-  font-size: 11px;
+  font-size: 12.5px;
   color: var(--text-muted);
 }
 
@@ -848,13 +848,13 @@ td input[type="number"] {
 .mc-field { display: flex; flex-direction: column; gap: 2px; }
 
 .mc-lbl {
-  font-size: 9.5px; font-weight: 600;
+  font-size: 11px; font-weight: 600;
   color: var(--text-light);
   text-transform: uppercase; letter-spacing: 0.4px;
 }
 
 .mc-val {
-  font-size: 12.5px; font-weight: 500;
+  font-size: 14px; font-weight: 500;
   color: var(--text);
 }
 
@@ -878,13 +878,13 @@ td input[type="number"] {
   text-align: center;
   padding: 40px 20px;
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: 14.5px;
 }
 
 .mobile-loading {
   display: flex; align-items: center; justify-content: center;
   gap: 10px; padding: 28px;
-  color: var(--text-muted); font-size: 13px;
+  color: var(--text-muted); font-size: 14.5px;
 }
 
 .mobile-meta {
@@ -895,7 +895,7 @@ td input[type="number"] {
 }
 
 .mobile-title {
-  font-size: 12.5px; font-weight: 700; color: var(--text);
+  font-size: 14px; font-weight: 700; color: var(--text);
 }
 
 /* ═══════════════════════════════════════════════════════════════

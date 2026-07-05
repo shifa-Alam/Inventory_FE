@@ -1,0 +1,87 @@
+<div class="th-doc">
+
+  <!-- ── Shop head ── -->
+  <div class="th-head">
+    <img *ngIf="settings.logo_url" class="th-logo" [src]="settings.logo_url" alt="logo">
+    <div class="th-shop">{{ settings.shop_name || ('invoice.company' | translate) }}</div>
+    <div class="th-line">{{ settings.shop_sub || ('invoice.company_sub' | translate) }}</div>
+    <div class="th-line" *ngIf="settings.address">{{ settings.address }}</div>
+    <div class="th-line" *ngIf="settings.phone">{{ settings.phone }}</div>
+  </div>
+
+  <div class="th-dash"></div>
+
+  <!-- ── Meta ── -->
+  <div class="th-meta">
+    <div class="th-meta-row">
+      <span>{{ 'invoice.invoice_no' | translate }}</span>
+      <span class="th-b">{{ invoice?.invoice_no }}</span>
+    </div>
+    <div class="th-meta-row">
+      <span>{{ invoice?.delivery_date ? 'Delivery' : ('invoice.date' | translate) }}</span>
+      <span>{{ (invoice?.delivery_date || invoice?.created_at) | date:'dd/MM/yyyy HH:mm' }}</span>
+    </div>
+    <div class="th-meta-row">
+      <span>{{ 'invoice.bill_to' | translate }}</span>
+      <span class="th-b">{{ invoice?.customer_name || ('invoice.walk_in' | translate) }}</span>
+    </div>
+    <div class="th-meta-row" *ngIf="invoice?.customer_phone">
+      <span>{{ 'common.phone' | translate }}</span>
+      <span>{{ invoice?.customer_phone }}</span>
+    </div>
+  </div>
+
+  <div class="th-dash"></div>
+
+  <!-- ── Items ── -->
+  <div class="th-items">
+    <div class="th-item" *ngFor="let item of invoice?.items; let i = index">
+      <div class="th-item-name">{{ i + 1 }}. {{ item.product_name }}</div>
+      <div class="th-item-calc">
+        <span>
+          {{ item.quantity }} × {{ item.rate | number }}
+          <ng-container *ngIf="settings.options.show_mrp && item.mrp"> (MRP {{ item.mrp | number }})</ng-container>
+        </span>
+        <span class="th-b">{{ item.quantity * item.rate | number }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="th-dash"></div>
+
+  <!-- ── Totals ── -->
+  <div class="th-totals">
+    <div class="th-t-row" *ngIf="invoice?.discount_amount > 0">
+      <span>{{ 'invoice.subtotal' | translate }}</span>
+      <span>{{ invoice?.subtotal | number }}</span>
+    </div>
+    <div class="th-t-row" *ngIf="invoice?.discount_amount > 0">
+      <span>{{ 'invoice.discount' | translate }}</span>
+      <span>−{{ invoice?.discount_amount | number }}</span>
+    </div>
+    <div class="th-t-row th-t-total">
+      <span>{{ 'invoice.net_total' | translate }}</span>
+      <span>৳ {{ invoice?.total_amount | number }}</span>
+    </div>
+    <ng-container *ngIf="settings.options.show_paid_due">
+      <div class="th-t-row">
+        <span>{{ 'invoice.paid' | translate }}</span>
+        <span>{{ invoice?.paid_amount | number }}</span>
+      </div>
+      <div class="th-t-row th-t-due">
+        <span>{{ 'invoice.balance_due' | translate }}</span>
+        <span>৳ {{ invoice?.due_amount | number }}</span>
+      </div>
+    </ng-container>
+  </div>
+
+  <div class="th-dash"></div>
+
+  <!-- ── Footer ── -->
+  <div class="th-footer">
+    <div class="th-thanks">{{ settings.footer_note || ('invoice.thank_you' | translate) }}</div>
+    <div class="th-line" *ngIf="settings.options.show_footer_contact && settings.phone">{{ settings.phone }}</div>
+    <div class="th-line" *ngIf="settings.options.show_footer_contact && settings.email">{{ settings.email }}</div>
+  </div>
+
+</div>
