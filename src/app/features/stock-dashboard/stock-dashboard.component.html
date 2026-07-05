@@ -107,7 +107,7 @@
             <td><span class="product-name">{{ s.name }}</span></td>
             <td><span class="sku-tag">{{ s.sku }}</span></td>
             <td class="muted">{{ s.category }}</td>
-            <td class="right">{{ s.purchase_price | number }}</td>
+            <td class="right">{{ s.average_cost | number }}</td>
             <td class="right">{{ s.sale_price | number }}</td>
             <td class="right mrp-cell">{{ s.mrp ? (s.mrp | number) : '—' }}</td>
             <td class="center">
@@ -174,7 +174,7 @@
         </div>
         <div class="mc-field">
           <span class="mc-lbl">Buy Price</span>
-          <span class="mc-val">{{ s.purchase_price | number }}</span>
+          <span class="mc-val">{{ s.average_cost | number }}</span>
         </div>
         <div class="mc-field">
           <span class="mc-lbl">Sale Price</span>

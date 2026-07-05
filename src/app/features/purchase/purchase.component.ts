@@ -151,7 +151,7 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
       existing.quantity++;
       this.showToast(`${product.name} × ${existing.quantity}`, 'success');
     } else {
-      const rate = product.purchase_price || 0;
+      const rate = product.last_purchase_price || product.average_cost || 0;
       this.items.unshift({
         product_id: product.id,
         product_name: product.name,
@@ -174,7 +174,7 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
       this.toast.warning('Product already added!');
       return;
     }
-    const rate = product.purchase_price || 0;
+    const rate = product.last_purchase_price || product.average_cost || 0;
     this.items.unshift({
       product_id: product.id,
       product_name: product.name,

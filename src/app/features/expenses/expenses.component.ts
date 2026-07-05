@@ -16,24 +16,17 @@ import { TranslatePipe } from '@ngx-translate/core';
 })
 export class ExpensesComponent implements OnInit {
   expenses: any[] = [];
+  categories: any[] = [];
   loading = false;
   showForm = false;
 
-  // value = backend enum, label = display text
-  expenseTypes = [
-    { value: 'carrying',    label: 'Carrying Cost' },
-    { value: 'delivery',    label: 'Delivery Cost' },
-    { value: 'rent',        label: 'Rent' },
-    { value: 'utility',     label: 'Utility / Electricity' },
-    { value: 'salary',      label: 'Salary' },
-    { value: 'maintenance', label: 'Maintenance' },
-    { value: 'marketing',   label: 'Marketing' },
-    { value: 'other',       label: 'Other / Miscellaneous' },
-  ];
+  // inline "add new category" state
+  showNewCategory = false;
+  newCategoryName = '';
 
-  form: any = { id: 0, category: '', amount: null, date: this.today(), description: '' };
+  form: any = { id: 0, category_id: 0, amount: null, date: this.today(), description: '' };
 
-  filterCategory = '';
+  filterCategoryId = 0;
   filterFrom = '';
   filterTo = '';
 
@@ -45,21 +38,31 @@ export class ExpensesComponent implements OnInit {
   summaryTotal = 0;
   summaryByCategory: Record<string, number> = {};
 
+  private badgePalette = ['badge-purple', 'badge-blue', 'badge-orange', 'badge-yellow',
+                          'badge-green', 'badge-teal', 'badge-pink', 'badge-gray'];
+
   constructor(
     private api: ApiService,
     private toast: ToastService,
     private confirmSvc: ConfirmService
   ) {}
 
-  ngOnInit() { this.load(); this.loadSummary(); }
+  ngOnInit() { this.loadCategories(); this.load(); this.loadSummary(); }
 
   today(): string {
     return new Date().toISOString().split('T')[0];
   }
 
+  loadCategories() {
+    this.api.get('/expense-categories/').subscribe({
+      next: (res: any) => { this.categories = res ?? []; },
+      error: (err) => console.error('Failed to load expense categories', err)
+    });
+  }
+
   load() {
     const params: string[] = [`page=${this.page}`, `page_size=${this.pageSize}`];
-    if (this.filterCategory) params.push(`category=${encodeURIComponent(this.filterCategory)}`);
+    if (+this.filterCategoryId > 0) params.push(`category_id=${this.filterCategoryId}`);
     if (this.filterFrom) params.push(`date_from=${this.filterFrom}`);
     if (this.filterTo) params.push(`date_to=${this.filterTo}`);
 
@@ -93,7 +96,7 @@ export class ExpensesComponent implements OnInit {
   applyFilter() { this.page = 1; this.load(); this.loadSummary(); }
 
   clearFilter() {
-    this.filterCategory = '';
+    this.filterCategoryId = 0;
     this.filterFrom = '';
     this.filterTo = '';
     this.applyFilter();
@@ -102,14 +105,14 @@ export class ExpensesComponent implements OnInit {
   onPageChange(p: number) { this.page = p; this.load(); }
 
   openAdd() {
-    this.form = { id: 0, category: '', amount: null, date: this.today(), description: '' };
+    this.form = { id: 0, category_id: 0, amount: null, date: this.today(), description: '' };
     this.showForm = true;
   }
 
   edit(expense: any) {
     this.form = {
       id: expense.id,
-      category: expense.category,
+      category_id: expense.category_id,
       amount: expense.amount,
       date: expense.date,
       description: expense.description ?? ''
@@ -120,16 +123,33 @@ export class ExpensesComponent implements OnInit {
 
   cancelForm() {
     this.showForm = false;
-    this.form = { id: 0, category: '', amount: null, date: this.today(), description: '' };
+    this.showNewCategory = false;
+    this.newCategoryName = '';
+    this.form = { id: 0, category_id: 0, amount: null, date: this.today(), description: '' };
+  }
+
+  addCategory() {
+    const name = this.newCategoryName.trim();
+    if (!name) { this.toast.warning('Please enter a category name.'); return; }
+    this.api.post('/expense-categories/', { name }).subscribe({
+      next: (res: any) => {
+        this.toast.success('Category added.');
+        this.showNewCategory = false;
+        this.newCategoryName = '';
+        this.loadCategories();
+        this.form.category_id = res.id;
+      },
+      error: (err: any) => this.toast.error(err?.error?.detail || 'Failed to add category.')
+    });
   }
 
   save() {
-    if (!this.form.category)              { this.toast.warning('Please select an expense type.'); return; }
+    if (!+this.form.category_id)          { this.toast.warning('Please select an expense type.'); return; }
     if (!this.form.amount || this.form.amount <= 0) { this.toast.warning('Please enter a valid amount.'); return; }
     if (!this.form.date)                  { this.toast.warning('Please select a date.'); return; }
 
     const payload = {
-      category: this.form.category,
+      category_id: +this.form.category_id,
       amount: +this.form.amount,
       date: this.form.date,
       description: this.form.description?.trim() || null
@@ -163,27 +183,16 @@ export class ExpensesComponent implements OnInit {
     });
   }
 
-  labelFor(value: string): string {
-    return this.expenseTypes.find(t => t.value === value)?.label ?? value;
-  }
-
-  badgeClass(category: string): string {
-    const map: Record<string, string> = {
-      carrying:    'badge-purple',
-      delivery:    'badge-blue',
-      rent:        'badge-orange',
-      utility:     'badge-yellow',
-      salary:      'badge-green',
-      maintenance: 'badge-teal',
-      marketing:   'badge-pink',
-      other:       'badge-gray',
-    };
-    return map[category] ?? 'badge-gray';
+  badgeClass(categoryName: string): string {
+    if (!categoryName) return 'badge-gray';
+    let hash = 0;
+    for (let i = 0; i < categoryName.length; i++) hash = (hash * 31 + categoryName.charCodeAt(i)) | 0;
+    return this.badgePalette[Math.abs(hash) % this.badgePalette.length];
   }
 
   summaryEntries(): { label: string; value: number; cls: string }[] {
     return Object.entries(this.summaryByCategory).map(([k, v]) => ({
-      label: this.labelFor(k),
+      label: k,
       value: v,
       cls: this.badgeClass(k)
     }));

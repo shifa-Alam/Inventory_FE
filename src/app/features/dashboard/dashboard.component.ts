@@ -64,21 +64,15 @@ export class DashboardComponent implements OnInit {
   get netProfitPositive(): boolean   { return (this.data.net_profit ?? 0) >= 0; }
 
   expenseCatLabel(cat: string): string {
-    const map: Record<string, string> = {
-      carrying: 'Carrying', delivery: 'Delivery', rent: 'Rent',
-      utility: 'Utility', salary: 'Salary', maintenance: 'Maintenance',
-      marketing: 'Marketing', other: 'Other',
-    };
-    return map[cat] ?? cat;
+    return cat;
   }
 
   expenseCatClass(cat: string): string {
-    const map: Record<string, string> = {
-      carrying: 'ec-purple', delivery: 'ec-blue', rent: 'ec-orange',
-      utility: 'ec-yellow', salary: 'ec-green', maintenance: 'ec-teal',
-      marketing: 'ec-pink',  other: 'ec-gray',
-    };
-    return map[cat] ?? 'ec-gray';
+    const palette = ['ec-purple', 'ec-blue', 'ec-orange', 'ec-yellow', 'ec-green', 'ec-teal', 'ec-pink', 'ec-gray'];
+    if (!cat) return 'ec-gray';
+    let hash = 0;
+    for (let i = 0; i < cat.length; i++) hash = (hash * 31 + cat.charCodeAt(i)) | 0;
+    return palette[Math.abs(hash) % palette.length];
   }
 
   expenseCatEntries(): { key: string; label: string; amount: number; cls: string; pct: number }[] {

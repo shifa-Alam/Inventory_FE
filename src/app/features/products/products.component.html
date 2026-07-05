@@ -35,8 +35,8 @@
         </select>
       </div>
       <div class="form-group">
-        <label>{{ 'products.purchase_price_placeholder' | translate }} <span class="req">*</span></label>
-        <input type="number" [placeholder]="'products.purchase_price_placeholder' | translate" [(ngModel)]="newProduct.purchase_price" />
+        <label>{{ 'products.average_cost_placeholder' | translate }} <span class="req">*</span></label>
+        <input type="number" [placeholder]="'products.average_cost_placeholder' | translate" [(ngModel)]="newProduct.average_cost" />
       </div>
       <div class="form-group">
         <label>{{ 'products.sale_price_placeholder' | translate }} <span class="req">*</span></label>
@@ -47,6 +47,10 @@
         <input type="number" [placeholder]="'products.mrp_placeholder' | translate" [(ngModel)]="newProduct.mrp" />
       </div>
       <div class="form-group">
+        <label>{{ 'products.minimum_stock_placeholder' | translate }}</label>
+        <input type="number" [placeholder]="'products.minimum_stock_placeholder' | translate" [(ngModel)]="newProduct.minimum_stock" />
+      </div>
+      <div class="form-group" *ngIf="!newProduct.id">
         <label>{{ 'products.stock_placeholder' | translate }}</label>
         <input type="number" [placeholder]="'products.stock_placeholder' | translate" [(ngModel)]="newProduct.current_stock" />
       </div>
@@ -92,7 +96,7 @@
             <th>{{ 'products.col_no' | translate }}</th>
             <th>{{ 'products.col_product' | translate }}</th>
             <th>{{ 'products.col_sku' | translate }}</th>
-            <th>{{ 'products.col_purchase' | translate }}</th>
+            <th>{{ 'products.col_avg_cost' | translate }}</th>
             <th>{{ 'products.col_sale' | translate }}</th>
             <th>{{ 'products.col_mrp' | translate }}</th>
             <th>{{ 'products.col_stock' | translate }}</th>
@@ -108,7 +112,7 @@
               <span class="inactive-tag" *ngIf="!p.is_active">{{ 'products.inactive' | translate }}</span>
             </td>
             <td class="muted">{{ p.sku }}</td>
-            <td>{{ p.purchase_price | number }}</td>
+            <td>{{ p.average_cost | number }}</td>
             <td>{{ p.sale_price | number }}</td>
             <td>{{ p.mrp ? (p.mrp | number) : '—' }}</td>
             <td><span class="stock-chip">{{ p.current_stock }}</span></td>
@@ -175,8 +179,8 @@
       </div>
       <div class="mc-grid">
         <div class="mc-field">
-          <span class="mc-lbl">{{ 'products.col_purchase' | translate }}</span>
-          <span class="mc-val">{{ p.purchase_price | number }}</span>
+          <span class="mc-lbl">{{ 'products.col_avg_cost' | translate }}</span>
+          <span class="mc-val">{{ p.average_cost | number }}</span>
         </div>
         <div class="mc-field">
           <span class="mc-lbl">{{ 'products.col_sale' | translate }}</span>

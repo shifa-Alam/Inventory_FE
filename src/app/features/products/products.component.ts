@@ -31,7 +31,7 @@ export class ProductsComponent implements OnInit {
   pageSize = 20;
 
   showForm = false;
-  newProduct = { id: 0, name: '', sku: '', category_id: 0, purchase_price: 0, sale_price: 0, mrp: 0, current_stock: 0 };
+  newProduct = { id: 0, name: '', sku: '', category_id: 0, average_cost: 0, sale_price: 0, mrp: 0, minimum_stock: 0, current_stock: 0 };
 
   constructor(private api: ApiService, private toast: ToastService, private confirmSvc: ConfirmService) {}
 
@@ -82,9 +82,9 @@ export class ProductsComponent implements OnInit {
   }
 
   update() {
-    const { name, sku, category_id, purchase_price, sale_price, mrp } = this.newProduct;
+    const { name, sku, category_id, average_cost, sale_price, mrp, minimum_stock } = this.newProduct;
     this.toast.startSaving();
-    this.api.put(`/products/${this.newProduct.id}`, { name, sku, category_id, purchase_price, sale_price, mrp }).subscribe({
+    this.api.put(`/products/${this.newProduct.id}`, { name, sku, category_id, average_cost, sale_price, mrp, minimum_stock }).subscribe({
       next: () => { this.toast.stopSaving(); this.toast.success('Product Updated'); this.load(); this.reset(); },
       error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to update product'); console.error(err); }
     });
@@ -110,7 +110,7 @@ export class ProductsComponent implements OnInit {
   }
 
   resetFields() {
-    this.newProduct = { id: 0, name: '', sku: '', category_id: 0, purchase_price: 0, sale_price: 0, mrp: 0, current_stock: 0 };
+    this.newProduct = { id: 0, name: '', sku: '', category_id: 0, average_cost: 0, sale_price: 0, mrp: 0, minimum_stock: 0, current_stock: 0 };
   }
 
   reset() { this.cancelForm(); }
