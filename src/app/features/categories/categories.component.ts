@@ -82,7 +82,7 @@ export class CategoriesComponent implements OnInit {
   }
 
   async delete(id: number) {
-    if (!await this.confirmSvc.open('Delete this category? This cannot be undone.')) return;
+    if (!await this.confirmSvc.open('Deactivate this category? Products keep their history.')) return;
     this.api.delete(`/categories/${id}`).subscribe({
       next: () => this.load(),
       error: () => this.toast.error('Failed to delete category.')

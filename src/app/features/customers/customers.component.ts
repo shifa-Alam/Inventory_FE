@@ -81,7 +81,7 @@ export class CustomersComponent implements OnInit {
   }
 
   async delete(id: number) {
-    if (!await this.confirmSvc.open('Delete this customer? This cannot be undone.')) return;
+    if (!await this.confirmSvc.open('Deactivate this customer? Their purchase history is kept.')) return;
     this.api.delete(`/customers/${id}`).subscribe({
       next: () => this.load(),
       error: () => this.toast.error('Failed to delete customer.')

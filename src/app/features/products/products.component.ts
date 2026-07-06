@@ -102,7 +102,7 @@ export class ProductsComponent implements OnInit {
   }
 
   async delete(id: number) {
-    if (!await this.confirmSvc.open('Delete this product? This cannot be undone.')) return;
+    if (!await this.confirmSvc.open('Deactivate this product? It will be hidden and cannot be sold, but its history is kept.')) return;
     this.api.delete(`/products/${id}`).subscribe({
       next: () => this.load(),
       error: () => this.toast.error('Failed to delete product.')

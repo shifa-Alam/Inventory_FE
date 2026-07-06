@@ -411,3 +411,15 @@
   .sidebar { display: none !important; }
   .sidebar-overlay { display: none !important; }
 }
+
+/* ── Desktop accessibility: larger sidebar text & targets ────── */
+@media (min-width: 769px) {
+  .sidebar { width: 248px; min-width: 248px; }
+  .logo-title { font-size: 15px; }
+  .logo-sub { font-size: 11.5px; }
+  .sidebar-nav a { font-size: 14.5px; padding: 10px 12px; gap: 10px; }
+  .sidebar-nav a svg { width: 18px; height: 18px; }
+  .nav-group-label { font-size: 10.5px; }
+  .user-name { font-size: 13.5px; }
+  .user-role { font-size: 11.5px; }
+}

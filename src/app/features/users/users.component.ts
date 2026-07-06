@@ -123,7 +123,7 @@ export class UsersComponent implements OnInit {
   }
 
   async delete(id: number) {
-    if (!await this.confirmSvc.open('Delete this user? This cannot be undone.')) return;
+    if (!await this.confirmSvc.open('Deactivate this user? They will no longer be able to log in.')) return;
     this.api.delete(`/auth/users/${id}`).subscribe({
       next: () => this.load(),
       error: () => {}

@@ -425,7 +425,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .hide-mobile { display: block; }
 .show-mobile { display: none; }
 
-.mobile-items { display: flex; flex-direction: column; gap: 8px; }
+.mobile-items { display: none; flex-direction: column; gap: 8px; }
 .mobile-empty { text-align: center; color: var(--text-muted); padding: 32px; font-size: 13px; }
 
 .mobile-item-card {
@@ -471,6 +471,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 @media (max-width: 640px) {
   .hide-mobile { display: none !important; }
   .show-mobile { display: block !important; }
+  .mobile-items.show-mobile { display: flex !important; }
 
   .page-header { flex-direction: column; gap: 10px; }
   .header-customer { flex-direction: column; gap: 10px; }

@@ -301,7 +301,18 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   submit() {
+    // Every sale must be booked against a registered customer
+    if (!this.customer_id || this.customer_id <= 0) {
+      this.toast.warning('Please select a customer before completing the sale.');
+      return;
+    }
+    if (this.items.length === 0) {
+      this.toast.warning('Please add at least one product.');
+      return;
+    }
+
     const payload: any = {
+      customer_id: +this.customer_id,
       paid_amount: +this.paid_amount,
       discount: +this.discount,
       items: this.items.map(i => ({
@@ -311,9 +322,6 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
       }))
     };
 
-    if (this.customer_id > 0) {
-      payload.customer_id = +this.customer_id;
-    }
     if (this.delivery_date) {
       payload.delivery_date = this.delivery_date;
     }
@@ -331,7 +339,11 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.clearPhone();
         this.router.navigate(['/invoice', res.id], { queryParams: { print: '1' } });
       },
-      error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to submit sale'); console.error(err); }
+      error: (err) => {
+        this.toast.stopSaving();
+        this.toast.error(err?.error?.detail || 'Failed to submit sale');
+        console.error(err);
+      }
     });
   }
 }

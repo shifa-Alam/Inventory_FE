@@ -999,3 +999,54 @@ td input[type="number"] {
   .chr-toolbar input, .chr-toolbar select { max-width: none; width: 100%; }
   .chr-toolbar .btn { width: 100%; justify-content: center; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   DESKTOP ACCESSIBILITY — larger, easier UI for desktop users
+   (fonts, buttons, inputs and spacing scaled up; mobile untouched)
+═══════════════════════════════════════════════════════════════ */
+@media (min-width: 769px) {
+  html, body { font-size: 16.5px; }
+
+  .page { padding: 26px 32px; }
+  .page-header h2 { font-size: 23px; }
+  .page-header .sub { font-size: 15px; }
+
+  .card-title { font-size: 17.5px; }
+  .card-body { padding: 24px 26px; }
+  .card-header-row { padding: 16px 20px; }
+
+  /* Forms */
+  .form-group label { font-size: 13.5px; }
+  input, select, textarea { font-size: 16px; padding: 12px 14px; }
+  .hint { font-size: 14px; }
+
+  /* Buttons — bigger touch/click targets */
+  .btn { font-size: 15.5px; padding: 12px 20px; gap: 8px; }
+  .btn-sm { font-size: 14.5px; padding: 9px 16px; }
+  .btn-lg { font-size: 17.5px; padding: 15px 30px; }
+  .btn-icon { width: 44px; height: 44px; }
+
+  /* Toolbars & filters */
+  .chr-toolbar input, .chr-toolbar select { height: 44px; font-size: 15.5px; max-width: 220px; }
+  .chr-toolbar .btn { height: 44px; font-size: 15px; }
+  .filter-bar input, .filter-bar select { height: 44px; font-size: 15.5px; max-width: 260px; }
+  .filter-bar .btn-sm { height: 44px; font-size: 15px; }
+
+  /* Tables — taller rows, larger text */
+  th { font-size: 13.5px; padding: 13px 16px; }
+  td { font-size: 16px; padding: 15px 16px; }
+  td input[type="number"] { width: 110px; font-size: 15.5px; padding: 9px 11px; }
+
+  /* Badges & chips */
+  .badge { font-size: 13.5px; padding: 5px 13px; }
+  .stock-chip { font-size: 14.5px; padding: 5px 13px; }
+  .count-badge { font-size: 14px; padding: 4px 13px; }
+  .amount-cell { font-size: 16px; }
+
+  /* Summary chips */
+  .chip-label { font-size: 13px; }
+  .chip-value { font-size: 28px; }
+
+  .alert { font-size: 15.5px; padding: 13px 16px; }
+  .loading-text { font-size: 15.5px; }
+}

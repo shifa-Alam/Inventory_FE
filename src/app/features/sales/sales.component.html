@@ -16,9 +16,9 @@
 
       <!-- ① Searchable dropdown -->
       <div class="cust-col">
-        <label class="field-label">{{ 'sales.customer_label' | translate }}</label>
+        <label class="field-label">{{ 'sales.customer_label' | translate }} <span style="color:#e53935">*</span></label>
         <div class="cust-dd-wrap" (keydown.escape)="ddOpen=false" (focusout)="onDdFocusOut($event)">
-          <div class="cust-dd-box" (click)="openDropdown()">
+          <div class="cust-dd-box" (click)="openDropdown()" [style.borderColor]="!selectedCustomer && items.length > 0 ? '#e53935' : ''">
             <span class="cust-dd-val" [class.placeholder]="!selectedCustomer">
               {{ selectedCustomer ? selectedCustomer.name : ('select one' ) }}
             </span>
@@ -207,7 +207,7 @@
           <span class="due-value">{{ getTotal() - discount - paid_amount | number }}</span>
         </div>
 
-        <button class="btn btn-primary btn-lg complete-btn" (click)="submit()" [disabled]="items.length === 0">
+        <button class="btn btn-primary btn-lg complete-btn" (click)="submit()" [disabled]="items.length === 0 || !customer_id">
           {{ 'sales.complete' | translate }}
         </button>
       </div>

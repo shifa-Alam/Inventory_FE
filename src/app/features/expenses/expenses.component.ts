@@ -176,7 +176,7 @@ export class ExpensesComponent implements OnInit {
   }
 
   async delete(id: number) {
-    if (!await this.confirmSvc.open('Delete this expense? This cannot be undone.', { danger: true })) return;
+    if (!await this.confirmSvc.open('Deactivate this expense? It will be removed from lists and summaries.', { danger: true })) return;
     this.api.delete(`/expenses/${id}`).subscribe({
       next: () => { this.toast.success('Expense deleted.'); this.load(); this.loadSummary(); },
       error: () => this.toast.error('Failed to delete expense.')
