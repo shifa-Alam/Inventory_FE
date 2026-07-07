@@ -93,7 +93,7 @@ export class PurchaseHistoryComponent implements OnInit, OnDestroy {
         this.pages = res.pages ?? 1;
         this.loading = false;
       },
-      error: (err) => { console.error('Failed to load purchases', err); this.loading = false; }
+      error: () => { this.loading = false; }
     });
   }
 

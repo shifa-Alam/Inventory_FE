@@ -52,6 +52,9 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   private toastTimer: any;
   private scanInProgress = false;
 
+  // Mobile checkout bottom sheet (UI state only)
+  sheetOpen = false;
+
   constructor(private api: ApiService, private toast: ToastService, private router: Router) { }
 
   ngOnInit() {
@@ -67,7 +70,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.selectedIndex = this.filteredProducts.length === 1 ? 0 : -1;
         this.searching = false;
       },
-      error: (err) => { if (!this.scanInProgress) this.searching = false; console.error('Product search failed', err); }
+      error: () => { if (!this.scanInProgress) this.searching = false; }
     });
   }
 
@@ -155,7 +158,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.clearPhone();
         this.loadDdCustomers('');
       },
-      error: (err) => { this.toast.error('Failed to add customer'); console.error(err); }
+      error: () => { this.toast.error('Failed to add customer'); }
     });
   }
 
@@ -300,6 +303,14 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.items.reduce((sum, i) => sum + (i.quantity * i.rate), 0);
   }
 
+  // ── Mobile checkout sheet (UI only) ───────────────────────
+  openSheet()  { this.sheetOpen = true; }
+  closeSheet() { this.sheetOpen = false; }
+
+  itemCount(): number {
+    return this.items.reduce((sum, i) => sum + (+i.quantity || 0), 0);
+  }
+
   submit() {
     // Every sale must be booked against a registered customer
     if (!this.customer_id || this.customer_id <= 0) {
@@ -330,6 +341,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.api.post('/sales/', payload).subscribe({
       next: (res: any) => {
         this.toast.stopSaving();
+        this.sheetOpen = false;
         this.paid_amount = 0;
         this.discount = 0;
         this.delivery_date = localDateStr();
@@ -342,7 +354,6 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
       error: (err) => {
         this.toast.stopSaving();
         this.toast.error(err?.error?.detail || 'Failed to submit sale');
-        console.error(err);
       }
     });
   }

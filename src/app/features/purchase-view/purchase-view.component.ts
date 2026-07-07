@@ -37,9 +37,7 @@ export class PurchaseViewComponent {
         next: (res: any) => {
           this.purchase = res;
         },
-        error: (err) => {
-          console.error('Error loading purchase', err);
-        }
+        error: () => {}
       });
 
   }

@@ -33,8 +33,9 @@ export class LoginComponent {
     this.loading = true;
     this.errorMsg = '';
     this.auth.login({ username: this.username, password: this.password }).subscribe({
-      next: (res: any) => {
-        this.auth.setToken(res.access_token);
+      next: () => {
+        // Backend sets httpOnly cookies — nothing to store client-side.
+        this.loading = false;
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {

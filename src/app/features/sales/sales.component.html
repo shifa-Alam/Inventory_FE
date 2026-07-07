@@ -6,25 +6,33 @@
 
 <div class="page">
 
-  <!-- HEADER -->
+  <!-- HEADER — same pattern as New Purchase: global .page-header,
+       sticky + compact on mobile via global styles -->
   <div class="page-header">
-    <div>
+    <div class="ph-title">
       <h2>{{ 'sales.title' | translate }}</h2>
       <p class="sub">{{ 'sales.subtitle' | translate }}</p>
     </div>
+
+    <!-- Customer controls (mirrors .header-supplier on Purchase) -->
     <div class="header-customer">
 
-      <!-- ① Searchable dropdown -->
-      <div class="cust-col">
-        <label class="field-label">{{ 'sales.customer_label' | translate }} <span style="color:#e53935">*</span></label>
+      <!-- ① Customer dropdown -->
+      <div class="cust-field cust-field-dd">
+        <label class="field-label hide-mobile">
+          {{ 'sales.customer_label' | translate }} <span class="req-star">*</span>
+        </label>
         <div class="cust-dd-wrap" (keydown.escape)="ddOpen=false" (focusout)="onDdFocusOut($event)">
-          <div class="cust-dd-box" (click)="openDropdown()" [style.borderColor]="!selectedCustomer && items.length > 0 ? '#e53935' : ''">
-            <span class="cust-dd-val" [class.placeholder]="!selectedCustomer">
-              {{ selectedCustomer ? selectedCustomer.name : ('select one' ) }}
-            </span>
-            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <polyline points="6 9 12 15 18 9" />
+          <div class="cust-dd-box" (click)="openDropdown()"
+               [class.dd-required]="!selectedCustomer && items.length > 0"
+               [class.dd-selected]="!!selectedCustomer">
+            <svg class="dd-user-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
             </svg>
+            <span class="cust-dd-val" [class.placeholder]="!selectedCustomer">
+              {{ selectedCustomer ? selectedCustomer.name : 'Customer *' }}
+            </span>
+            <svg class="dd-caret" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
           <div class="cust-dd-panel" *ngIf="ddOpen">
             <input #ddSearch type="text" class="cust-dd-search" [(ngModel)]="ddQuery"
@@ -40,44 +48,39 @@
         </div>
       </div>
 
-      <!-- ② Phone search + quick create -->
-      <div class="cust-col">
-        <label class="field-label">{{ 'sales.phone_search_label' | translate }}</label>
+      <!-- ② Phone search -->
+      <div class="cust-field cust-field-phone">
+        <label class="field-label hide-mobile">{{ 'sales.phone_search_label' | translate }}</label>
         <div class="cust-phone-wrap">
-          <input type="text" class="cust-phone-input" [(ngModel)]="customerPhone"
+          <input type="tel" class="cust-phone-input" [(ngModel)]="customerPhone"
             (ngModelChange)="onPhoneChange($event)" [placeholder]="'sales.phone_search_ph' | translate"
             autocomplete="off" />
           <button *ngIf="customerPhone" class="btn-cancel-customer" (click)="clearPhone()">✕</button>
         </div>
-
-        <!-- Phone results -->
         <div class="cust-phone-results" *ngIf="phoneResults.length > 0">
           <div class="cust-drop-item" *ngFor="let c of phoneResults" (click)="pickCustomer(c); clearPhone()">
             <span class="cdi-name">{{ c.name }}</span>
             <span class="cdi-phone">{{ c.phone }}</span>
           </div>
         </div>
-
-        <!-- Not found inline -->
         <div *ngIf="phoneNotFound" class="phone-not-found">
           <span class="not-found-label">Not found</span>
           <input type="text" [(ngModel)]="newCustomerName" placeholder="Enter name" class="cust-name-input" />
-          <button class="btn-save-customer" [disabled]="!newCustomerName.trim()" (click)="savePhoneCustomer()">Save &
-            Select</button>
+          <button class="btn-save-customer" [disabled]="!newCustomerName.trim()" (click)="savePhoneCustomer()">Save</button>
         </div>
       </div>
 
     </div>
   </div>
 
-  <!-- BODY -->
+  <!-- BODY — two columns on desktop, single column on smaller screens -->
   <div class="sales-layout">
 
-    <!-- LEFT: items -->
+    <!-- LEFT: search + items -->
     <div class="left-col">
 
-      <!-- Search -->
-      <div class="card card-body search-wrap" style="margin-bottom:16px">
+      <!-- SEARCH — identical structure to New Purchase -->
+      <div class="card card-body search-wrap">
         <div class="search-input-row">
           <svg class="search-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input #searchInput type="text" [placeholder]="'sales.search_placeholder' | translate"
@@ -91,39 +94,56 @@
           </div>
           <div class="dropdown-item" *ngFor="let p of filteredProducts; let i = index"
             [class.active]="i === selectedIndex" (click)="selectProduct(p)">
-            <span class="dp-name">{{ p.name }}</span>
-            <span class="dp-stock">{{ 'sales.col_stock' | translate }}: {{ p.current_stock }}</span>
+            <div class="dp-main">
+              <span class="dp-name">{{ p.name }}</span>
+              <span class="dp-meta">
+                <span class="dp-stock">{{ 'sales.col_stock' | translate }}: {{ p.current_stock }}</span>
+                <span class="dp-price">৳{{ p.sale_price | number }}</span>
+              </span>
+            </div>
+            <span class="dp-add" aria-hidden="true">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
           </div>
         </div>
       </div>
 
-      <!-- Items table — desktop -->
-      <div class="card hide-mobile">
+      <!-- ITEMS TABLE — desktop -->
+      <div class="card items-card hide-mobile">
         <div class="table-wrapper">
-          <table>
+          <table class="items-table">
+            <colgroup>
+              <col class="w-no" />
+              <col class="w-product" />
+              <col class="w-stock" />
+              <col class="w-mrp" />
+              <col class="w-qty" />
+              <col class="w-rate" />
+              <col class="w-total" />
+              <col class="w-action" />
+            </colgroup>
             <thead>
               <tr>
-                <th class="col-no">#</th>
-                <th class="col-product">{{ 'sales.col_product' | translate }}</th>
-                <th class="col-stock col-center">{{ 'sales.col_stock' | translate }}</th>
-                <th class="col-mrp col-right">{{ 'sales.col_mrp' | translate }}</th>
-                <th class="col-qty col-center">{{ 'sales.col_qty' | translate }}</th>
-                <th class="col-rate col-right">{{ 'sales.col_rate' | translate }}</th>
-                <th class="col-total col-right">{{ 'sales.col_total' | translate }}</th>
-                <th class="col-action"></th>
+                <th class="col-center">#</th>
+                <th>{{ 'sales.col_product' | translate }}</th>
+                <th class="col-center">{{ 'sales.col_stock' | translate }}</th>
+                <th class="col-right">{{ 'sales.col_mrp' | translate }}</th>
+                <th class="col-center">{{ 'sales.col_qty' | translate }}</th>
+                <th class="col-right">{{ 'sales.col_rate' | translate }}</th>
+                <th class="col-right">{{ 'sales.col_total' | translate }}</th>
+                <th class="col-center"></th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let item of items; let i = index">
-                <td class="col-no muted">{{ i + 1 }}</td>
-                <td class="col-product bold">{{ item.product_name }}</td>
-                <td class="col-stock col-center"><span class="stock-chip">{{ item.stock }}</span></td>
-                <td class="col-mrp col-right mrp-ref">{{ item.mrp ? (item.mrp | number) : '—' }}</td>
-                <td class="col-qty"><input #qtyInput type="number" [(ngModel)]="item.quantity" min="1" [max]="item.stock"
-                    (change)="clampQuantity(item)" /></td>
-                <td class="col-rate"><input type="number" [(ngModel)]="item.rate" min="0" /></td>
-                <td class="col-total col-right">{{ item.quantity * item.rate | number }}</td>
-                <td class="col-action"><button class="btn btn-danger btn-sm" (click)="removeRow(i)">✕</button></td>
+                <td class="col-center muted">{{ i + 1 }}</td>
+                <td class="cell-product bold" [title]="item.product_name">{{ item.product_name }}</td>
+                <td class="col-center"><span class="stock-chip">{{ item.stock }}</span></td>
+                <td class="col-right mrp-ref">{{ item.mrp ? (item.mrp | number) : '—' }}</td>
+                <td class="cell-input"><input #qtyInput class="input-qty" type="number" [(ngModel)]="item.quantity" min="1" [max]="item.stock" (change)="clampQuantity(item)" /></td>
+                <td class="cell-input"><input class="input-rate" type="number" [(ngModel)]="item.rate" min="0" /></td>
+                <td class="col-right cell-total">{{ item.quantity * item.rate | number }}</td>
+                <td class="col-center"><button class="row-remove" (click)="removeRow(i)" title="Remove">✕</button></td>
               </tr>
               <tr *ngIf="items.length === 0">
                 <td colspan="8" class="empty-row">{{ 'sales.empty' | translate }}</td>
@@ -133,36 +153,37 @@
         </div>
       </div>
 
-      <!-- Items — mobile cards -->
+      <!-- ITEMS — mobile cards (same pattern as New Purchase) -->
       <div class="mobile-items show-mobile">
         <div class="mobile-empty" *ngIf="items.length === 0">{{ 'sales.empty' | translate }}</div>
         <div class="mobile-item-card" *ngFor="let item of items; let i = index">
           <div class="mic-top">
             <span class="mic-num">{{ i + 1 }}</span>
             <span class="mic-name">{{ item.product_name }}</span>
+            <span class="stock-chip">{{ item.stock }}</span>
             <button class="mic-remove" (click)="removeRow(i)">✕</button>
           </div>
           <div class="mic-row">
-            <div class="mic-field">
-              <span class="mic-lbl">{{ 'sales.col_stock' | translate }}</span>
-              <span class="stock-chip">{{ item.stock }}</span>
-            </div>
-            <div class="mic-field">
-              <span class="mic-lbl">{{ 'sales.col_mrp' | translate }}</span>
-              <span class="mrp-ref">{{ item.mrp ? (item.mrp | number) : '—' }}</span>
-            </div>
-            <div class="mic-field">
+            <div class="mic-field mic-qty">
               <span class="mic-lbl">{{ 'sales.col_qty' | translate }}</span>
-              <input #qtyInput type="number" [(ngModel)]="item.quantity" min="1" [max]="item.stock"
-                (change)="clampQuantity(item)" class="mic-input" />
+              <div class="qty-stepper">
+                <button class="qty-btn" type="button"
+                  (click)="item.quantity = item.quantity - 1; clampQuantity(item)"
+                  [disabled]="item.quantity <= 1">−</button>
+                <input #qtyInput type="number" [(ngModel)]="item.quantity" min="1" [max]="item.stock"
+                  (change)="clampQuantity(item)" class="qty-input" />
+                <button class="qty-btn" type="button"
+                  (click)="item.quantity = item.quantity + 1; clampQuantity(item)"
+                  [disabled]="item.quantity >= item.stock">+</button>
+              </div>
             </div>
             <div class="mic-field">
               <span class="mic-lbl">{{ 'sales.col_rate' | translate }}</span>
               <input type="number" [(ngModel)]="item.rate" min="0" class="mic-input" />
             </div>
-            <div class="mic-field">
+            <div class="mic-field mic-total-field">
               <span class="mic-lbl">{{ 'sales.col_total' | translate }}</span>
-              <span class="mic-total">{{ item.quantity * item.rate | number }}</span>
+              <span class="mic-rate">৳{{ item.quantity * item.rate | number }}</span>
             </div>
           </div>
         </div>
@@ -170,49 +191,103 @@
 
     </div>
 
-    <!-- RIGHT: summary -->
-    <div class="right-col">
+    <!-- RIGHT: summary + action bar (desktop / tablet) -->
+    <div class="right-col hide-mobile">
+
       <div class="card card-body summary-card">
         <p class="card-title">{{ 'sales.summary_title' | translate }}</p>
 
-        <div class="summary-row">
+        <div class="summary-line">
           <span class="s-label">{{ 'sales.subtotal' | translate }}</span>
-          <span class="s-value">{{ getTotal() | number }}</span>
+          <span class="s-value">৳{{ getTotal() | number }}</span>
         </div>
 
-        <div class="summary-row discount-row">
+        <div class="summary-line">
           <span class="s-label">{{ 'sales.discount' | translate }}</span>
-          <input type="number" [(ngModel)]="discount" placeholder="0" min="0" [max]="getTotal()" />
+          <input class="s-input s-input-discount" type="number" [(ngModel)]="discount" placeholder="0" min="0" [max]="getTotal()" />
         </div>
 
-        <div class="summary-row net-row" *ngIf="discount > 0">
+        <div class="summary-line net-row" *ngIf="discount > 0">
           <span class="s-label">{{ 'sales.net_total' | translate }}</span>
-          <span class="s-value net-val">{{ getTotal() - discount | number }}</span>
+          <span class="s-value net-val">৳{{ getTotal() - discount | number }}</span>
         </div>
 
-        <div class="summary-row">
+        <div class="summary-line">
           <span class="s-label">Delivery Date</span>
-          <input type="date" [(ngModel)]="delivery_date" />
+          <input class="s-input s-input-date" type="date" [(ngModel)]="delivery_date" />
         </div>
 
-        <div class="summary-row">
+        <div class="summary-line">
           <span class="s-label">{{ 'sales.paid_amount' | translate }}</span>
-          <input type="number" [(ngModel)]="paid_amount" placeholder="0" min="0" />
+          <input class="s-input" type="number" [(ngModel)]="paid_amount" placeholder="0" min="0" />
         </div>
+      </div>
 
-        <div class="summary-divider"></div>
-
-        <div class="summary-row due-row">
-          <span class="s-label">{{ 'sales.balance_due' | translate }}</span>
-          <span class="due-value">{{ getTotal() - discount - paid_amount | number }}</span>
+      <!-- ACTION BAR — same pattern as New Purchase -->
+      <div class="action-bar">
+        <div class="total-info">
+          <span class="total-label">{{ 'sales.balance_due' | translate }}</span>
+          <span class="total-value due-value">৳{{ getTotal() - discount - paid_amount | number }}</span>
         </div>
-
-        <button class="btn btn-primary btn-lg complete-btn" (click)="submit()" [disabled]="items.length === 0 || !customer_id">
+        <button class="btn btn-primary btn-lg" (click)="submit()"
+          [disabled]="items.length === 0 || !customer_id">
           {{ 'sales.complete' | translate }}
         </button>
       </div>
+
     </div>
 
   </div>
+
+  <!-- ═══ MOBILE CHECKOUT — sticky charge bar + bottom sheet ═══ -->
+  <div class="sheet-scrim show-mobile" [class.open]="sheetOpen" (click)="closeSheet()"></div>
+
+  <div class="checkout-sheet show-mobile" [class.open]="sheetOpen" role="dialog" aria-modal="true">
+    <div class="sheet-handle" (click)="closeSheet()"><span></span></div>
+    <p class="sheet-title">{{ 'sales.summary_title' | translate }}</p>
+
+    <div class="sheet-line">
+      <span class="sl-label">{{ 'sales.subtotal' | translate }}</span>
+      <span class="sl-value">৳{{ getTotal() | number }}</span>
+    </div>
+
+    <div class="sheet-line">
+      <span class="sl-label">{{ 'sales.discount' | translate }}</span>
+      <input class="sl-input sl-input-discount" type="number" [(ngModel)]="discount" placeholder="0" min="0" [max]="getTotal()" />
+    </div>
+
+    <div class="sheet-line" *ngIf="discount > 0">
+      <span class="sl-label">{{ 'sales.net_total' | translate }}</span>
+      <span class="sl-value net-val">৳{{ getTotal() - discount | number }}</span>
+    </div>
+
+    <div class="sheet-line">
+      <span class="sl-label">Delivery Date</span>
+      <input class="sl-input sl-input-date" type="date" [(ngModel)]="delivery_date" />
+    </div>
+
+    <div class="sheet-line">
+      <span class="sl-label">{{ 'sales.paid_amount' | translate }}</span>
+      <input class="sl-input" type="number" [(ngModel)]="paid_amount" placeholder="0" min="0" />
+    </div>
+
+    <div class="sheet-line sheet-due">
+      <span class="sl-label">{{ 'sales.balance_due' | translate }}</span>
+      <span class="sl-due">৳{{ getTotal() - discount - paid_amount | number }}</span>
+    </div>
+
+    <button class="charge-btn" (click)="submit()" [disabled]="items.length === 0 || !customer_id">
+      {{ 'sales.complete' | translate }} · ৳{{ getTotal() - discount | number }}
+    </button>
+  </div>
+
+  <button class="checkout-bar show-mobile" *ngIf="items.length > 0 && !sheetOpen" (click)="openSheet()">
+    <span class="cb-badge">{{ itemCount() }}</span>
+    <span class="cb-total">৳{{ getTotal() - discount | number }}</span>
+    <span class="cb-action">
+      {{ 'sales.complete' | translate }}
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </span>
+  </button>
 
 </div>

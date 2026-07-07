@@ -167,7 +167,8 @@
         </div>
       </div>
     </div>
-    <div class="table-wrapper">
+    <!-- Desktop history table -->
+    <div class="table-wrapper hide-mobile">
       <table>
         <thead>
           <tr>
@@ -197,6 +198,37 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Mobile history cards -->
+    <div class="show-mobile" style="padding:10px 12px">
+      <div class="mobile-loading" *ngIf="loadingReturns"><div class="loading-spinner"></div> Loading…</div>
+      <div class="mobile-empty" *ngIf="!loadingReturns && returns.length === 0">{{ 'sale_return.history_empty' | translate }}</div>
+      <div class="mobile-card" *ngFor="let r of returns">
+        <div class="mc-top">
+          <div class="mc-name-wrap">
+            <div>
+              <div class="mc-title">{{ r.customer_name || '—' }}</div>
+              <div class="mc-sub">{{ r.created_at | date:'dd MMM yyyy, hh:mm a' }}</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            <span class="amount-return" style="font-size:15px;font-weight:800">৳{{ r.total_amount | number:'1.0-2' }}</span>
+            <span class="ref-badge">{{ r.return_no }}</span>
+          </div>
+        </div>
+        <div class="mc-grid">
+          <div class="mc-field">
+            <span class="mc-lbl">{{ 'sale_return.col_sale_id' | translate }}</span>
+            <span class="mc-val muted">{{ r.invoice_no || ('#' + r.sale_id) }}</span>
+          </div>
+          <div class="mc-field" style="grid-column:span 2">
+            <span class="mc-lbl">{{ 'sale_return.col_reason' | translate }}</span>
+            <span class="mc-val muted">{{ r.reason || '—' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <app-paginator [page]="page" [pages]="pages" [total]="historyTotal" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
   </div>
 

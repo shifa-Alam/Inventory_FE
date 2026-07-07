@@ -9,26 +9,29 @@ export class ApiService {
 
     baseUrl = environment.apiUrl;
 
+    // withCredentials: true is required for the browser to send httpOnly
+    // session cookies on cross-origin requests (dev: 4200 → 8000).
+    private opts = { withCredentials: true };
+
     constructor(private http: HttpClient) { }
 
-    get(url: string) {
-        return this.http.get(this.baseUrl + url);
+    get(url: string, params?: any) {
+        return this.http.get(this.baseUrl + url, { ...this.opts, params });
     }
 
     post(url: string, data: any) {
-        return this.http.post(this.baseUrl + url, data);
+        return this.http.post(this.baseUrl + url, data, this.opts);
     }
 
     put(url: string, data: any) {
-        return this.http.put(this.baseUrl + url, data);
+        return this.http.put(this.baseUrl + url, data, this.opts);
     }
 
     patch(url: string, data: any) {
-        return this.http.patch(this.baseUrl + url, data);
+        return this.http.patch(this.baseUrl + url, data, this.opts);
     }
 
     delete(url: string) {
-        return this.http.delete(this.baseUrl + url);
+        return this.http.delete(this.baseUrl + url, this.opts);
     }
-
 }

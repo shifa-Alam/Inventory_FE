@@ -46,7 +46,7 @@ export class CustomersComponent implements OnInit {
         this.pages = res.pages;
         this.loading = false;
       },
-      error: (err) => { console.error('Failed to load customers', err); this.loading = false; }
+      error: () => { this.loading = false; }
     });
   }
 
@@ -65,7 +65,7 @@ export class CustomersComponent implements OnInit {
     this.toast.startSaving();
     this.api.post('/customers/', this.newCustomer).subscribe({
       next: () => { this.toast.stopSaving(); this.toast.success('Customer Added'); this.load(); this.cancelForm(); },
-      error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to create customer'); console.error(err); }
+      error: () => { this.toast.stopSaving(); this.toast.error('Failed to create customer'); }
     });
   }
 
@@ -76,7 +76,7 @@ export class CustomersComponent implements OnInit {
     this.toast.startSaving();
     this.api.put(`/customers/${this.newCustomer.id}`, { name, phone, address, credit_limit, current_due }).subscribe({
       next: () => { this.toast.stopSaving(); this.toast.success('Customer Updated'); this.load(); this.cancelForm(); },
-      error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to update customer'); console.error(err); }
+      error: () => { this.toast.stopSaving(); this.toast.error('Failed to update customer'); }
     });
   }
 

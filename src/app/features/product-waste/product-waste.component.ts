@@ -79,7 +79,7 @@ export class ProductWasteComponent implements OnInit, AfterViewInit, OnDestroy {
         this.selectedIndex = this.filteredProducts.length === 1 ? 0 : -1;
         this.searching = false;
       },
-      error: (err) => { if (!this.scanInProgress) this.searching = false; console.error('Product search failed', err); }
+      error: () => { if (!this.scanInProgress) this.searching = false; }
     });
     this.filterDateFrom = this.today();
     this.filterDateTo = this.today();
@@ -120,7 +120,7 @@ export class ProductWasteComponent implements OnInit, AfterViewInit, OnDestroy {
         this.pages = res.pages ?? 1;
         this.loadingWastes = false;
       },
-      error: (err) => { console.error('Failed to load wastes', err); this.loadingWastes = false; }
+      error: () => { this.loadingWastes = false; }
     });
   }
 

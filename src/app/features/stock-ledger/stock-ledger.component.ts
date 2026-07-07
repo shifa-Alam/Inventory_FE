@@ -51,7 +51,7 @@ export class StockLedgerComponent implements OnInit {
         this.pages = res.pages;
         this.loading = false;
       },
-      error: (err) => { console.error('Failed to load transactions', err); this.loading = false; }
+      error: () => { this.loading = false; }
     });
   }
 

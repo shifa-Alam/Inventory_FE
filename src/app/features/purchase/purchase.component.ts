@@ -50,7 +50,7 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
         this.selectedIndex = this.filteredProducts.length === 1 ? 0 : -1;
         this.searching = false;
       },
-      error: (err) => { if (!this.scanInProgress) this.searching = false; console.error('Product search failed', err); }
+      error: () => { if (!this.scanInProgress) this.searching = false; }
     });
     this.loadSupplier();
   }
@@ -73,9 +73,9 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadSupplier() {
-    this.api.get('/suppliers/?page=1&page_size=1000').subscribe({
+    this.api.get('/suppliers/?page=1&page_size=200').subscribe({
       next: (r: any) => { this.suppliers = r.data ?? r; },
-      error: (err) => console.error('Failed to load suppliers', err)
+      error: () => {}
     });
   }
 
@@ -230,7 +230,7 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
         this.supplier_id = 0;
         this.searchInputRef.nativeElement.focus();
       },
-      error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to save purchase'); console.error(err); }
+      error: () => { this.toast.stopSaving(); this.toast.error('Failed to save purchase'); }
     });
   }
 }

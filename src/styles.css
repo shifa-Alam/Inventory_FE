@@ -1050,3 +1050,53 @@ td input[type="number"] {
   .alert { font-size: 15.5px; padding: 13px 16px; }
   .loading-text { font-size: 15.5px; }
 }
+
+/* ================================================================
+   MATERIAL 3 MOBILE FOUNDATION
+   App-like polish for phone screens. Desktop is untouched.
+================================================================ */
+@media (max-width: 640px) {
+
+  /* — Shape: rounder corners everywhere — */
+  .card { border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .action-bar { border-radius: 16px; }
+
+  /* — Buttons: M3 filled buttons (pill, 44px+ touch target) — */
+  .btn {
+    border-radius: 22px;
+    min-height: 44px;
+    padding: 10px 20px;
+    font-size: 14px;
+    transition: transform 0.12s, background 0.15s, box-shadow 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn-primary { box-shadow: 0 2px 8px var(--primary-ring); }
+  .btn-sm { min-height: 36px; border-radius: 18px; padding: 7px 14px; }
+  .btn-lg { min-height: 50px; border-radius: 25px; font-size: 15.5px; }
+  .btn-icon { border-radius: 50%; width: 44px; height: 44px; }
+
+  /* — Inputs: M3 text fields (large radius, focus ring) — */
+  input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+    border-radius: 12px;
+    min-height: 46px;
+    font-size: 16px;      /* prevents iOS/Android zoom-on-focus */
+    transition: border-color 0.15s, box-shadow 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  input:focus, select:focus, textarea:focus {
+    box-shadow: 0 0 0 3px var(--primary-ring);
+  }
+
+  /* — Tables become horizontally scrollable cards, never overflow — */
+  .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* — Modals feel like Android dialogs / bottom sheets — */
+  .modal, .modal-content, .confirm-modal {
+    border-radius: 24px 24px 0 0;
+  }
+
+  /* — Larger tap feedback on list-style rows — */
+  .mobile-card:active,
+  .mobile-item-card:active { background: var(--surface-hover); }
+}

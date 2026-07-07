@@ -47,9 +47,9 @@ export class InvoicePrintComponent implements OnInit {
         next: (res: any) => {
           this.invoice = res;
           this.loading = false;
-          //this.maybeAutoPrint();
+          this.maybeAutoPrint();
         },
-        error: (err) => { console.error('Failed to load invoice', err); this.loading = false; }
+        error: () => { this.loading = false; }
       });
     } else {
       this.invoice = JSON.parse(localStorage.getItem('invoice') || '{}');

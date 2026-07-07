@@ -55,7 +55,7 @@ export class UsersComponent implements OnInit {
         this.pages = res.pages;
         this.loading = false;
       },
-      error: (err) => { console.error('Failed to load users', err); this.loading = false; }
+      error: () => { this.loading = false; }
     });
   }
 

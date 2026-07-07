@@ -167,6 +167,10 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .rh-qb-clear { border-color: var(--danger-mid); color: var(--danger-text); }
 .rh-qb-clear:hover { background: var(--danger-light); }
 
+/* ── Mobile show/hide ────────────────────────────────────────── */
+.hide-mobile { display: block; }
+.show-mobile { display: none; }
+
 /* ── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .bottom-row { grid-template-columns: 1fr; }
@@ -174,4 +178,10 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   .sale-banner { flex-direction: column; align-items: flex-start; }
   .banner-right { width: 100%; justify-content: space-between; }
   th, td { padding: 6px 8px; font-size: 12px; }
+}
+
+@media (max-width: 640px) {
+  .hide-mobile { display: none !important; }
+  .show-mobile { display: block !important; }
+  .loading-spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.65s linear infinite; margin-right: 8px; vertical-align: middle; }
 }

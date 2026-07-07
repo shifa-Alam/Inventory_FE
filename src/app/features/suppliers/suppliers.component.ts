@@ -43,7 +43,7 @@ export class SuppliersComponent implements OnInit {
         this.pages = res.pages;
         this.loading = false;
       },
-      error: (err) => { console.error('Failed to load suppliers', err); this.loading = false; }
+      error: () => { this.loading = false; }
     });
   }
 
@@ -73,7 +73,7 @@ export class SuppliersComponent implements OnInit {
         this.cancelForm();
         this.load();
       },
-      error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to save supplier'); console.error(err); }
+      error: () => { this.toast.stopSaving(); this.toast.error('Failed to save supplier'); }
     });
   }
 }

@@ -259,6 +259,22 @@
   overflow-y: auto;
 }
 
+/* App-like page transition: routed components slide-fade in.
+   router-outlet inserts the component as its next sibling. */
+@media (max-width: 1024px) {
+  .content > *:not(router-outlet) {
+    display: block;
+    animation: page-in 0.28s cubic-bezier(0.2, 0, 0, 1);
+  }
+}
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .content > *:not(router-outlet) { animation: none; }
+}
+
 /* ─── Top Bar (mobile) ──────────────────────────────────────────── */
 .topbar {
   display: none;
@@ -327,18 +343,18 @@
 
 .lang-toggle-topbar:hover { background: rgba(255,255,255,0.1); }
 
-/* ─── Bottom Navigation ─────────────────────────────────────────── */
+/* ─── Bottom Navigation — Material 3 navigation bar ─────────────── */
 .bottom-nav {
   display: none;
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  height: 62px;
+  height: 68px;
   background: var(--surface);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border-light);
   z-index: 200;
   padding: 0 4px;
   padding-bottom: env(safe-area-inset-bottom);
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 -2px 16px rgba(0,0,0,0.07);
   align-items: stretch;
   justify-content: space-around;
 }
@@ -350,29 +366,47 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
   color: var(--text-light);
   text-decoration: none;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.2px;
   border: none;
   background: none;
   cursor: pointer;
-  padding: 6px 0;
-  border-radius: 12px;
-  transition: color 0.15s;
+  padding: 8px 0 10px;
+  transition: color 0.2s;
   -webkit-tap-highlight-color: transparent;
+  position: relative;
 }
 
+/* M3 active pill indicator behind the icon */
 .bottom-nav a svg,
-.bottom-nav .bn-more svg { transition: stroke 0.15s; }
-
-.bottom-nav a.bn-active {
-  color: var(--primary);
+.bottom-nav .bn-more svg {
+  position: relative; z-index: 1;
+  transition: stroke 0.2s;
+  padding: 3px 0;
 }
+.bottom-nav a::before {
+  content: "";
+  position: absolute;
+  top: 8px; left: 50%;
+  width: 0; height: 28px;
+  transform: translateX(-50%);
+  background: var(--primary-light);
+  border-radius: 14px;
+  transition: width 0.25s cubic-bezier(0.2, 0, 0, 1);
+}
+.bottom-nav a.bn-active::before { width: 56px; }
+.bottom-nav a.bn-active {
+  color: var(--text);
+  font-weight: 700;
+}
+.bottom-nav a.bn-active svg { stroke: var(--primary-dark); }
 
-.bottom-nav a.bn-active svg { stroke: var(--primary); }
+.bottom-nav a:active svg,
+.bottom-nav .bn-more:active svg { transform: scale(0.9); transition: transform 0.1s; }
 
 /* ─── Responsive ────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
@@ -392,10 +426,10 @@
   .lang-toggle-btn { display: none; }
 
   /* Content must clear the bottom nav */
-  .content { padding-bottom: 62px; }
+  .content { padding-bottom: 68px; }
 
   /* Sidebar must also clear the bottom nav */
-  .sidebar { padding-bottom: 62px; }
+  .sidebar { padding-bottom: 68px; }
 }
 
 @media (min-width: 1025px) {

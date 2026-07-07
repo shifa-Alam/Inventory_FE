@@ -43,8 +43,8 @@
     </div>
   </div>
 
-  <!-- ITEMS TABLE -->
-  <div class="card" style="margin-bottom:14px">
+  <!-- ITEMS TABLE — desktop -->
+  <div class="card hide-mobile" style="margin-bottom:14px">
     <div class="table-wrapper">
       <table>
         <thead>
@@ -68,35 +68,54 @@
               <span class="stock-chip" [class.stock-low]="item.current_stock < 5">{{ item.current_stock }}</span>
             </td>
             <td>
-              <input
-                #qtyInput
-                type="number"
-                [(ngModel)]="item.quantity"
-                min="1"
-                [max]="item.current_stock"
-                [class.qty-error]="item.quantity > item.current_stock"
-              />
+              <input #qtyInput type="number" [(ngModel)]="item.quantity" min="1" [max]="item.current_stock" [class.qty-error]="item.quantity > item.current_stock" />
             </td>
             <td>
-              <input
-                type="text"
-                [(ngModel)]="item.reason"
-                placeholder="Enter reason…"
-                class="reason-input"
-              />
+              <input type="text" [(ngModel)]="item.reason" placeholder="Enter reason…" class="reason-input" />
             </td>
             <td>
               <button class="btn btn-danger btn-sm icon-btn" (click)="removeRow(i)" title="Remove">✕</button>
             </td>
           </tr>
           <tr *ngIf="wasteItems.length === 0">
-            <td colspan="6" class="empty-row">
-              <span class="empty-icon">🗑</span>
-              Scan or search a product to add it to the waste list
-            </td>
+            <td colspan="6" class="empty-row"><span class="empty-icon">🗑</span> Scan or search a product to add it to the waste list</td>
           </tr>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- ITEMS — mobile cards -->
+  <div class="show-mobile" style="margin-bottom:14px">
+    <div class="mobile-empty" *ngIf="wasteItems.length === 0">
+      <span class="empty-icon">🗑</span><br>Scan or search a product to add it to the waste list
+    </div>
+    <div class="mobile-card" *ngFor="let item of wasteItems; let i = index">
+      <div class="mc-top">
+        <div class="mc-name-wrap">
+          <span class="mc-num">{{ i + 1 }}</span>
+          <div>
+            <div class="mc-title">{{ item.product_name }}</div>
+            <div class="mc-sub" *ngIf="item.sku">{{ item.sku }}</div>
+          </div>
+        </div>
+        <button class="mic-remove" (click)="removeRow(i)">✕</button>
+      </div>
+      <div class="wm-fields">
+        <div class="wm-field">
+          <span class="mc-lbl">Stock</span>
+          <span class="stock-chip" [class.stock-low]="item.current_stock < 5">{{ item.current_stock }}</span>
+        </div>
+        <div class="wm-field">
+          <span class="mc-lbl">{{ 'product_waste.qty_label' | translate }}</span>
+          <input #qtyInput type="number" [(ngModel)]="item.quantity" min="1" [max]="item.current_stock"
+            [class.qty-error]="item.quantity > item.current_stock" class="mic-input" />
+        </div>
+        <div class="wm-field wm-field-reason">
+          <span class="mc-lbl">{{ 'product_waste.reason_label' | translate }}</span>
+          <input type="text" [(ngModel)]="item.reason" placeholder="Enter reason…" class="mic-input" />
+        </div>
+      </div>
     </div>
   </div>
 
@@ -153,7 +172,8 @@
       </div>
     </div>
 
-    <div class="table-wrapper">
+    <!-- Desktop history table -->
+    <div class="table-wrapper hide-mobile">
       <table>
         <thead>
           <tr>
@@ -176,14 +196,39 @@
             <td class="muted">{{ w.reason || '—' }}</td>
           </tr>
           <tr *ngIf="wastes.length === 0 && !loadingWastes">
-            <td colspan="5" class="empty-row">
-              <span class="empty-icon">🗑</span>
-              {{ wastes.length === 0 ? ('product_waste.history_empty' | translate) : 'No records match the filter' }}
-            </td>
+            <td colspan="5" class="empty-row"><span class="empty-icon">🗑</span> {{ 'product_waste.history_empty' | translate }}</td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <!-- Mobile history cards -->
+    <div class="show-mobile" style="padding:10px 12px">
+      <div class="mobile-loading" *ngIf="loadingWastes"><div class="loading-spinner"></div> Loading…</div>
+      <div class="mobile-empty" *ngIf="!loadingWastes && wastes.length === 0">{{ 'product_waste.history_empty' | translate }}</div>
+      <div class="mobile-card" *ngFor="let w of wastes">
+        <div class="mc-top">
+          <div class="mc-name-wrap">
+            <div>
+              <div class="mc-title">{{ w.product_name }}</div>
+              <div class="mc-sub">{{ w.created_at | date:'dd MMM yyyy, hh:mm a' }}</div>
+            </div>
+          </div>
+          <span class="ref-badge waste-badge">{{ w.waste_no }}</span>
+        </div>
+        <div class="mc-grid">
+          <div class="mc-field">
+            <span class="mc-lbl">{{ 'product_waste.col_qty' | translate }}</span>
+            <span class="mc-val"><span class="qty-chip">{{ w.quantity }}</span></span>
+          </div>
+          <div class="mc-field" style="grid-column: span 2">
+            <span class="mc-lbl">{{ 'product_waste.col_reason' | translate }}</span>
+            <span class="mc-val muted">{{ w.reason || '—' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <app-paginator [page]="page" [pages]="pages" [total]="historyTotal" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
   </div>
 

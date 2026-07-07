@@ -51,7 +51,7 @@ export class CategoriesComponent implements OnInit {
         }
         this.loading = false;
       },
-      error: (err) => { console.error('Failed to load categories', err); this.loading = false; }
+      error: () => { this.loading = false; }
     });
   }
 
@@ -66,7 +66,7 @@ export class CategoriesComponent implements OnInit {
   createCategory() {
     this.api.post('/categories/', this.newCategory).subscribe({
       next: () => { this.load(); this.cancelForm(); },
-      error: (err) => console.error('Failed to create category', err)
+      error: () => this.toast.error('Failed to create category')
     });
   }
 
@@ -77,7 +77,7 @@ export class CategoriesComponent implements OnInit {
   updateCategory() {
     this.api.put(`/categories/${this.newCategory.id}`, this.newCategory).subscribe({
       next: () => { this.load(); this.cancelForm(); },
-      error: (err) => console.error('Failed to update category', err)
+      error: () => this.toast.error('Failed to update category')
     });
   }
 

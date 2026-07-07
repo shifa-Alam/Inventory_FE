@@ -41,14 +41,14 @@ export class StockDashboardComponent implements OnInit {
   loadSummary() {
     this.api.get('/reports/stock/summary').subscribe({
       next: (res: any) => { this.summary = res; },
-      error: (err) => console.error('Failed to load summary', err)
+      error: () => {}
     });
   }
 
   loadCategories() {
-    this.api.get('/categories/?page=1&page_size=1000').subscribe({
+    this.api.get('/categories/?page=1&page_size=200').subscribe({
       next: (res: any) => { this.categories = res.data ?? res; },
-      error: (err) => console.error('Failed to load categories', err)
+      error: () => {}
     });
   }
 
@@ -66,7 +66,7 @@ export class StockDashboardComponent implements OnInit {
         this.pages = res.pages ?? 1;
         this.loading = false;
       },
-      error: (err) => { console.error('Failed to load stock', err); this.loading = false; }
+      error: () => { this.loading = false; }
     });
   }
 

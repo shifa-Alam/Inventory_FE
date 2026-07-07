@@ -437,10 +437,10 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   RESPONSIVE
+   RESPONSIVE — tablet keeps the (stacked) desktop layout
 ══════════════════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
-  .login-shell { flex-direction: column; }
+  .login-shell { flex-direction: column; height: auto; min-height: 100vh; }
   .left-panel { padding: 48px 32px 40px; }
   .hero-text h1 { font-size: 36px; }
   .feature-list { display: none; }
@@ -448,10 +448,284 @@
   .form-card { padding: 32px 28px; }
 }
 
-@media (max-width: 480px) {
-  .left-panel { padding: 36px 20px 32px; }
-  .hero-text h1 { font-size: 30px; }
-  .stats-row { gap: 16px; padding: 16px 18px; }
-  .right-panel { padding: 28px 16px 56px; }
-  .form-card { padding: 28px 20px; border-radius: 18px; }
+/* ══════════════════════════════════════════════════════════════════
+   MOBILE LOGIN
+   Hidden by default; shown ≤640px replacing the desktop shell.
+══════════════════════════════════════════════════════════════════ */
+.m-login { display: none; }
+
+@media (max-width: 640px) {
+  .login-desktop { display: none !important; }
+
+  /* ── Page shell ── */
+  .m-login {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+    position: relative;
+    overflow: hidden;
+    background: #0C0D19;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }
+
+  /* Ambient glow blobs */
+  .m-bg-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    pointer-events: none;
+  }
+  .m-blob-1 {
+    width: 340px; height: 340px;
+    background: rgba(99,102,241,0.28);
+    top: -130px; right: -100px;
+  }
+  .m-blob-2 {
+    width: 280px; height: 280px;
+    background: rgba(139,92,246,0.18);
+    bottom: -100px; left: -110px;
+  }
+
+  /* ── Content wrapper ── */
+  .m-content {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 48px 28px 28px;
+    max-width: 420px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  /* ── Brand ── */
+  .m-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 36px;
+    animation: m-in 0.5s cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  .m-logo {
+    width: 72px; height: 72px;
+    border-radius: 22px;
+    background: linear-gradient(145deg, #6366f1 0%, #8b5cf6 100%);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 18px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.1),
+      0 20px 60px rgba(99,102,241,0.5),
+      0 8px 24px rgba(99,102,241,0.3);
+    animation: m-logo-pop 0.6s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  }
+
+  .m-app-name {
+    font-size: 28px;
+    font-weight: 800;
+    color: #F0F1FF;
+    letter-spacing: -0.7px;
+    margin: 0 0 6px;
+  }
+
+  .m-tagline {
+    font-size: 13px;
+    color: rgba(255,255,255,0.32);
+    margin: 0;
+    letter-spacing: 0.2px;
+  }
+
+  /* ── Form ── */
+  .m-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    animation: m-in 0.5s 0.1s cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  /* Form heading */
+  .m-form-header { margin-bottom: 6px; }
+
+  .m-form-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #E8EAFF;
+    letter-spacing: -0.3px;
+    margin: 0 0 3px;
+  }
+
+  .m-form-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.3);
+    margin: 0;
+  }
+
+  /* ── Input fields ── */
+  .m-field, .m-field-icon, .m-field-inner { all: unset; }
+
+  .m-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .m-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.1px;
+    padding-left: 2px;
+  }
+
+  .m-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.09);
+    background: rgba(255,255,255,0.05);
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  }
+  .m-input-wrap.m-focused {
+    border-color: rgba(99,102,241,0.7);
+    background: rgba(99,102,241,0.07);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.14);
+  }
+
+  .m-input-wrap input {
+    flex: 1;
+    min-width: 0;
+    padding: 16px 16px;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    font-weight: 400;
+    color: #F0F1FF;
+    font-family: inherit;
+    line-height: 1;
+    caret-color: #818cf8;
+  }
+  .m-input-wrap input::placeholder {
+    color: rgba(255,255,255,0.18);
+    font-weight: 400;
+  }
+
+  .m-eye {
+    flex-shrink: 0;
+    width: 50px;
+    height: 52px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(255,255,255,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.15s;
+  }
+  .m-eye:active { color: #818cf8; }
+
+  /* ── Error ── */
+  .m-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(239,68,68,0.1);
+    color: #fca5a5;
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 12px;
+    padding: 11px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    animation: shake 0.3s ease;
+  }
+
+  /* ── Sign In button ── */
+  .m-signin {
+    width: 100%;
+    height: 54px;
+    margin-top: 4px;
+    background: #6366f1;
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 15.5px;
+    font-weight: 700;
+    letter-spacing: 0.1px;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 8px 28px rgba(99,102,241,0.4);
+    transition: transform 0.12s, opacity 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .m-signin:active:not(:disabled) { transform: scale(0.98); opacity: 0.9; }
+  .m-signin:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .m-spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  /* ── Language toggle ── */
+  .m-lang {
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    background: transparent;
+    color: rgba(255,255,255,0.3);
+    font-size: 12.5px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .m-lang:active { border-color: rgba(99,102,241,0.5); color: #818cf8; }
+
+  /* ── Footer ── */
+  .m-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-top: 36px;
+    padding-bottom: 8px;
+    animation: m-in 0.5s 0.2s cubic-bezier(0.2, 0, 0, 1) both;
+  }
+  .m-powered { font-size: 12px; color: rgba(255,255,255,0.2); }
+  .m-powered strong { color: rgba(255,255,255,0.4); font-weight: 700; letter-spacing: 0.1px; }
+  .m-copy { font-size: 11px; color: rgba(255,255,255,0.12); }
+
+  /* ── Animations ── */
+  @keyframes m-in {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes m-logo-pop {
+    from { opacity: 0; transform: scale(0.65); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m-brand, .m-form, .m-footer, .m-logo { animation: none !important; }
 }

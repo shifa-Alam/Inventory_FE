@@ -56,7 +56,7 @@ export class ExpensesComponent implements OnInit {
   loadCategories() {
     this.api.get('/expense-categories/').subscribe({
       next: (res: any) => { this.categories = res ?? []; },
-      error: (err) => console.error('Failed to load expense categories', err)
+      error: () => {}
     });
   }
 
@@ -74,7 +74,7 @@ export class ExpensesComponent implements OnInit {
         this.pages   = res.pages  ?? 1;
         this.loading = false;
       },
-      error: (err) => { console.error('Failed to load expenses', err); this.loading = false; }
+      error: () => { this.loading = false; }
     });
   }
 

@@ -55,14 +55,14 @@ export class ProductsComponent implements OnInit {
         this.pages = res.pages;
         this.loading = false;
       },
-      error: (err) => { console.error('Failed to load products', err); this.loading = false; }
+      error: () => { this.loading = false; }
     });
   }
 
   loadCategories() {
     this.api.get('/categories/').subscribe({
       next: (res: any) => { this.categories = res.data ?? res; },
-      error: (err) => console.error('Failed to load categories', err)
+      error: () => {}
     });
   }
 
@@ -77,7 +77,7 @@ export class ProductsComponent implements OnInit {
     this.toast.startSaving();
     this.api.post('/products/', this.newProduct).subscribe({
       next: () => { this.toast.stopSaving(); this.toast.success('Product Added'); this.load(); this.reset(); },
-      error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to create product'); console.error(err); }
+      error: () => { this.toast.stopSaving(); this.toast.error('Failed to create product'); }
     });
   }
 
@@ -86,7 +86,7 @@ export class ProductsComponent implements OnInit {
     this.toast.startSaving();
     this.api.put(`/products/${this.newProduct.id}`, { name, sku, category_id, average_cost, sale_price, mrp, minimum_stock }).subscribe({
       next: () => { this.toast.stopSaving(); this.toast.success('Product Updated'); this.load(); this.reset(); },
-      error: (err) => { this.toast.stopSaving(); this.toast.error('Failed to update product'); console.error(err); }
+      error: () => { this.toast.stopSaving(); this.toast.error('Failed to update product'); }
     });
   }
 
