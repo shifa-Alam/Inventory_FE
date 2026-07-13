@@ -82,6 +82,9 @@
             <th>{{ 'users.col_no' | translate }}</th>
             <th>{{ 'users.col_username' | translate }}</th>
             <th>{{ 'users.col_role' | translate }}</th>
+            <th *ngIf="isSystemAdmin">{{ 'users.col_tenant' | translate }}</th>
+            <th *ngIf="isSystemAdmin">{{ 'users.col_created_at' | translate }}</th>
+            <th *ngIf="isSystemAdmin">{{ 'users.col_created_by' | translate }}</th>
             <th>{{ 'users.col_actions' | translate }}</th>
           </tr>
         </thead>
@@ -90,6 +93,9 @@
             <td class="muted">{{ (page - 1) * pageSize + i + 1 }}</td>
             <td class="bold">{{ u.username }}</td>
             <td><span class="badge badge-success">{{ u.role }}</span></td>
+            <td *ngIf="isSystemAdmin">{{ u.tenant_name || 'N/A' }}</td>
+            <td *ngIf="isSystemAdmin" class="muted">{{ u.created_at ? (u.created_at | date:'dd MMM yyyy HH:mm') : 'N/A' }}</td>
+            <td *ngIf="isSystemAdmin">{{ u.created_by_name || 'System' }}</td>
             <td>
               <div class="row-actions">
                 <button class="btn btn-secondary btn-sm" (click)="edit(u)">{{ 'users.edit' | translate }}</button>
@@ -98,10 +104,10 @@
             </td>
           </tr>
           <tr *ngIf="loading" class="loading-row">
-            <td colspan="4"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
+            <td [attr.colspan]="isSystemAdmin ? 7 : 4"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
           </tr>
           <tr *ngIf="!loading && users.length === 0">
-            <td colspan="4" class="empty-row">{{ 'users.empty' | translate }}</td>
+            <td [attr.colspan]="isSystemAdmin ? 7 : 4" class="empty-row">{{ 'users.empty' | translate }}</td>
           </tr>
         </tbody>
       </table>
@@ -126,6 +132,11 @@
           </div>
         </div>
         <span class="badge badge-success">{{ u.role }}</span>
+      </div>
+      <div class="mc-meta-rows" *ngIf="isSystemAdmin">
+        <div class="mc-meta-row"><span class="mc-meta-lbl">{{ 'users.col_tenant' | translate }}</span><span>{{ u.tenant_name || 'N/A' }}</span></div>
+        <div class="mc-meta-row"><span class="mc-meta-lbl">{{ 'users.col_created_at' | translate }}</span><span>{{ u.created_at ? (u.created_at | date:'dd MMM yyyy HH:mm') : 'N/A' }}</span></div>
+        <div class="mc-meta-row"><span class="mc-meta-lbl">{{ 'users.col_created_by' | translate }}</span><span>{{ u.created_by_name || 'System' }}</span></div>
       </div>
       <div class="mc-actions">
         <button class="btn btn-secondary btn-sm" (click)="edit(u)">{{ 'users.edit' | translate }}</button>

@@ -29,6 +29,8 @@ export class LayoutComponent {
     this.applyTheme();
   }
 
+  get isSystemAdmin(): boolean { return this.currentUser?.role === 'system_admin'; }
+
   toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
   closeSidebar()  { this.sidebarOpen = false; }
 

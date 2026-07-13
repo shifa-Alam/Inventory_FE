@@ -17,15 +17,48 @@ export class DashboardComponent implements OnInit {
   data: any = {};
   loading = false;
   today = new Date();
+  trendDays = 7;             // sales-trend window: 7 / 30 / 90
 
   constructor(private api: ApiService, public router: Router) {}
 
   ngOnInit() {
+    this.load();
+  }
+
+  load() {
     this.loading = true;
-    this.api.get('/dashboard/').subscribe({
+    this.api.get(`/dashboard/?trend_days=${this.trendDays}`).subscribe({
       next: (res: any) => { this.data = res; this.loading = false; },
       error: () => { this.loading = false; }
     });
+  }
+
+  setTrend(days: number) {
+    if (this.trendDays === days) return;
+    this.trendDays = days;
+    this.load();
+  }
+
+  go(path: string) { this.router.navigate([path]); }
+
+  /** Smart-insight severity → CSS class for the coloured dot/border. */
+  insightClass(type: string): string {
+    return {
+      positive: 'ins-positive', warning: 'ins-warning',
+      danger: 'ins-danger', info: 'ins-info',
+    }[type] ?? 'ins-info';
+  }
+
+  categoryBarWidth(rev: number): number {
+    const rows: any[] = this.data.sales_by_category ?? [];
+    const max = Math.max(...rows.map(r => r.revenue), 1);
+    return Math.max(2, Math.round((rev / max) * 100));
+  }
+
+  customerBarWidth(total: number): number {
+    const rows: any[] = this.data.top_customers ?? [];
+    const max = Math.max(...rows.map(r => r.total), 1);
+    return Math.max(2, Math.round((total / max) * 100));
   }
 
   get chartBars(): { label: string; amount: number; collection: number; count: number; height: number; collectHeight: number; isToday: boolean }[] {

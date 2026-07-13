@@ -42,7 +42,7 @@ export class UsersComponent implements OnInit {
   ngOnInit() {
     this.load();
     if (this.isSystemAdmin) {
-      this.api.get('/tenants/').subscribe({ next: (res: any) => this.tenants = res, error: () => {} });
+      this.api.get('/tenants/').subscribe({ next: (res: any) => this.tenants = res?.data ?? res, error: () => {} });
     }
   }
 

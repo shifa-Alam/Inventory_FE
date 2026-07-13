@@ -1,0 +1,148 @@
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <h2>Supplier Payments</h2>
+      <p class="sub">Pay down outstanding purchase dues</p>
+    </div>
+  </div>
+
+  <!-- Summary chips -->
+  <div class="summary-row">
+    <div class="summary-chip">
+      <span class="chip-label">Total Payable</span>
+      <span class="chip-value danger">৳{{ fmt(summary.total_payable) }}</span>
+    </div>
+    <div class="summary-chip">
+      <span class="chip-label">Pending Invoices</span>
+      <span class="chip-value">{{ summary.pending_invoices }}</span>
+    </div>
+    <div class="summary-chip">
+      <span class="chip-label">Paid Today</span>
+      <span class="chip-value">৳{{ fmt(summary.today_payments) }}</span>
+    </div>
+    <div class="summary-chip">
+      <span class="chip-label">Total Paid</span>
+      <span class="chip-value">৳{{ fmt(summary.total_payments) }}</span>
+    </div>
+  </div>
+
+  <!-- Pending purchases -->
+  <div class="card">
+    <div class="card-header-row">
+      <span class="card-title" style="margin-bottom:0">Pending Purchase Invoices</span>
+      <span class="count-badge">{{ invoiceTotal }} with due</span>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Invoice</th>
+            <th>Supplier</th>
+            <th class="right">Total</th>
+            <th class="right">Paid</th>
+            <th class="right">Due</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let inv of invoices">
+            <tr [class.row-selected]="selected?.id === inv.id">
+              <td class="bold mono">{{ inv.invoice_no || inv.purchase_no }}</td>
+              <td>{{ inv.supplier_name || '—' }}</td>
+              <td class="right">৳{{ inv.total_amount | number:'1.0-2' }}</td>
+              <td class="right">৳{{ inv.paid_amount | number:'1.0-2' }}</td>
+              <td class="right"><span class="due-chip">৳{{ inv.due_amount | number:'1.0-2' }}</span></td>
+              <td class="right">
+                <button class="btn btn-primary btn-sm" (click)="select(inv)">
+                  {{ selected?.id === inv.id ? 'Close' : 'Pay' }}
+                </button>
+              </td>
+            </tr>
+
+            <!-- Inline pay panel -->
+            <tr class="pay-row" *ngIf="selected?.id === inv.id">
+              <td colspan="6">
+                <div class="pay-panel">
+                  <div class="pay-info">
+                    <div class="pi-row"><span class="pi-lbl">Invoice</span><span class="pi-val fw">{{ inv.invoice_no }}</span></div>
+                    <div class="pi-row"><span class="pi-lbl">Supplier</span><span class="pi-val">{{ inv.supplier_name || '—' }}</span></div>
+                    <div class="pi-row"><span class="pi-lbl">Due</span><span class="pi-val due">৳{{ fmt(maxDue) }}</span></div>
+                    <div class="pi-row"><span class="pi-lbl">After Payment</span><span class="pi-val" [class.ok]="afterPayment === 0">৳{{ fmt(afterPayment) }}</span></div>
+                  </div>
+                  <div class="pay-form">
+                    <div class="pay-fields">
+                      <div class="amount-row">
+                        <input type="number" [(ngModel)]="payAmount" placeholder="Amount" min="0" [max]="maxDue" />
+                        <button class="btn btn-ghost btn-sm" (click)="setFullPay()">Full</button>
+                      </div>
+                      <input type="text" [(ngModel)]="payNote" placeholder="Note (optional)" />
+                    </div>
+                    <div class="pay-actions">
+                      <button class="btn btn-primary" [disabled]="!isValid || paying" (click)="pay()">
+                        <span *ngIf="paying" class="spinner"></span>
+                        {{ paying ? 'Saving…' : 'Record Payment' }}
+                      </button>
+                      <button class="btn btn-ghost" (click)="clearSelection()">Cancel</button>
+                    </div>
+                    <p class="hint-error" *ngIf="errorMsg">{{ errorMsg }}</p>
+                    <p class="hint-success" *ngIf="successMsg">{{ successMsg }}</p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+
+          <tr *ngIf="loadingInvoices" class="loading-row">
+            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+          </tr>
+          <tr *ngIf="!loadingInvoices && invoices.length === 0">
+            <td colspan="6" class="empty-row">🎉 No outstanding supplier dues.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <app-paginator [page]="invoicePage" [pages]="invoicePages" [total]="invoiceTotal" [pageSize]="invoicePageSize" (pageChange)="onInvoicePage($event)"></app-paginator>
+  </div>
+
+  <!-- Payment history -->
+  <div class="card">
+    <div class="card-header-row">
+      <span class="card-title" style="margin-bottom:0">Payment History</span>
+      <span class="count-badge">{{ histTotal }} records</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Reference</th>
+            <th>Invoice</th>
+            <th>Supplier</th>
+            <th class="right">Amount</th>
+            <th>Note</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of history">
+            <td class="muted">{{ p.created_at | date:'dd MMM yyyy, hh:mm a' }}</td>
+            <td><span class="ref-badge">{{ p.reference_no }}</span></td>
+            <td class="mono">{{ p.invoice_no || '—' }}</td>
+            <td>{{ p.supplier_name || '—' }}</td>
+            <td class="right fw7">৳{{ p.amount | number:'1.0-2' }}</td>
+            <td class="muted">{{ p.note || '—' }}</td>
+          </tr>
+          <tr *ngIf="loadingHistory" class="loading-row">
+            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+          </tr>
+          <tr *ngIf="!loadingHistory && history.length === 0">
+            <td colspan="6" class="empty-row">No supplier payments recorded yet.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <app-paginator [page]="histPage" [pages]="histPages" [total]="histTotal" [pageSize]="histPageSize" (pageChange)="onHistPage($event)"></app-paginator>
+  </div>
+
+</div>

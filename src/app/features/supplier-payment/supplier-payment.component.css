@@ -1,0 +1,73 @@
+.summary-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.summary-chip {
+  flex: 1; min-width: 160px;
+  display: flex; flex-direction: column; gap: 4px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px;
+}
+.chip-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); }
+.chip-value { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -0.4px; }
+.chip-value.danger { color: var(--danger); }
+
+.right { text-align: right; }
+.bold { font-weight: 700; }
+.fw7 { font-weight: 700; }
+.mono { font-family: ui-monospace, monospace; font-size: 12.5px; }
+.muted { color: var(--text-muted); }
+.count-badge { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+
+.due-chip {
+  display: inline-block; background: var(--danger-light); color: var(--danger-text);
+  border: 1px solid var(--danger-mid); font-size: 12px; font-weight: 700;
+  padding: 2px 10px; border-radius: 20px;
+}
+.ref-badge {
+  display: inline-block; background: var(--primary-light); color: var(--primary-dark);
+  font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.3px;
+}
+.row-selected td { background: var(--primary-light) !important; }
+.empty-row { text-align: center; color: var(--text-muted); padding: 32px !important; }
+
+/* Inline pay panel */
+.pay-row td { padding: 0 !important; border-bottom: 2px solid var(--primary-mid) !important; }
+.pay-panel {
+  display: flex; gap: 24px; align-items: flex-start;
+  padding: 16px 20px; background: var(--primary-light);
+}
+.pay-info {
+  display: flex; gap: 20px; flex-wrap: wrap; flex-shrink: 0;
+  padding: 12px 16px; background: var(--surface);
+  border: 1px solid var(--primary-mid); border-radius: 8px;
+}
+.pi-row { display: flex; flex-direction: column; gap: 2px; }
+.pi-lbl { font-size: 10px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
+.pi-val { font-size: 14px; font-weight: 500; color: var(--text); }
+.pi-val.fw { font-weight: 700; }
+.pi-val.due { color: var(--danger-text); font-weight: 700; }
+.pi-val.ok { color: var(--success-text, #16a34a); font-weight: 700; }
+
+.pay-form { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 220px; }
+.pay-fields { display: flex; flex-direction: column; gap: 8px; }
+.amount-row { display: flex; gap: 6px; align-items: center; }
+.amount-row input { flex: 1; }
+.pay-actions { display: flex; gap: 8px; }
+.hint-error { color: var(--danger-text); font-size: 12.5px; margin: 2px 0 0; }
+.hint-success { color: var(--success-text, #16a34a); font-size: 12.5px; font-weight: 600; margin: 2px 0 0; }
+
+.spinner {
+  width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff; border-radius: 50%; display: inline-block;
+  animation: spin 0.7s linear infinite; margin-right: 6px; vertical-align: -2px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-row td { text-align: center; padding: 24px !important; color: var(--text-muted); }
+.loading-spinner {
+  width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--primary);
+  border-radius: 50%; display: inline-block; animation: spin 0.7s linear infinite; vertical-align: -3px; margin-right: 8px;
+}
+
+@media (max-width: 768px) {
+  .pay-panel { flex-direction: column; }
+  .pay-info { width: 100%; }
+}

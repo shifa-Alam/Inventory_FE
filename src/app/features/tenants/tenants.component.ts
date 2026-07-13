@@ -27,7 +27,7 @@ export class TenantsComponent implements OnInit {
   load() {
     this.loading = true;
     this.api.get('/tenants/').subscribe({
-      next: (res: any) => { this.tenants = res; this.loading = false; },
+      next: (res: any) => { this.tenants = res?.data ?? res; this.loading = false; },
       error: () => { this.loading = false; }
     });
   }

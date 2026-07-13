@@ -4,3 +4,23 @@
 .form-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .close-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; padding: 4px 8px; border-radius: 4px; line-height: 1; }
 .close-btn:hover { background: var(--bg); color: var(--danger); }
+
+/* System-admin metadata rows on mobile user cards */
+.mc-meta-rows {
+  margin: 8px 0;
+  padding: 8px 0;
+  border-top: 1px solid var(--border-light, #f1f5f9);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.mc-meta-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12.5px;
+}
+.mc-meta-lbl {
+  color: var(--text-muted);
+  font-weight: 600;
+}

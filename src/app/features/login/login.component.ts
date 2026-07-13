@@ -36,7 +36,8 @@ export class LoginComponent {
       next: () => {
         // Backend sets httpOnly cookies — nothing to store client-side.
         this.loading = false;
-        this.router.navigate(['/dashboard']);
+        // system_admin has no tenant modules; land it on Users.
+        this.router.navigate([this.auth.isSystemAdmin() ? '/users' : '/dashboard']);
       },
       error: (err) => {
         this.loading = false;

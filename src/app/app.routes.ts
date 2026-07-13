@@ -18,6 +18,7 @@ import { ProductWasteComponent } from './features/product-waste/product-waste.co
 import { StockLedgerComponent } from './features/stock-ledger/stock-ledger.component';
 import { UsersComponent } from './features/users/users.component';
 import { CustomerPaymentComponent } from './features/customer-payment/customer-payment.component';
+import { SupplierPaymentComponent } from './features/supplier-payment/supplier-payment.component';
 import { PaymentLedgerComponent } from './features/payment-ledger/payment-ledger.component';
 import { OperatorSummaryComponent } from './features/operator-summary/operator-summary.component';
 import { TenantsComponent } from './features/tenants/tenants.component';
@@ -52,10 +53,16 @@ export const routes: Routes = [
             { path: 'stock-ledger', component: StockLedgerComponent },
             { path: 'users', component: UsersComponent },
             { path: 'customer-payment', component: CustomerPaymentComponent },
+            { path: 'supplier-payment', component: SupplierPaymentComponent },
             { path: 'payment-ledger', component: PaymentLedgerComponent },
             { path: 'operator-summary', component: OperatorSummaryComponent },
             { path: 'tenants', component: TenantsComponent },
             { path: 'expenses', component: ExpensesComponent }
         ]
-    }
+    },
+
+    // Catch-all: any unknown URL (stale bookmark, bad link) goes to the
+    // dashboard instead of rendering a blank page. The auth guard on the
+    // layout route bounces unauthenticated users to /login.
+    { path: '**', redirectTo: 'dashboard' }
 ];

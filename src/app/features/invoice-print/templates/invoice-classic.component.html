@@ -24,13 +24,14 @@
         <span class="inv-meta-val">{{ invoice?.invoice_no }}</span>
       </div>
       <div class="inv-meta-row">
-        <span class="inv-meta-label">{{ invoice?.delivery_date ? 'Delivery Date' : ('invoice.date' | translate) }}:</span>
+        <span class="inv-meta-label">{{ invoice?.delivery_date ? 'Delivery Date' : ('invoice.date' | translate)
+          }}:</span>
         <span class="inv-meta-val">{{ (invoice?.delivery_date || invoice?.created_at) | date:'dd MMM yyyy' }}</span>
       </div>
       <div class="inv-status-row" *ngIf="settings.options.show_status">
         <span class="status-pill" [class.paid]="(invoice?.due_amount ?? 1) <= 0">
-          {{ (invoice?.due_amount ?? 1) <= 0 ? ('invoice.status_paid' | translate) : ('invoice.status_due' | translate) }}
-        </span>
+          {{ (invoice?.due_amount ?? 1) <= 0 ? ('invoice.status_paid' | translate) : ('invoice.status_due' | translate)
+            }} </span>
       </div>
     </div>
 
@@ -71,7 +72,11 @@
           <td class="td-no">{{ i + 1 }}</td>
           <td class="td-desc">{{ item.product_name }}</td>
           <td class="td-center">{{ item.quantity }}</td>
-          <td class="td-right td-mrp" *ngIf="settings.options.show_mrp">{{ item.mrp ? ('৳ ' + (item.mrp | number)) : '—' }}</td>
+          <!-- <td class="td-right td-mrp" *ngIf="settings.options.show_mrp">{{ item.mrp ? ('৳ ' + (item.mrp | number)) : '—'
+            }}</td> -->
+          <td class="td-right td-mrp">{{ ('৳ ' + (item.mrp | number))
+            }}</td>
+
           <td class="td-right">৳&thinsp;{{ item.rate | number }}</td>
           <td class="td-right td-amount">৳&thinsp;{{ item.quantity * item.rate | number }}</td>
         </tr>
@@ -91,7 +96,8 @@
         <span class="t-val disc-val">−&thinsp;৳&thinsp;{{ invoice?.discount_amount | number }}</span>
       </div>
       <div class="t-row" [class.t-net]="invoice?.discount_amount > 0">
-        <span class="t-label">{{ invoice?.discount_amount > 0 ? ('invoice.net_total' | translate) : ('invoice.subtotal' | translate) }}</span>
+        <span class="t-label">{{ invoice?.discount_amount > 0 ? ('invoice.net_total' | translate) : ('invoice.subtotal'
+          | translate) }}</span>
         <span class="t-val">৳&thinsp;{{ invoice?.total_amount | number }}</span>
       </div>
       <ng-container *ngIf="settings.options.show_paid_due">
