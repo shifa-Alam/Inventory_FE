@@ -1,5 +1,7 @@
 {
-  "lang": { "toggle": "English" },
+  "lang": {
+    "toggle": "English"
+  },
   "common": {
     "filter": "ফিল্টার",
     "clear": "মুছুন",
@@ -417,11 +419,6 @@
     "back": "ফিরে যান",
     "print": "প্রিন্ট",
     "download_pdf": "PDF ডাউনলোড করুন",
-    "company": "AMIRA TRADER'S",
-    "company_sub": "58, New Market, Dhaka-1205",
-    "company_location": "",
-    "company_phone": "📞 ০১৭০০-০০০০০০",
-    "company_email": "✉ info@amiratraders.com",
     "badge": "চালান",
     "invoice_no": "চালান নং",
     "date": "তারিখ",

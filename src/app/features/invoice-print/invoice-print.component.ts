@@ -1,18 +1,20 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
+import { Component, OnInit, ElementRef, ViewChild, Type } from '@angular/core';
+import { CommonModule, Location, NgComponentOutlet } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import html2pdf from 'html2pdf.js';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ApiService } from '../../core/services/api.service';
+import { AuthService } from '../../core/services/auth.service';
 import { TenantSettingsService, TenantInvoiceSettings, DEFAULT_INVOICE_SETTINGS } from '../../core/services/tenant-settings.service';
 import { InvoiceClassicComponent } from './templates/invoice-classic.component';
 import { InvoiceCompactComponent } from './templates/invoice-compact.component';
 import { InvoiceThermalComponent } from './templates/invoice-thermal.component';
+import { TENANT_TEMPLATES } from './templates/tenant-templates';
 
 @Component({
   selector: 'app-invoice-print',
   standalone: true,
-  imports: [CommonModule, TranslatePipe, InvoiceClassicComponent, InvoiceCompactComponent, InvoiceThermalComponent],
+  imports: [CommonModule, NgComponentOutlet, TranslatePipe, InvoiceClassicComponent, InvoiceCompactComponent, InvoiceThermalComponent],
   templateUrl: './invoice-print.component.html',
   styleUrls: ['./invoice-print.component.css']
 })
@@ -21,6 +23,8 @@ export class InvoicePrintComponent implements OnInit {
   invoice: any = null;
   settings: TenantInvoiceSettings | null = null;
   loading = true;
+  /** Bespoke per-tenant template from TENANT_TEMPLATES; null = generic templates. */
+  customTemplate: Type<unknown> | null = null;
   @ViewChild('invoiceBox', { static: false }) invoiceBox!: ElementRef;
 
   private autoPrint = false;
@@ -30,8 +34,12 @@ export class InvoicePrintComponent implements OnInit {
     private location: Location,
     private route: ActivatedRoute,
     private api: ApiService,
+    private auth: AuthService,
     private tenantSettings: TenantSettingsService
-  ) {}
+  ) {
+    const tenantId = this.auth.getCurrentUser()?.tenant_id;
+    this.customTemplate = (tenantId != null && TENANT_TEMPLATES[tenantId]) || null;
+  }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -47,14 +55,14 @@ export class InvoicePrintComponent implements OnInit {
         next: (res: any) => {
           this.invoice = res;
           this.loading = false;
-          this.maybeAutoPrint();
+          // this.maybeAutoPrint();
         },
         error: () => { this.loading = false; }
       });
     } else {
       this.invoice = JSON.parse(localStorage.getItem('invoice') || '{}');
       this.loading = false;
-      this.maybeAutoPrint();
+      // this.maybeAutoPrint();
     }
   }
 

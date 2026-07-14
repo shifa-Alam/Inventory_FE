@@ -1,5 +1,7 @@
 {
-  "lang": { "toggle": "বাংলা" },
+  "lang": {
+    "toggle": "বাংলা"
+  },
   "common": {
     "filter": "Filter",
     "clear": "Clear",
@@ -417,11 +419,6 @@
     "back": "Back",
     "print": "Print",
     "download_pdf": "Download PDF",
-    "company": "AMIRA TRADER'S",
-    "company_sub": "58, New Market, Dhaka-1205",
-    "company_location": "",
-    "company_phone": "📞 01700-000000",
-    "company_email": "✉ info@amiratraders.com",
     "badge": "INVOICE",
     "invoice_no": "Invoice No",
     "date": "Date",

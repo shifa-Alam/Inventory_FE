@@ -10,8 +10,8 @@
     <div class="company-block">
       <img *ngIf="settings.logo_url" class="company-logo" [src]="settings.logo_url" alt="logo">
       <div class="company-info">
-        <div class="company-name">{{ settings.shop_name || ('invoice.company' | translate) }}</div>
-        <div class="company-sub">{{ settings.shop_sub || ('invoice.company_sub' | translate) }}</div>
+        <div class="company-name">{{ settings.shop_name }}</div>
+        <div class="company-sub">{{ settings.shop_sub }}</div>
         <div class="company-sub" *ngIf="settings.address">{{ settings.address }}</div>
       </div>
     </div>
@@ -41,8 +41,8 @@
   <div class="bill-section">
     <div class="bill-block">
       <div class="bill-label">{{ 'invoice.from' | translate }}</div>
-      <div class="bill-name">{{ settings.shop_name || ('invoice.company' | translate) }}</div>
-      <div class="bill-line">{{ settings.shop_sub || ('invoice.company_sub' | translate) }}</div>
+      <div class="bill-name">{{ settings.shop_name }}</div>
+      <div class="bill-line">{{ settings.shop_sub }}</div>
       <div class="bill-line" *ngIf="settings.address">{{ settings.address }}</div>
       <div class="bill-line" *ngIf="settings.phone">{{ settings.phone }}</div>
     </div>
@@ -72,10 +72,9 @@
           <td class="td-no">{{ i + 1 }}</td>
           <td class="td-desc">{{ item.product_name }}</td>
           <td class="td-center">{{ item.quantity }}</td>
-          <!-- <td class="td-right td-mrp" *ngIf="settings.options.show_mrp">{{ item.mrp ? ('৳ ' + (item.mrp | number)) : '—'
-            }}</td> -->
-          <td class="td-right td-mrp">{{ ('৳ ' + (item.mrp | number))
+          <td class="td-right td-mrp" *ngIf="settings.options.show_mrp">{{ item.mrp ? ('৳ ' + (item.mrp | number)) : '—'
             }}</td>
+
 
           <td class="td-right">৳&thinsp;{{ item.rate | number }}</td>
           <td class="td-right td-amount">৳&thinsp;{{ item.quantity * item.rate | number }}</td>

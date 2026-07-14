@@ -25,13 +25,20 @@
   <!-- Loading (invoice or tenant settings still on the way) -->
   <div *ngIf="loading || !settings" class="inv-loading">Loading invoice…</div>
 
-  <!-- ══ Invoice Document — template picked per tenant ══ -->
+  <!-- ══ Invoice Document — template picked per tenant ══
+       1. A bespoke component registered for this tenant_id (TENANT_TEMPLATES) wins.
+       2. Otherwise the generic template chosen by tenant config (B2B/B2C or explicit). -->
   <div #invoiceBox *ngIf="!loading && invoice && settings">
-    <ng-container [ngSwitch]="settings.invoice_template">
-      <app-invoice-thermal *ngSwitchCase="'thermal'" [invoice]="invoice" [settings]="settings"></app-invoice-thermal>
-      <app-invoice-compact *ngSwitchCase="'compact'" [invoice]="invoice" [settings]="settings"></app-invoice-compact>
-      <app-invoice-classic *ngSwitchDefault [invoice]="invoice" [settings]="settings"></app-invoice-classic>
+    <ng-container *ngIf="customTemplate; else genericTpl">
+      <ng-container *ngComponentOutlet="customTemplate; inputs: { invoice: invoice, settings: settings }"></ng-container>
     </ng-container>
+    <ng-template #genericTpl>
+      <ng-container [ngSwitch]="settings.invoice_template">
+        <app-invoice-thermal *ngSwitchCase="'thermal'" [invoice]="invoice" [settings]="settings"></app-invoice-thermal>
+        <app-invoice-compact *ngSwitchCase="'compact'" [invoice]="invoice" [settings]="settings"></app-invoice-compact>
+        <app-invoice-classic *ngSwitchDefault [invoice]="invoice" [settings]="settings"></app-invoice-classic>
+      </ng-container>
+    </ng-template>
   </div>
 
 </div>

@@ -2,3 +2,36 @@
 .form-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .close-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; padding: 4px 8px; border-radius: 4px; line-height: 1; }
 .close-btn:hover { background: var(--bg); color: var(--danger); }
+
+/* ── Tenant configuration form ─────────────────────────────── */
+.section-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.6px; color: var(--text-muted);
+  margin: 16px 0 8px; padding-top: 12px;
+  border-top: 1px dashed var(--border);
+}
+.section-label:first-of-type { border-top: none; padding-top: 0; margin-top: 4px; }
+
+.color-input {
+  width: 64px; height: 36px; padding: 2px;
+  border: 1px solid var(--border); border-radius: 6px;
+  background: var(--bg); cursor: pointer;
+}
+
+.chk-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--text); cursor: pointer;
+  padding: 4px 0;
+}
+.chk-row input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--primary); }
+.customize-row { margin-top: 14px; font-weight: 600; }
+.muted-hint { font-weight: 400; color: var(--text-muted); font-size: 12px; }
+
+.options-grid {
+  display: grid; grid-template-columns: repeat(3, minmax(160px, 1fr));
+  gap: 2px 18px; padding: 8px 12px; margin-top: 6px;
+  background: var(--bg-alt); border-radius: 8px;
+}
+@media (max-width: 640px) { .options-grid { grid-template-columns: 1fr; } }
+
+.small { font-size: 11.5px; font-weight: 400; }
