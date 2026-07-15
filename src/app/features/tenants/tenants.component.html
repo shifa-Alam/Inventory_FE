@@ -34,6 +34,12 @@
         <input type="text" [(ngModel)]="name" placeholder="e.g. Acme Corp" maxlength="150" />
       </div>
       <div class="form-group">
+        <label>Tenant Code</label>
+        <input type="text" [(ngModel)]="code" placeholder="e.g. at_01" maxlength="20"
+               pattern="[a-zA-Z0-9_-]+" />
+        <span class="muted-hint">Unique short code — selects a bespoke invoice template (letters, digits, _ -)</span>
+      </div>
+      <div class="form-group">
         <label>Business Type <span class="req">*</span></label>
         <select [(ngModel)]="businessType" (ngModelChange)="onBusinessTypeChange()">
           <option value="B2C">B2C — Retail (receipt-style invoice)</option>
@@ -120,6 +126,7 @@
           <tr>
             <th>#</th>
             <th>Name</th>
+            <th>Code</th>
             <th>Type</th>
             <th>Invoice</th>
             <th>Status</th>
@@ -131,6 +138,7 @@
           <tr *ngFor="let t of tenants; let i = index">
             <td class="muted">{{ i + 1 }}</td>
             <td class="bold">{{ t.name }}<div class="muted small" *ngIf="t.tagline">{{ t.tagline }}</div></td>
+            <td><span class="code-badge" *ngIf="t.code">{{ t.code }}</span><span *ngIf="!t.code" class="muted">—</span></td>
             <td>
               <span class="badge" [class.badge-info]="t.business_type === 'B2B'" [class.badge-warning]="t.business_type !== 'B2B'">
                 {{ t.business_type || 'B2C' }}
@@ -151,10 +159,10 @@
             </td>
           </tr>
           <tr *ngIf="loading" class="loading-row">
-            <td colspan="7"><div class="loading-spinner"></div><span class="loading-text">Loading...</span></td>
+            <td colspan="8"><div class="loading-spinner"></div><span class="loading-text">Loading...</span></td>
           </tr>
           <tr *ngIf="!loading && tenants.length === 0">
-            <td colspan="7" class="empty-row">No tenants found.</td>
+            <td colspan="8" class="empty-row">No tenants found.</td>
           </tr>
         </tbody>
       </table>

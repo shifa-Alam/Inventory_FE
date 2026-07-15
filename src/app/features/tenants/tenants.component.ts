@@ -33,6 +33,7 @@ export class TenantsComponent implements OnInit {
 
   /* form model */
   name = '';
+  code = '';
   businessType: 'B2B' | 'B2C' = 'B2C';
   phone = '';
   email = '';
@@ -76,6 +77,7 @@ export class TenantsComponent implements OnInit {
     this.reset();
     this.editingId = t.id;
     this.name = t.name;
+    this.code = t.code ?? '';
     this.businessType = t.business_type === 'B2B' ? 'B2B' : 'B2C';
     this.phone = t.phone ?? '';
     this.email = t.email ?? '';
@@ -100,6 +102,7 @@ export class TenantsComponent implements OnInit {
 
     const payload: any = {
       name: this.name.trim(),
+      code: this.code.trim().toLowerCase() || null,
       business_type: this.businessType,
       phone: this.phone.trim() || null,
       email: this.email.trim() || null,
@@ -142,6 +145,7 @@ export class TenantsComponent implements OnInit {
   private reset() {
     this.editingId = null;
     this.name = '';
+    this.code = '';
     this.businessType = 'B2C';
     this.phone = '';
     this.email = '';

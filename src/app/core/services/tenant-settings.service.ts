@@ -14,6 +14,8 @@ export interface InvoiceOptions {
 }
 
 export interface TenantInvoiceSettings {
+    /** Unique tenant code (e.g. 'at_01') — resolves a bespoke invoice template. */
+    code: string | null;
     invoice_template: InvoiceTemplate;
     /** Empty strings fall back to the i18n invoice.company* keys in the templates. */
     shop_name: string;
@@ -28,6 +30,7 @@ export interface TenantInvoiceSettings {
 }
 
 export const DEFAULT_INVOICE_SETTINGS: TenantInvoiceSettings = {
+    code: null,
     invoice_template: 'classic',
     shop_name: '',
     shop_sub: '',

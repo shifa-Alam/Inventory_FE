@@ -121,11 +121,19 @@
 
   <!-- ACTION BAR -->
   <div class="action-bar" *ngIf="wasteItems.length > 0">
-    <span class="items-count">{{ wasteItems.length }} product{{ wasteItems.length > 1 ? 's' : '' }} to waste</span>
-    <button class="btn btn-danger btn-lg" (click)="save()" [disabled]="saving">
-      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-      {{ saving ? 'Saving…' : 'Record Waste' }}
-    </button>
+    <span class="items-count">{{ wasteItems.length }} product{{ wasteItems.length > 1 ? 's' : '' }} · {{ adjustmentType | titlecase }}</span>
+    <div class="ab-right">
+      <label class="adj-type-label">
+        Adjustment type
+        <select [(ngModel)]="adjustmentType" class="adj-type-select">
+          <option *ngFor="let t of adjustmentTypes" [value]="t">{{ t | titlecase }}</option>
+        </select>
+      </label>
+      <button class="btn btn-danger btn-lg" (click)="save()" [disabled]="saving">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+        {{ saving ? 'Saving…' : 'Record Adjustment' }}
+      </button>
+    </div>
   </div>
 
   <!-- HISTORY TABLE -->
@@ -179,6 +187,7 @@
           <tr>
             <th>{{ 'product_waste.col_date' | translate }}</th>
             <th>{{ 'product_waste.col_waste_no' | translate }}</th>
+            <th>Type</th>
             <th>{{ 'product_waste.col_product' | translate }}</th>
             <th>{{ 'product_waste.col_qty' | translate }}</th>
             <th>{{ 'product_waste.col_reason' | translate }}</th>
@@ -186,11 +195,12 @@
         </thead>
         <tbody>
           <tr *ngIf="loadingWastes" class="loading-row">
-            <td colspan="5"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
           </tr>
           <tr *ngFor="let w of wastes">
             <td class="muted">{{ w.created_at | date:'dd MMM yyyy, hh:mm a' }}</td>
             <td><span class="ref-badge waste-badge">{{ w.waste_no }}</span></td>
+            <td><span class="adj-badge" [attr.data-type]="w.adjustment_type || 'WASTE'">{{ (w.adjustment_type || 'WASTE') | titlecase }}</span></td>
             <td class="bold">{{ w.product_name }}</td>
             <td><span class="qty-chip">{{ w.quantity }}</span></td>
             <td class="muted">{{ w.reason || '—' }}</td>

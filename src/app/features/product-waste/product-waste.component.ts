@@ -57,6 +57,10 @@ export class ProductWasteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   wasteItems: WasteItem[] = [];
 
+  // Reason type applied to this batch of adjustments.
+  adjustmentType = 'WASTE';
+  adjustmentTypes = ['WASTE', 'DAMAGE', 'EXPIRY', 'GIFT', 'SAMPLE', 'STAFF'];
+
   saving = false;
 
   searchSubject = new Subject<string>();
@@ -315,6 +319,7 @@ export class ProductWasteComponent implements OnInit, AfterViewInit, OnDestroy {
     const requests = this.wasteItems.map(item => ({
       product_id: item.product_id,
       quantity: +item.quantity,
+      adjustment_type: this.adjustmentType,
       reason: item.reason.trim()
     }));
 

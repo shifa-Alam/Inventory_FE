@@ -1,0 +1,117 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2>Stock Count</h2>
+      <p class="sub">Reconcile physical count with system stock (shrinkage / found)</p>
+    </div>
+  </div>
+
+  <!-- Count form -->
+  <div class="card card-body count-card">
+    <p class="card-title">New Count</p>
+
+    <!-- product picker -->
+    <div class="sc-search" *ngIf="!selected">
+      <input type="text" [(ngModel)]="search" (ngModelChange)="onSearch($event)"
+             placeholder="Search product by name or SKU (min 2 chars)…" autocomplete="off" />
+      <div class="sc-dropdown" *ngIf="results.length">
+        <div class="sc-item" *ngFor="let p of results" (click)="pick(p)">
+          <span class="sc-name">{{ p.name }}</span>
+          <span class="sc-stock">stock: {{ p.current_stock }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- selected + count -->
+    <div class="sc-form" *ngIf="selected">
+      <div class="sc-picked">
+        <div>
+          <div class="sc-picked-name">{{ selected.name }}</div>
+          <div class="sc-picked-sku muted">{{ selected.sku }}</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" (click)="clearSelection()">Change</button>
+      </div>
+
+      <div class="sc-grid">
+        <div class="sc-field">
+          <label>System Stock</label>
+          <div class="sc-readonly">{{ selected.current_stock }}</div>
+        </div>
+        <div class="sc-field">
+          <label>Counted (physical) <span class="req">*</span></label>
+          <input type="number" [(ngModel)]="countedQty" min="0" placeholder="0" />
+        </div>
+        <div class="sc-field">
+          <label>Variance</label>
+          <div class="sc-variance"
+               [class.neg]="(difference ?? 0) < 0" [class.pos]="(difference ?? 0) > 0"
+               *ngIf="difference !== null">
+            {{ difference! > 0 ? '+' : '' }}{{ difference }}
+            <span class="sc-var-tag" *ngIf="difference! < 0">Shrinkage</span>
+            <span class="sc-var-tag" *ngIf="difference! > 0">Found</span>
+            <span class="sc-var-tag" *ngIf="difference === 0">No variance</span>
+          </div>
+          <div class="sc-readonly muted" *ngIf="difference === null">—</div>
+        </div>
+      </div>
+
+      <div class="sc-field">
+        <label>Reason / Note</label>
+        <input type="text" [(ngModel)]="reason" placeholder="e.g. monthly stock take, breakage found…" />
+      </div>
+
+      <div class="form-footer">
+        <button class="btn btn-primary" (click)="save()" [disabled]="!isValid || saving">
+          <span *ngIf="saving" class="spinner"></span>
+          {{ saving ? 'Saving…' : 'Record Count' }}
+        </button>
+        <button class="btn btn-ghost" (click)="clearSelection()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="card">
+    <div class="card-header-row">
+      <span class="card-title" style="margin-bottom:0">Count History</span>
+      <span class="count-badge">{{ total }} records</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Ref</th>
+            <th>Product</th>
+            <th class="right">System</th>
+            <th class="right">Counted</th>
+            <th class="right">Variance</th>
+            <th class="right">Value Impact</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="loadingHistory" class="loading-row">
+            <td colspan="7"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+          </tr>
+          <tr *ngFor="let c of history">
+            <td class="muted">{{ c.created_at | date:'dd MMM yyyy, hh:mm a' }}</td>
+            <td><span class="ref-badge">{{ c.count_no }}</span></td>
+            <td class="bold">{{ c.product_name }}</td>
+            <td class="right">{{ c.system_qty }}</td>
+            <td class="right">{{ c.counted_qty }}</td>
+            <td class="right">
+              <span class="var-chip" [class.neg]="c.difference < 0" [class.pos]="c.difference > 0">
+                {{ c.difference > 0 ? '+' : '' }}{{ c.difference }}
+              </span>
+            </td>
+            <td class="right" [class.neg-text]="c.value_impact < 0">৳{{ c.value_impact | number:'1.0-2' }}</td>
+          </tr>
+          <tr *ngIf="!loadingHistory && history.length === 0">
+            <td colspan="7" class="empty-row">No stock counts recorded yet.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPage($event)"></app-paginator>
+  </div>
+</div>

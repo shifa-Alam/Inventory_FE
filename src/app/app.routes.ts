@@ -15,6 +15,8 @@ import { PurchaseViewComponent } from './features/purchase-view/purchase-view.co
 import { StockDashboardComponent } from './features/stock-dashboard/stock-dashboard.component';
 import { SaleReturnComponent } from './features/sale-return/sale-return.component';
 import { ProductWasteComponent } from './features/product-waste/product-waste.component';
+import { StockCountComponent } from './features/stock-count/stock-count.component';
+import { PurchaseReturnComponent } from './features/purchase-return/purchase-return.component';
 import { StockLedgerComponent } from './features/stock-ledger/stock-ledger.component';
 import { UsersComponent } from './features/users/users.component';
 import { CustomerPaymentComponent } from './features/customer-payment/customer-payment.component';
@@ -50,6 +52,8 @@ export const routes: Routes = [
             { path: 'stock', component: StockDashboardComponent },
             { path: 'sale-return', component: SaleReturnComponent },
             { path: 'product-waste', component: ProductWasteComponent },
+            { path: 'stock-count', component: StockCountComponent },
+            { path: 'purchase-return', component: PurchaseReturnComponent },
             { path: 'stock-ledger', component: StockLedgerComponent },
             { path: 'users', component: UsersComponent },
             { path: 'customer-payment', component: CustomerPaymentComponent },

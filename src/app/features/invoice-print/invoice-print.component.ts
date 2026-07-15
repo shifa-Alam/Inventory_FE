@@ -4,7 +4,6 @@ import { ActivatedRoute } from '@angular/router';
 import html2pdf from 'html2pdf.js';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ApiService } from '../../core/services/api.service';
-import { AuthService } from '../../core/services/auth.service';
 import { TenantSettingsService, TenantInvoiceSettings, DEFAULT_INVOICE_SETTINGS } from '../../core/services/tenant-settings.service';
 import { InvoiceClassicComponent } from './templates/invoice-classic.component';
 import { InvoiceCompactComponent } from './templates/invoice-compact.component';
@@ -34,19 +33,20 @@ export class InvoicePrintComponent implements OnInit {
     private location: Location,
     private route: ActivatedRoute,
     private api: ApiService,
-    private auth: AuthService,
     private tenantSettings: TenantSettingsService
-  ) {
-    const tenantId = this.auth.getCurrentUser()?.tenant_id;
-    this.customTemplate = (tenantId != null && TENANT_TEMPLATES[tenantId]) || null;
-  }
+  ) {}
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     this.autoPrint = this.route.snapshot.queryParamMap.get('print') === '1';
 
     this.tenantSettings.getSettings().subscribe({
-      next: (s) => { this.settings = s; this.maybeAutoPrint(); },
+      next: (s) => {
+        this.settings = s;
+        // Resolve a bespoke template from the tenant's code (e.g. 'at_01').
+        this.customTemplate = (s.code && TENANT_TEMPLATES[s.code]) || null;
+        this.maybeAutoPrint();
+      },
       error: () => { this.settings = DEFAULT_INVOICE_SETTINGS; this.maybeAutoPrint(); }
     });
 

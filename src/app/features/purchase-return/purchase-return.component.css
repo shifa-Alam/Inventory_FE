@@ -1,0 +1,45 @@
+.pr-search {
+  padding: 7px 12px; font-size: 13px; width: 200px; max-width: 50vw;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  background: var(--bg); color: var(--text); outline: none;
+}
+.pr-search:focus { border-color: var(--primary); }
+
+.row-selected td { background: var(--primary-light) !important; }
+.due-chip {
+  display: inline-block; background: var(--danger-light); color: var(--danger-text);
+  border: 1px solid var(--danger-mid); font-size: 12px; font-weight: 700;
+  padding: 2px 9px; border-radius: 20px;
+}
+
+/* inline return panel */
+.pr-row td { padding: 0 !important; border-bottom: 2px solid var(--primary-mid) !important; }
+.pr-panel { padding: 14px 18px; background: var(--primary-light); }
+.pr-items { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 8px; overflow: hidden; }
+.pr-items th {
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+  color: var(--text-muted); padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border);
+}
+.pr-items td { padding: 7px 10px; font-size: 13px; border-bottom: 1px solid var(--border-light); }
+.pr-items .right, .right { text-align: right; }
+.pr-qty {
+  width: 80px; padding: 5px 8px; font-size: 13px; font-weight: 600; text-align: right;
+  border: 1.5px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); outline: none;
+}
+.pr-qty:focus { border-color: var(--primary); }
+.pr-qty.input-error { border-color: var(--danger); }
+
+.pr-foot { display: flex; align-items: center; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+.pr-reason {
+  flex: 1; min-width: 160px; padding: 8px 12px; font-size: 13px;
+  border: 1.5px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); outline: none;
+}
+.pr-total { font-size: 14px; color: var(--text); }
+.pr-total b { color: var(--danger); }
+
+.ref-badge {
+  display: inline-block; font-family: ui-monospace, monospace; font-size: 11px; font-weight: 600;
+  padding: 2px 8px; border-radius: 5px; background: var(--primary-light); color: var(--primary-dark);
+}
+
+@media (max-width: 640px) { .pr-foot { flex-direction: column; align-items: stretch; } }

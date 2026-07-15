@@ -1,19 +1,20 @@
 import { Type } from '@angular/core';
-import { InvoiceTenant1Component } from './tenant-1.component';
+import { PrintSaleInvoiceAt01Component } from './print-sale-invoice-at-01.component';
 
 /**
- * Per-tenant CUSTOM invoice templates.
+ * Bespoke sale-invoice templates keyed by the tenant's unique CODE (not id).
  *
- * When a tenant needs a fully bespoke invoice layout (beyond the generic
- * classic/compact/thermal templates configured on the Tenants screen),
- * build a `tenant-<id>.component` next to this file and register it here.
+ * The code lives on the tenant record (set on the Tenants screen) and is
+ * returned in the tenant settings. A tenant with code "at_01" prints with
+ * PrintSaleInvoiceAt01Component (file: print-sale-invoice-at-01.component.*).
  *
  * Resolution order in InvoicePrintComponent:
- *   1. TENANT_TEMPLATES[tenant_id]  → this custom component wins
- *   2. settings.invoice_template    → generic template from tenant config
+ *   1. TENANT_TEMPLATES[settings.code]  → bespoke component wins
+ *   2. settings.invoice_template        → generic template from tenant config
  *
- * Every template receives the same inputs: [invoice] and [settings].
+ * To add one for another tenant: create print-sale-invoice-<code>.component.*
+ * and register it here under that code.
  */
-export const TENANT_TEMPLATES: Record<number, Type<unknown>> = {
-  1: InvoiceTenant1Component,   // Amira Traders — bespoke wholesale layout
+export const TENANT_TEMPLATES: Record<string, Type<unknown>> = {
+  at_01: PrintSaleInvoiceAt01Component,   // Amira Traders
 };
