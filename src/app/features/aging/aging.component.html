@@ -41,8 +41,8 @@
     </div>
   </div>
 
-  <!-- Table -->
-  <div class="card">
+  <!-- Table (desktop) -->
+  <div class="card desktop-table">
     <div class="card-header-row">
       <span class="card-title" style="margin-bottom:0">
         {{ (tab === 'customer' ? 'aging.customer_list' : 'aging.supplier_list') | translate }}
@@ -92,6 +92,40 @@
           </tr>
         </tfoot>
       </table>
+    </div>
+  </div>
+
+  <!-- Mobile cards -->
+  <div class="mobile-list">
+    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div></div>
+    <div class="mobile-empty" *ngIf="!loading && rows.length === 0">{{ 'aging.empty' | translate }}</div>
+
+    <div class="aging-card" *ngFor="let r of rows">
+      <div class="ac-top">
+        <div>
+          <div class="ac-name">{{ r.name }}</div>
+          <div class="ac-phone">{{ r.phone || '—' }}</div>
+        </div>
+        <div class="ac-total">৳{{ fmt(r.total) }}</div>
+      </div>
+      <div class="ac-buckets">
+        <div class="ac-bucket" [class.has-value]="r.b0_30 > 0">
+          <span class="ac-lbl">0–30</span>
+          <span class="ac-val">{{ r.b0_30 ? '৳' + fmt(r.b0_30) : '—' }}</span>
+        </div>
+        <div class="ac-bucket" [class.has-value]="r.b31_60 > 0">
+          <span class="ac-lbl">31–60</span>
+          <span class="ac-val">{{ r.b31_60 ? '৳' + fmt(r.b31_60) : '—' }}</span>
+        </div>
+        <div class="ac-bucket warn" [class.has-value]="r.b61_90 > 0">
+          <span class="ac-lbl">61–90</span>
+          <span class="ac-val">{{ r.b61_90 ? '৳' + fmt(r.b61_90) : '—' }}</span>
+        </div>
+        <div class="ac-bucket danger" [class.has-value]="r.b90_plus > 0">
+          <span class="ac-lbl">90+</span>
+          <span class="ac-val">{{ r.b90_plus ? '৳' + fmt(r.b90_plus) : '—' }}</span>
+        </div>
+      </div>
     </div>
   </div>
 

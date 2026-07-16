@@ -76,8 +76,8 @@
     </div>
   </div>
 
-  <!-- ═══ HISTORY ═══ -->
-  <div class="card">
+  <!-- ═══ HISTORY (desktop table) ═══ -->
+  <div class="card desktop-table">
     <div class="card-header-row">
       <span class="card-title" style="margin-bottom:0">{{ 'shift.history_title' | translate }}</span>
       <span class="count-badge">{{ total }} {{ 'common.records' | translate }}</span>
@@ -126,6 +126,54 @@
         </tbody>
       </table>
     </div>
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
+  </div>
+
+  <!-- ═══ HISTORY (mobile cards) ═══ -->
+  <div class="mobile-list">
+    <div class="mobile-meta">
+      <span class="mobile-title">{{ 'shift.history_title' | translate }}</span>
+      <span class="count-badge">{{ total }}</span>
+    </div>
+
+    <div class="mobile-loading" *ngIf="loadingHistory"><div class="loading-spinner"></div></div>
+    <div class="mobile-empty" *ngIf="!loadingHistory && history.length === 0">{{ 'shift.empty' | translate }}</div>
+
+    <div class="shift-card" *ngFor="let s of history">
+      <div class="sc-top">
+        <div>
+          <div class="sc-operator">{{ s.operator }}</div>
+          <div class="sc-times">
+            {{ s.opened_at | date:'dd MMM, h:mm a' }}
+            <ng-container *ngIf="s.closed_at"> → {{ s.closed_at | date:'h:mm a' }}</ng-container>
+          </div>
+        </div>
+        <span class="badge" [ngClass]="s.status === 'OPEN' ? 'badge-warning' : 'badge-success'">{{ s.status }}</span>
+      </div>
+      <div class="sc-grid">
+        <div class="sc-field">
+          <span class="sc-lbl">{{ 'shift.opening_float' | translate }}</span>
+          <span class="sc-val">৳{{ fmt(s.opening_float) }}</span>
+        </div>
+        <div class="sc-field">
+          <span class="sc-lbl">{{ 'shift.expected_cash' | translate }}</span>
+          <span class="sc-val">{{ s.expected_cash !== null ? '৳' + fmt(s.expected_cash) : '—' }}</span>
+        </div>
+        <div class="sc-field">
+          <span class="sc-lbl">{{ 'shift.counted_cash' | translate }}</span>
+          <span class="sc-val">{{ s.counted_cash !== null ? '৳' + fmt(s.counted_cash) : '—' }}</span>
+        </div>
+        <div class="sc-field">
+          <span class="sc-lbl">{{ 'shift.over_short' | translate }}</span>
+          <span class="badge" *ngIf="s.over_short !== null"
+                [ngClass]="s.over_short < 0 ? 'badge-danger' : (s.over_short > 0 ? 'badge-warning' : 'badge-success')">
+            {{ s.over_short > 0 ? '+' : '' }}৳{{ fmt(s.over_short) }}
+          </span>
+          <span class="sc-val" *ngIf="s.over_short === null">—</span>
+        </div>
+      </div>
+    </div>
+
     <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
   </div>
 

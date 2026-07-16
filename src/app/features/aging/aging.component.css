@@ -16,3 +16,33 @@
   border-top: 2px solid var(--border-strong, var(--border));
   background: var(--bg-alt);
 }
+
+/* ── Mobile aging cards ──────────────────────────────────────── */
+.aging-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-xs);
+}
+.ac-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 8px; margin-bottom: 12px;
+}
+.ac-name { font-size: 14.5px; font-weight: 700; color: var(--text); }
+.ac-phone { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.ac-total { font-size: 17px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.ac-buckets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.ac-bucket {
+  display: flex; flex-direction: column; gap: 3px;
+  background: var(--bg-alt); border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm); padding: 8px 6px; text-align: center;
+}
+.ac-lbl { font-size: 10px; font-weight: 700; letter-spacing: 0.4px; color: var(--text-muted); }
+.ac-val { font-size: 12.5px; font-weight: 600; color: var(--text-light); font-variant-numeric: tabular-nums; }
+.ac-bucket.has-value .ac-val { color: var(--text); }
+.ac-bucket.warn.has-value   { background: var(--warning-light); border-color: var(--warning-mid); }
+.ac-bucket.warn.has-value .ac-val   { color: var(--warning-text); }
+.ac-bucket.danger.has-value { background: var(--danger-light); border-color: var(--danger-mid); }
+.ac-bucket.danger.has-value .ac-val { color: var(--danger-text); }

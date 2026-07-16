@@ -44,7 +44,7 @@
         <div class="sc-field">
           <label>Variance</label>
           <div class="sc-variance"
-               [class.neg]="(difference ?? 0) < 0" [class.pos]="(difference ?? 0) > 0"
+               [class.neg]="difference! < 0" [class.pos]="difference! > 0"
                *ngIf="difference !== null">
             {{ difference! > 0 ? '+' : '' }}{{ difference }}
             <span class="sc-var-tag" *ngIf="difference! < 0">Shrinkage</span>
