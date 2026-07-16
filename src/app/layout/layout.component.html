@@ -101,6 +101,14 @@
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="23" y1="21" x2="23" y2="19"/><line x1="19" y1="21" x2="19" y2="15"/><line x1="15" y1="21" x2="15" y2="17"/></svg>
         {{ 'nav.operator_summary' | translate }}
       </a>
+      <a routerLink="/shift" routerLinkActive="active" (click)="closeSidebar()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        {{ 'nav.shift' | translate }}
+      </a>
+      <a routerLink="/aging" routerLinkActive="active" (click)="closeSidebar()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 13l4-4 4 4 5-5"/></svg>
+        {{ 'nav.aging' | translate }}
+      </a>
 
       <!-- Operations -->
       <span class="nav-group-label">{{ 'nav.operations' | translate }}</span>

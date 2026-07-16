@@ -25,6 +25,8 @@ import { PaymentLedgerComponent } from './features/payment-ledger/payment-ledger
 import { OperatorSummaryComponent } from './features/operator-summary/operator-summary.component';
 import { TenantsComponent } from './features/tenants/tenants.component';
 import { ExpensesComponent } from './features/expenses/expenses.component';
+import { ShiftComponent } from './features/shift/shift.component';
+import { AgingComponent } from './features/aging/aging.component';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
@@ -61,7 +63,9 @@ export const routes: Routes = [
             { path: 'payment-ledger', component: PaymentLedgerComponent },
             { path: 'operator-summary', component: OperatorSummaryComponent },
             { path: 'tenants', component: TenantsComponent },
-            { path: 'expenses', component: ExpensesComponent }
+            { path: 'expenses', component: ExpensesComponent },
+            { path: 'shift', component: ShiftComponent },
+            { path: 'aging', component: AgingComponent }
         ]
     },
 

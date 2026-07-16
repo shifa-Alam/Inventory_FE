@@ -1,0 +1,132 @@
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <h2>{{ 'shift.title' | translate }}</h2>
+      <p class="sub">{{ 'shift.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- ═══ CLOSE RESULT (shown once, right after closing) ═══ -->
+  <div class="card card-body close-result" *ngIf="closeResult">
+    <p class="card-title">{{ 'shift.closed_title' | translate }}</p>
+    <div class="result-grid">
+      <div class="r-item"><span class="r-lbl">{{ 'shift.opening_float' | translate }}</span><span class="r-val">৳{{ fmt(closeResult.opening_float) }}</span></div>
+      <div class="r-item"><span class="r-lbl">{{ 'shift.cash_in' | translate }}</span><span class="r-val">৳{{ fmt(closeResult.cash_in) }}</span></div>
+      <div class="r-item"><span class="r-lbl">{{ 'shift.cash_out' | translate }}</span><span class="r-val">৳{{ fmt(closeResult.cash_out) }}</span></div>
+      <div class="r-item"><span class="r-lbl">{{ 'shift.expected_cash' | translate }}</span><span class="r-val">৳{{ fmt(closeResult.expected_cash) }}</span></div>
+      <div class="r-item"><span class="r-lbl">{{ 'shift.counted_cash' | translate }}</span><span class="r-val">৳{{ fmt(closeResult.counted_cash) }}</span></div>
+      <div class="r-item over-short" [class.short]="closeResult.over_short < 0" [class.over]="closeResult.over_short > 0">
+        <span class="r-lbl">{{ 'shift.over_short' | translate }}</span>
+        <span class="r-val">{{ closeResult.over_short > 0 ? '+' : '' }}৳{{ fmt(closeResult.over_short) }}</span>
+      </div>
+    </div>
+    <div class="method-chips" *ngIf="methodEntries(closeResult.by_method).length">
+      <span class="chip" *ngFor="let m of methodEntries(closeResult.by_method)">{{ m.method }} ৳{{ fmt(m.amount) }}</span>
+    </div>
+  </div>
+
+  <!-- ═══ NO OPEN SHIFT → OPEN FORM ═══ -->
+  <div class="card card-body open-card" *ngIf="!current && !loadingCurrent">
+    <p class="card-title">{{ 'shift.open_title' | translate }}</p>
+    <p class="hint">{{ 'shift.open_hint' | translate }}</p>
+    <div class="open-row">
+      <div class="form-group">
+        <label>{{ 'shift.opening_float' | translate }}</label>
+        <input type="number" [(ngModel)]="openingFloat" min="0" placeholder="0.00" />
+      </div>
+      <button class="btn btn-primary" (click)="openShift()" [disabled]="working || openingFloat === null">
+        {{ 'shift.open_btn' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ OPEN SHIFT → LIVE STATUS + CLOSE ═══ -->
+  <div class="shift-live" *ngIf="current">
+    <div class="card card-body">
+      <div class="live-head">
+        <p class="card-title">{{ 'shift.current_title' | translate }}</p>
+        <span class="badge badge-success">{{ 'shift.open_since' | translate }} {{ current.opened_at | date:'dd MMM, h:mm a' }}</span>
+      </div>
+
+      <div class="live-grid">
+        <div class="l-item"><span class="l-lbl">{{ 'shift.opening_float' | translate }}</span><span class="l-val">৳{{ fmt(current.opening_float) }}</span></div>
+        <div class="l-item"><span class="l-lbl">{{ 'shift.cash_in' | translate }}</span><span class="l-val in">+৳{{ fmt(current.totals?.cash_in) }}</span></div>
+        <div class="l-item"><span class="l-lbl">{{ 'shift.cash_out' | translate }}</span><span class="l-val out">−৳{{ fmt(current.totals?.cash_out) }}</span></div>
+        <div class="l-item expected"><span class="l-lbl">{{ 'shift.expected_cash' | translate }}</span><span class="l-val">৳{{ fmt(current.totals?.expected_cash) }}</span></div>
+      </div>
+
+      <div class="method-chips" *ngIf="methodEntries(current.totals?.by_method).length">
+        <span class="chip" *ngFor="let m of methodEntries(current.totals?.by_method)">{{ m.method }} ৳{{ fmt(m.amount) }}</span>
+      </div>
+
+      <div class="close-row">
+        <div class="form-group">
+          <label>{{ 'shift.counted_cash' | translate }} <span class="req">*</span></label>
+          <input type="number" [(ngModel)]="countedCash" min="0" placeholder="0.00" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'common.note' | translate }}</label>
+          <input type="text" [(ngModel)]="closeNote" maxlength="255" />
+        </div>
+        <button class="btn btn-danger" (click)="closeShift()" [disabled]="working || countedCash === null">
+          {{ 'shift.close_btn' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ HISTORY ═══ -->
+  <div class="card">
+    <div class="card-header-row">
+      <span class="card-title" style="margin-bottom:0">{{ 'shift.history_title' | translate }}</span>
+      <span class="count-badge">{{ total }} {{ 'common.records' | translate }}</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>{{ 'shift.col_operator' | translate }}</th>
+            <th>{{ 'shift.col_opened' | translate }}</th>
+            <th>{{ 'shift.col_closed' | translate }}</th>
+            <th class="text-right">{{ 'shift.opening_float' | translate }}</th>
+            <th class="text-right">{{ 'shift.expected_cash' | translate }}</th>
+            <th class="text-right">{{ 'shift.counted_cash' | translate }}</th>
+            <th class="text-right">{{ 'shift.over_short' | translate }}</th>
+            <th>{{ 'common.status' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of history; let i = index">
+            <td class="muted">{{ (page - 1) * pageSize + i + 1 }}</td>
+            <td class="bold">{{ s.operator }}</td>
+            <td class="muted">{{ s.opened_at | date:'dd MMM yy, h:mm a' }}</td>
+            <td class="muted">{{ s.closed_at ? (s.closed_at | date:'dd MMM yy, h:mm a') : '—' }}</td>
+            <td class="text-right">৳{{ fmt(s.opening_float) }}</td>
+            <td class="text-right">{{ s.expected_cash !== null ? '৳' + fmt(s.expected_cash) : '—' }}</td>
+            <td class="text-right">{{ s.counted_cash !== null ? '৳' + fmt(s.counted_cash) : '—' }}</td>
+            <td class="text-right">
+              <span *ngIf="s.over_short !== null" class="badge"
+                    [ngClass]="s.over_short < 0 ? 'badge-danger' : (s.over_short > 0 ? 'badge-warning' : 'badge-success')">
+                {{ s.over_short > 0 ? '+' : '' }}৳{{ fmt(s.over_short) }}
+              </span>
+              <span *ngIf="s.over_short === null" class="muted">—</span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="s.status === 'OPEN' ? 'badge-warning' : 'badge-success'">{{ s.status }}</span>
+            </td>
+          </tr>
+          <tr *ngIf="loadingHistory">
+            <td colspan="9" class="loading-row"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
+          </tr>
+          <tr *ngIf="!loadingHistory && history.length === 0">
+            <td colspan="9" class="empty-row">{{ 'shift.empty' | translate }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"></app-paginator>
+  </div>
+
+</div>

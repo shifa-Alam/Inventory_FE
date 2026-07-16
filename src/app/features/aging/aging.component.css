@@ -1,0 +1,18 @@
+.aging-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+.tab-btn {
+  padding: 10px 22px; font-size: 15px; font-weight: 600;
+  border: 1.5px solid var(--border); border-radius: var(--radius-full);
+  background: var(--surface); color: var(--text-muted); cursor: pointer;
+  transition: all 0.15s;
+}
+.tab-btn.active {
+  background: var(--primary); color: #fff; border-color: var(--primary);
+}
+
+.cell-warn   { color: var(--warning-text, #b45309); }
+.cell-danger { color: var(--danger-text, #b91c1c); font-weight: 600; }
+
+.totals-row td {
+  border-top: 2px solid var(--border-strong, var(--border));
+  background: var(--bg-alt);
+}

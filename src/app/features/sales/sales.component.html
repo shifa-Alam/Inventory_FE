@@ -221,6 +221,13 @@
           <span class="s-label">{{ 'sales.paid_amount' | translate }}</span>
           <input class="s-input" type="number" [(ngModel)]="paid_amount" placeholder="0" min="0" />
         </div>
+
+        <div class="summary-line">
+          <span class="s-label">{{ 'sales.payment_method' | translate }}</span>
+          <select class="s-input" [(ngModel)]="payment_method">
+            <option *ngFor="let m of paymentMethods" [value]="m.value">{{ m.label }}</option>
+          </select>
+        </div>
       </div>
 
       <!-- ACTION BAR — same pattern as New Purchase -->
@@ -269,6 +276,13 @@
     <div class="sheet-line">
       <span class="sl-label">{{ 'sales.paid_amount' | translate }}</span>
       <input class="sl-input" type="number" [(ngModel)]="paid_amount" placeholder="0" min="0" />
+    </div>
+
+    <div class="sheet-line">
+      <span class="sl-label">{{ 'sales.payment_method' | translate }}</span>
+      <select class="sl-input" [(ngModel)]="payment_method">
+        <option *ngFor="let m of paymentMethods" [value]="m.value">{{ m.label }}</option>
+      </select>
     </div>
 
     <div class="sheet-line sheet-due">

@@ -86,7 +86,9 @@
     "users": "Users",
     "admin": "Admin",
     "administrator": "Administrator",
-    "logout": "Logout"
+    "logout": "Logout",
+    "shift": "Shift / Drawer",
+    "aging": "Due Aging"
   },
   "login": {
     "title": "Manage your business with confidence.",
@@ -314,7 +316,8 @@
     "net_total": "Net Total",
     "paid_amount": "Paid Amount",
     "balance_due": "Payable Amount",
-    "complete": "Complete Sale"
+    "complete": "Complete Sale",
+    "payment_method": "Payment Method"
   },
   "sales_list": {
     "title": "Sales History",
@@ -623,7 +626,8 @@
     "no_records": "No payment records yet",
     "mobile_no_records": "No payment records",
     "mobile_collect_btn": "Collect Payment",
-    "empty": "No payment records found."
+    "empty": "No payment records found.",
+    "method_label": "Payment Method"
   },
   "payment_ledger": {
     "title": "Payment Ledger",
@@ -768,5 +772,39 @@
     "total_expenses": "Total Expenses",
     "list_title": "Expense History",
     "empty": "No expenses recorded yet."
+  },
+  "shift": {
+    "title": "Shift & Cash Drawer",
+    "subtitle": "Open/close cashier shifts and reconcile the drawer",
+    "closed_title": "Shift Closed — Drawer Report",
+    "open_title": "Open a New Shift",
+    "open_hint": "Count the cash you are starting the drawer with and enter it below.",
+    "open_btn": "Open Shift",
+    "current_title": "Current Shift",
+    "open_since": "Open since",
+    "opening_float": "Opening Float",
+    "cash_in": "Cash In",
+    "cash_out": "Cash Out",
+    "expected_cash": "Expected Cash",
+    "counted_cash": "Counted Cash",
+    "over_short": "Over / Short",
+    "close_btn": "Close Shift",
+    "history_title": "Shift History",
+    "col_operator": "Operator",
+    "col_opened": "Opened",
+    "col_closed": "Closed",
+    "empty": "No shifts yet."
+  },
+  "aging": {
+    "title": "Due Aging",
+    "subtitle": "How old your receivables and payables are",
+    "tab_customers": "Customer Dues",
+    "tab_suppliers": "Supplier Dues",
+    "days": "days",
+    "total_label": "Total",
+    "at_risk": "at risk",
+    "customer_list": "Dues by Customer",
+    "supplier_list": "Dues by Supplier",
+    "empty": "No outstanding dues!"
   }
 }

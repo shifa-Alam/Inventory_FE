@@ -29,6 +29,16 @@ export class CustomerPaymentComponent implements OnInit {
   payAmount: number | null = null;
   payDiscount: number | null = null;
   payNote = '';
+  payMethod = 'CASH';
+  paymentMethods = [
+    { value: 'CASH', label: 'Cash' },
+    { value: 'BKASH', label: 'bKash' },
+    { value: 'NAGAD', label: 'Nagad' },
+    { value: 'CARD', label: 'Card' },
+    { value: 'BANK', label: 'Bank' },
+    { value: 'OTHER', label: 'Other' },
+  ];
+
   paying = false;
   successMsg = '';
   errorMsg = '';
@@ -143,6 +153,7 @@ export class CustomerPaymentComponent implements OnInit {
       sale_id: this.selectedSale.id,
       amount: +(this.payAmount || 0),
       discount_amount: +(this.payDiscount || 0),
+      payment_method: this.payMethod,
       note: this.payNote || null
     }).subscribe({
       next: (res: any) => {

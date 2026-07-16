@@ -25,6 +25,16 @@ export class SupplierPaymentComponent implements OnInit {
   selected: any = null;
   payAmount: number | null = null;
   payNote = '';
+  payMethod = 'CASH';
+  paymentMethods = [
+    { value: 'CASH', label: 'Cash' },
+    { value: 'BKASH', label: 'bKash' },
+    { value: 'NAGAD', label: 'Nagad' },
+    { value: 'CARD', label: 'Card' },
+    { value: 'BANK', label: 'Bank' },
+    { value: 'OTHER', label: 'Other' },
+  ];
+
   paying = false;
   successMsg = '';
   errorMsg = '';
@@ -103,6 +113,7 @@ export class SupplierPaymentComponent implements OnInit {
     this.api.post('/supplier-payments/', {
       purchase_id: this.selected.id,
       amount: +(this.payAmount || 0),
+      payment_method: this.payMethod,
       note: this.payNote || null
     }).subscribe({
       next: (res: any) => {

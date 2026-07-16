@@ -25,8 +25,18 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   customer_id: number = 0;
   paid_amount: number = 0;
+  payment_method = 'CASH';
   discount: number = 0;
   delivery_date: string = localDateStr();
+
+  paymentMethods = [
+    { value: 'CASH', label: 'Cash' },
+    { value: 'BKASH', label: 'bKash' },
+    { value: 'NAGAD', label: 'Nagad' },
+    { value: 'CARD', label: 'Card' },
+    { value: 'BANK', label: 'Bank' },
+    { value: 'OTHER', label: 'Other' },
+  ];
 
   // Dropdown
   selectedCustomer: any = null;
@@ -325,6 +335,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     const payload: any = {
       customer_id: +this.customer_id,
       paid_amount: +this.paid_amount,
+      payment_method: this.payment_method,
       discount: +this.discount,
       items: this.items.map(i => ({
         product_id: +i.product_id,
@@ -343,6 +354,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.toast.stopSaving();
         this.sheetOpen = false;
         this.paid_amount = 0;
+        this.payment_method = 'CASH';
         this.discount = 0;
         this.delivery_date = localDateStr();
         this.items = [];

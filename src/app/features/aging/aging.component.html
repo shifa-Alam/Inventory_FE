@@ -1,0 +1,98 @@
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <h2>{{ 'aging.title' | translate }}</h2>
+      <p class="sub">{{ 'aging.subtitle' | translate }} · {{ asOf }}</p>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="aging-tabs">
+    <button class="tab-btn" [class.active]="tab === 'customer'" (click)="setTab('customer')">
+      {{ 'aging.tab_customers' | translate }}
+    </button>
+    <button class="tab-btn" [class.active]="tab === 'supplier'" (click)="setTab('supplier')">
+      {{ 'aging.tab_suppliers' | translate }}
+    </button>
+  </div>
+
+  <!-- Bucket summary chips -->
+  <div class="summary-row" *ngIf="!loading">
+    <div class="summary-chip success">
+      <span class="chip-label">0–30 {{ 'aging.days' | translate }}</span>
+      <span class="chip-value">৳{{ fmt(totals.b0_30) }}</span>
+    </div>
+    <div class="summary-chip info">
+      <span class="chip-label">31–60 {{ 'aging.days' | translate }}</span>
+      <span class="chip-value">৳{{ fmt(totals.b31_60) }}</span>
+    </div>
+    <div class="summary-chip warn">
+      <span class="chip-label">61–90 {{ 'aging.days' | translate }}</span>
+      <span class="chip-value">৳{{ fmt(totals.b61_90) }}</span>
+    </div>
+    <div class="summary-chip danger">
+      <span class="chip-label">90+ {{ 'aging.days' | translate }}</span>
+      <span class="chip-value">৳{{ fmt(totals.b90_plus) }}</span>
+    </div>
+    <div class="summary-chip primary">
+      <span class="chip-label">{{ 'aging.total_label' | translate }} ({{ riskShare() }}% {{ 'aging.at_risk' | translate }})</span>
+      <span class="chip-value">৳{{ fmt(totals.total) }}</span>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="card-header-row">
+      <span class="card-title" style="margin-bottom:0">
+        {{ (tab === 'customer' ? 'aging.customer_list' : 'aging.supplier_list') | translate }}
+      </span>
+      <span class="count-badge">{{ rows.length }} {{ 'common.records' | translate }}</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>{{ 'common.name' | translate }}</th>
+            <th>{{ 'common.phone' | translate }}</th>
+            <th class="text-right">0–30</th>
+            <th class="text-right">31–60</th>
+            <th class="text-right">61–90</th>
+            <th class="text-right">90+</th>
+            <th class="text-right">{{ 'common.total' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of rows; let i = index">
+            <td class="muted">{{ i + 1 }}</td>
+            <td class="bold">{{ r.name }}</td>
+            <td class="muted">{{ r.phone || '—' }}</td>
+            <td class="text-right">{{ r.b0_30 ? '৳' + fmt(r.b0_30) : '—' }}</td>
+            <td class="text-right">{{ r.b31_60 ? '৳' + fmt(r.b31_60) : '—' }}</td>
+            <td class="text-right cell-warn">{{ r.b61_90 ? '৳' + fmt(r.b61_90) : '—' }}</td>
+            <td class="text-right cell-danger">{{ r.b90_plus ? '৳' + fmt(r.b90_plus) : '—' }}</td>
+            <td class="text-right bold">৳{{ fmt(r.total) }}</td>
+          </tr>
+          <tr *ngIf="loading">
+            <td colspan="8" class="loading-row"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
+          </tr>
+          <tr *ngIf="!loading && rows.length === 0">
+            <td colspan="8" class="empty-row">{{ 'aging.empty' | translate }}</td>
+          </tr>
+        </tbody>
+        <tfoot *ngIf="rows.length > 0">
+          <tr class="totals-row">
+            <td colspan="3" class="bold">{{ 'aging.total_label' | translate }}</td>
+            <td class="text-right bold">৳{{ fmt(totals.b0_30) }}</td>
+            <td class="text-right bold">৳{{ fmt(totals.b31_60) }}</td>
+            <td class="text-right bold cell-warn">৳{{ fmt(totals.b61_90) }}</td>
+            <td class="text-right bold cell-danger">৳{{ fmt(totals.b90_plus) }}</td>
+            <td class="text-right bold">৳{{ fmt(totals.total) }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+</div>
