@@ -24,6 +24,7 @@ export class SaleReturnComponent implements OnInit, OnDestroy {
   sale: any = null;
   returnItems: ReturnRow[] = [];
   reason = '';
+  refundMode: 'credit' | 'cash' = 'credit';   // store credit vs cash refund
 
   // History filters
   filterDateFrom = '';
@@ -142,6 +143,7 @@ export class SaleReturnComponent implements OnInit, OnDestroy {
       sale_id: this.sale.id,
       customer_id: this.sale.customer_id,
       reason: this.reason.trim(),
+      refund_mode: this.refundMode,
       items: this.returnItems
         .filter(i => i.return_qty > 0)
         .map(i => ({ product_id: i.product_id, quantity: i.return_qty, rate: i.rate }))

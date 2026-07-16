@@ -185,3 +185,19 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   .show-mobile { display: block !important; }
   .loading-spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.65s linear infinite; margin-right: 8px; vertical-align: middle; }
 }
+
+/* ── Refund method toggle (store credit vs cash) ─────────────── */
+.refund-mode-label { margin-top: 12px; display: block; }
+.refund-mode-toggle { display: flex; gap: 8px; margin-top: 6px; }
+.rm-option {
+  flex: 1; display: flex; flex-direction: column; gap: 2px;
+  padding: 10px 12px; cursor: pointer;
+  border: 1.5px solid var(--border); border-radius: 10px;
+  background: var(--bg); transition: border-color .15s, background .15s;
+}
+.rm-option input { position: absolute; opacity: 0; pointer-events: none; }
+.rm-option.active { border-color: var(--primary); background: var(--primary-light); }
+.rm-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.rm-option.active .rm-title { color: var(--primary-dark); }
+.rm-sub { font-size: 11px; color: var(--text-muted); line-height: 1.3; }
+@media (max-width: 640px) { .refund-mode-toggle { flex-direction: column; } }

@@ -280,9 +280,17 @@
           <span class="pnl-lbl">{{ 'dashboard.revenue_label' | translate }}</span>
           <span class="pnl-val revenue">৳{{ fmt(data.month_sales ?? 0) }}</span>
         </div>
+        <div class="pnl-line deduct" *ngIf="(data.month_returns ?? 0) > 0">
+          <span class="pnl-lbl">− {{ 'dashboard.returns_label' | translate }}</span>
+          <span class="pnl-val cost">৳{{ fmt(data.month_returns ?? 0) }}</span>
+        </div>
+        <div class="pnl-line" *ngIf="(data.month_returns ?? 0) > 0">
+          <span class="pnl-lbl">= {{ 'dashboard.net_revenue_label' | translate }}</span>
+          <span class="pnl-val">৳{{ fmt(data.net_revenue ?? 0) }}</span>
+        </div>
         <div class="pnl-line deduct">
           <span class="pnl-lbl">− {{ 'dashboard.cogs_label' | translate }}</span>
-          <span class="pnl-val cost">৳{{ fmt(data.month_cogs ?? 0) }}</span>
+          <span class="pnl-val cost">৳{{ fmt((data.month_cogs ?? 0) - (data.returns_cogs ?? 0)) }}</span>
         </div>
         <div class="pnl-divider"></div>
         <div class="pnl-line result">
@@ -295,6 +303,10 @@
         <div class="pnl-line deduct">
           <span class="pnl-lbl">− {{ 'dashboard.expenses_label' | translate }}</span>
           <span class="pnl-val cost">৳{{ fmt(data.month_expenses ?? 0) }}</span>
+        </div>
+        <div class="pnl-line deduct" *ngIf="(data.stock_loss ?? 0) > 0">
+          <span class="pnl-lbl">− {{ 'dashboard.stock_loss_label' | translate }}</span>
+          <span class="pnl-val cost">৳{{ fmt(data.stock_loss ?? 0) }}</span>
         </div>
         <div class="pnl-divider final-divider"></div>
         <div class="pnl-line result net-result">

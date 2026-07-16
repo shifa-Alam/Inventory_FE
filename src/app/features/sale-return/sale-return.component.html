@@ -111,6 +111,20 @@
         <textarea [(ngModel)]="reason" rows="3"
           [placeholder]="'sale_return.reason_placeholder' | translate"
           class="reason-input"></textarea>
+
+        <label class="field-label refund-mode-label">Refund Method</label>
+        <div class="refund-mode-toggle">
+          <label class="rm-option" [class.active]="refundMode === 'credit'">
+            <input type="radio" name="refundMode" value="credit" [(ngModel)]="refundMode" />
+            <span class="rm-title">Store Credit</span>
+            <span class="rm-sub">Reduces customer's due balance</span>
+          </label>
+          <label class="rm-option" [class.active]="refundMode === 'cash'">
+            <input type="radio" name="refundMode" value="cash" [(ngModel)]="refundMode" />
+            <span class="rm-title">Cash Refund</span>
+            <span class="rm-sub">Money handed back — due unchanged</span>
+          </label>
+        </div>
       </div>
 
       <div class="summary-box card card-body">
