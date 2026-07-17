@@ -43,7 +43,7 @@
           <button type="button" class="btn btn-ghost btn-sm" (click)="showNewCategory = !showNewCategory" title="Add new type">+</button>
         </div>
         <div *ngIf="showNewCategory" style="display:flex; gap:6px; margin-top:6px">
-          <input type="text" [(ngModel)]="newCategoryName" placeholder="New expense type" style="flex:1" (keyup.enter)="addCategory()" />
+          <input autofocus type="text" [(ngModel)]="newCategoryName" placeholder="New expense type" style="flex:1" (keyup.enter)="addCategory()" />
           <button type="button" class="btn btn-primary btn-sm" (click)="addCategory()">Add</button>
         </div>
       </div>

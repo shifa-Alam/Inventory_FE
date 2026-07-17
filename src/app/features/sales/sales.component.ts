@@ -29,6 +29,11 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   discount: number = 0;
   delivery_date: string = localDateStr();
 
+  /** Cash handed over by the customer — drives the change-due calculator. */
+  cashReceived: number | null = null;
+  /** True while a sale POST is in flight — blocks double submit. */
+  saving = false;
+
   paymentMethods = [
     { value: 'CASH', label: 'Cash' },
     { value: 'BKASH', label: 'bKash' },
@@ -93,14 +98,55 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     clearTimeout(this.toastTimer);
   }
 
-  // Redirect any keypress to the search box when no input is focused
+  // Cashier keyboard shortcuts + keypress-to-search routing.
+  //   F4 → open customer picker · F8 → mark fully paid · F9 → complete sale
   @HostListener('document:keydown', ['$event'])
   onGlobalKey(event: KeyboardEvent) {
+    if (event.key === 'F9') { event.preventDefault(); this.submit(); return; }
+    if (event.key === 'F8') { event.preventDefault(); this.setFullPaid(); return; }
+    if (event.key === 'F4') { event.preventDefault(); this.openDropdown(); return; }
     const tag = (document.activeElement as HTMLElement)?.tagName?.toLowerCase();
     const isInputFocused = tag === 'input' || tag === 'select' || tag === 'textarea';
     if (!isInputFocused && event.key.length === 1) {
       this.searchInputRef.nativeElement.focus();
     }
+  }
+
+  // ── Cashier helpers: payable / full-pay / change calculator ──
+  get payable(): number {
+    return Math.max(0, this.getTotal() - (this.discount || 0));
+  }
+
+  /** One tap / F8: customer pays the exact bill. */
+  setFullPaid() {
+    this.paid_amount = this.payable;
+    this.cashReceived = this.payable;
+  }
+
+  /** Cash tender chips: note handed over (e.g. ৳500/৳1000). */
+  setCashReceived(amount: number) {
+    this.cashReceived = amount;
+    // Paid can never exceed the bill — extra is change to hand back.
+    this.paid_amount = Math.min(amount, this.payable);
+  }
+
+  onCashReceivedChange() {
+    const cash = this.cashReceived || 0;
+    this.paid_amount = Math.min(cash, this.payable);
+  }
+
+  /** ফেরত — cash to hand back when tender exceeds the bill. */
+  get changeDue(): number {
+    return Math.max(0, (this.cashReceived || 0) - this.payable);
+  }
+
+  /** Sensible note denominations ≥ payable for quick-tender chips. */
+  get tenderChips(): number[] {
+    const p = this.payable;
+    if (p <= 0) return [];
+    const notes = [100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000];
+    const ups = notes.filter(n => n > p).slice(0, 2);
+    return ups;
   }
 
   // ── Dropdown ──────────────────────────────────────────────
@@ -228,7 +274,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
           this.showToast(`Not found: ${sku}`, 'error');
           return;
         }
-        const product = res.find((p: any) => p.sku === sku) ?? res[0];
+        const product = res.find((p: any) => p.barcode === sku || p.sku === sku) ?? res[0];
         this.addOrIncrement(product);
       },
       error: () => {
@@ -322,6 +368,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   submit() {
+    if (this.saving) return;   // block double-click / repeated F9
     // Every sale must be booked against a registered customer
     if (!this.customer_id || this.customer_id <= 0) {
       this.toast.warning('Please select a customer before completing the sale.');
@@ -348,13 +395,16 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
       payload.delivery_date = this.delivery_date;
     }
 
+    this.saving = true;
     this.toast.startSaving();
     this.api.post('/sales/', payload).subscribe({
       next: (res: any) => {
+        this.saving = false;
         this.toast.stopSaving();
         this.sheetOpen = false;
         this.paid_amount = 0;
         this.payment_method = 'CASH';
+        this.cashReceived = null;
         this.discount = 0;
         this.delivery_date = localDateStr();
         this.items = [];
@@ -364,6 +414,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.router.navigate(['/invoice', res.id], { queryParams: { print: '1' } });
       },
       error: (err) => {
+        this.saving = false;
         this.toast.stopSaving();
         this.toast.error(err?.error?.detail || 'Failed to submit sale');
       }

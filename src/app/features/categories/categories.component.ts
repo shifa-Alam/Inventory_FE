@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { AutofocusDirective } from '../../shared/directives/autofocus.directive';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
@@ -10,7 +11,7 @@ import { ToastService } from '../../shared/services/toast.service';
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe, PaginatorComponent],
+  imports: [CommonModule, FormsModule, TranslatePipe, PaginatorComponent, AutofocusDirective],
   templateUrl: './categories.component.html',
   styleUrls: ['./categories.component.css']
 })
@@ -26,6 +27,10 @@ export class CategoriesComponent implements OnInit {
   pageSize = 20;
 
   showForm = false;
+
+  /** Esc closes the open form modal — standard desktop expectation. */
+  @HostListener('document:keydown.escape')
+  onEscape() { if (this.showForm) this.cancelForm(); }
   newCategory: any = { id: 0, name: '' };
 
   constructor(private api: ApiService, private confirmSvc: ConfirmService, private toast: ToastService) {}

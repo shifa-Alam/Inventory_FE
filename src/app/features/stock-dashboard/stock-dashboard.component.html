@@ -105,7 +105,7 @@
             [class.row-out]="s.status === 'OUT'">
             <td class="col-no muted">{{ (page-1)*pageSize+i+1 }}</td>
             <td><span class="product-name">{{ s.name }}</span></td>
-            <td><span class="sku-tag">{{ s.sku }}</span></td>
+            <td><span class="sku-tag">{{ s.barcode || s.sku }}</span></td>
             <td class="muted">{{ s.category }}</td>
             <td class="right">{{ s.average_cost | number }}</td>
             <td class="right">{{ s.sale_price | number }}</td>
@@ -156,7 +156,7 @@
           <span class="mc-num">{{ (page-1)*pageSize+i+1 }}</span>
           <div>
             <div class="mc-name">{{ s.name }}</div>
-            <span class="sku-tag">{{ s.sku }}</span>
+            <span class="sku-tag">{{ s.barcode || s.sku }}</span>
           </div>
         </div>
         <span class="status-pill dot-ok" *ngIf="s.status==='OK'">● OK</span>

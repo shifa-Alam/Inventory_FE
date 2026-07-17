@@ -133,7 +133,7 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
           this.showToast(`Not found: ${sku}`, 'error');
           return;
         }
-        const product = res.find((p: any) => p.sku === sku) ?? res[0];
+        const product = res.find((p: any) => p.barcode === sku || p.sku === sku) ?? res[0];
         this.addOrIncrement(product);
       },
       error: () => {

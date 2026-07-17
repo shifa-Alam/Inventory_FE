@@ -186,3 +186,17 @@
   .inv-hist { padding: 10px 12px; }
   .inv-hist-table { display: none; }
 }
+
+/* Payment method one-tap pills */
+.pm-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.pm-pill {
+  padding: 6px 12px; font-size: 12px; font-weight: 700;
+  border: 1.5px solid var(--border); border-radius: 16px;
+  background: var(--bg); color: var(--text-muted); cursor: pointer;
+  transition: border-color .12s, background .12s, color .12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.pm-pill.active {
+  border-color: var(--primary); background: var(--primary-light);
+  color: var(--primary-dark);
+}

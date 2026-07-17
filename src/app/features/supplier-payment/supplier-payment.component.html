@@ -77,9 +77,10 @@
                         <input type="number" [(ngModel)]="payAmount" placeholder="Amount" min="0" [max]="maxDue" />
                         <button class="btn btn-ghost btn-sm" (click)="setFullPay()">Full</button>
                       </div>
-                      <select [(ngModel)]="payMethod">
-                        <option *ngFor="let m of paymentMethods" [value]="m.value">{{ m.label }}</option>
-                      </select>
+                      <div class="pm-pills">
+                        <button type="button" *ngFor="let m of paymentMethods" class="pm-pill"
+                                [class.active]="payMethod === m.value" (click)="payMethod = m.value">{{ m.label }}</button>
+                      </div>
                       <input type="text" [(ngModel)]="payNote" placeholder="Note (optional)" />
                     </div>
                     <div class="pay-actions">

@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { AutofocusDirective } from '../../shared/directives/autofocus.directive';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
@@ -10,7 +11,7 @@ import { ConfirmService } from '../../shared/services/confirm.service';
 @Component({
   selector: 'app-customers',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe, PaginatorComponent],
+  imports: [CommonModule, FormsModule, TranslatePipe, PaginatorComponent, AutofocusDirective],
   templateUrl: './customers.component.html',
   styleUrls: ['./customers.component.css']
 })
@@ -27,6 +28,10 @@ export class CustomersComponent implements OnInit {
   pageSize = 20;
 
   showForm = false;
+
+  /** Esc closes the open form modal — standard desktop expectation. */
+  @HostListener('document:keydown.escape')
+  onEscape() { if (this.showForm) this.cancelForm(); }
   newCustomer = { id: 0, name: '', phone: '', address: '', credit_limit: 0, current_due: 0 };
 
   constructor(private api: ApiService, private toast: ToastService, private confirmSvc: ConfirmService) {}

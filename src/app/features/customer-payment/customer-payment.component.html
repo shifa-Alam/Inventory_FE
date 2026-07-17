@@ -118,9 +118,10 @@
                       </div>
                       <div class="form-group">
                         <label>{{ 'customer_payment.method_label' | translate }}</label>
-                        <select [(ngModel)]="payMethod">
-                          <option *ngFor="let m of paymentMethods" [value]="m.value">{{ m.label }}</option>
-                        </select>
+                        <div class="pm-pills">
+                          <button type="button" *ngFor="let m of paymentMethods" class="pm-pill"
+                                  [class.active]="payMethod === m.value" (click)="payMethod = m.value">{{ m.label }}</button>
+                        </div>
                       </div>
                       <div class="form-group">
                         <label>{{ 'customer_payment.note_label' | translate }} <span class="hint">({{ 'customer_payment.note_hint' | translate }})</span></label>
@@ -253,9 +254,10 @@
           </div>
           <div class="form-group">
             <label>{{ 'customer_payment.method_label' | translate }}</label>
-            <select [(ngModel)]="payMethod">
-              <option *ngFor="let m of paymentMethods" [value]="m.value">{{ m.label }}</option>
-            </select>
+            <div class="pm-pills">
+              <button type="button" *ngFor="let m of paymentMethods" class="pm-pill"
+                      [class.active]="payMethod === m.value" (click)="payMethod = m.value">{{ m.label }}</button>
+            </div>
           </div>
           <div class="form-group">
             <label>{{ 'customer_payment.note_label' | translate }}</label>

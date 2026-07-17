@@ -14,6 +14,7 @@ interface WasteItem {
   product_name: string;
   current_stock: number;
   sku: string;
+  barcode?: string | null;
   quantity: number;
   reason: string;
 }
@@ -163,7 +164,7 @@ export class ProductWasteComponent implements OnInit, AfterViewInit, OnDestroy {
       next: (res: any) => {
         this.filterProductSearching = false;
         const results: any[] = res.data ?? res;
-        const match = results.find((p: any) => p.sku === sku) ?? results[0];
+        const match = results.find((p: any) => p.barcode === sku || p.sku === sku) ?? results[0];
         if (match) {
           this.filterProduct = match.name;
           this.filterProductId = match.id;
@@ -245,7 +246,7 @@ export class ProductWasteComponent implements OnInit, AfterViewInit, OnDestroy {
         this.scanInProgress = false;
         const results = res.data ?? res;
         if (!results?.length) { this.showToast(`Not found: ${sku}`, 'error'); return; }
-        const product = results.find((p: any) => p.sku === sku) ?? results[0];
+        const product = results.find((p: any) => p.barcode === sku || p.sku === sku) ?? results[0];
         this.selectProduct(product);
       },
       error: () => {
@@ -272,6 +273,7 @@ export class ProductWasteComponent implements OnInit, AfterViewInit, OnDestroy {
         product_name: product.name,
         current_stock: product.current_stock,
         sku: product.sku || '',
+        barcode: product.barcode || null,
         quantity: 1,
         reason: ''
       });

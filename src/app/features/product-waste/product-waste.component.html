@@ -62,7 +62,7 @@
             <td class="muted">{{ i + 1 }}</td>
             <td>
               <span class="bold">{{ item.product_name }}</span>
-              <span class="sku-text" *ngIf="item.sku"> · {{ item.sku }}</span>
+              <span class="sku-text" *ngIf="item.barcode || item.sku"> · {{ item.barcode || item.sku }}</span>
             </td>
             <td>
               <span class="stock-chip" [class.stock-low]="item.current_stock < 5">{{ item.current_stock }}</span>
@@ -96,7 +96,7 @@
           <span class="mc-num">{{ i + 1 }}</span>
           <div>
             <div class="mc-title">{{ item.product_name }}</div>
-            <div class="mc-sub" *ngIf="item.sku">{{ item.sku }}</div>
+            <div class="mc-sub" *ngIf="item.barcode || item.sku">{{ item.barcode || item.sku }}</div>
           </div>
         </div>
         <button class="mic-remove" (click)="removeRow(i)">✕</button>

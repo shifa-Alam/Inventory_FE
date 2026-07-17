@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { AutofocusDirective } from '../../shared/directives/autofocus.directive';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
@@ -10,7 +11,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-expenses',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe, PaginatorComponent],
+  imports: [CommonModule, FormsModule, TranslatePipe, PaginatorComponent, AutofocusDirective],
   templateUrl: './expenses.component.html',
   styleUrls: ['./expenses.component.css']
 })
@@ -19,6 +20,10 @@ export class ExpensesComponent implements OnInit {
   categories: any[] = [];
   loading = false;
   showForm = false;
+
+  /** Esc closes the open form modal — standard desktop expectation. */
+  @HostListener('document:keydown.escape')
+  onEscape() { if (this.showForm) this.cancelForm(); }
 
   // inline "add new category" state
   showNewCategory = false;

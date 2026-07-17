@@ -27,7 +27,7 @@
       <div class="sc-picked">
         <div>
           <div class="sc-picked-name">{{ selected.name }}</div>
-          <div class="sc-picked-sku muted">{{ selected.sku }}</div>
+          <div class="sc-picked-sku muted">{{ selected.barcode || selected.sku }}</div>
         </div>
         <button class="btn btn-ghost btn-sm" (click)="clearSelection()">Change</button>
       </div>

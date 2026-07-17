@@ -21,19 +21,27 @@
     <div class="form-grid">
       <div class="form-group">
         <label>{{ 'products.name_placeholder' | translate }} <span class="req">*</span></label>
-        <input [placeholder]="'products.name_placeholder' | translate" [(ngModel)]="newProduct.name" />
+        <input autofocus [placeholder]="'products.name_placeholder' | translate" [(ngModel)]="newProduct.name" />
       </div>
       <div class="form-group">
-        <label>{{ 'products.sku_placeholder' | translate }}</label>
-        <input [placeholder]="'products.sku_placeholder' | translate" [(ngModel)]="newProduct.sku" />
-      </div>
-      <div class="form-group">
-        <label>Category</label>
+        <label>Category <span class="req">*</span></label>
         <select [(ngModel)]="newProduct.category_id">
           <option value="0">{{ 'products.select_category' | translate }}</option>
           <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
         </select>
       </div>
+      <div class="form-group" *ngIf="!newProduct.has_variants">
+        <label>Barcode</label>
+        <input placeholder="Scan or type barcode" [(ngModel)]="newProduct.barcode" />
+      </div>
+      <div class="form-group" *ngIf="!newProduct.id">
+        <label>&nbsp;</label>
+        <label class="hv-check">
+          <input type="checkbox" [(ngModel)]="newProduct.has_variants" />
+          <span>Has Variants <small>(e.g. Sprite → 250ml / 500ml / 1L)</small></span>
+        </label>
+      </div>
+      <ng-container *ngIf="!newProduct.has_variants">
       <div class="form-group">
         <label>{{ 'products.average_cost_placeholder' | translate }} <span class="req">*</span></label>
         <input type="number" [placeholder]="'products.average_cost_placeholder' | translate" [(ngModel)]="newProduct.average_cost" />
@@ -41,6 +49,10 @@
       <div class="form-group">
         <label>{{ 'products.sale_price_placeholder' | translate }} <span class="req">*</span></label>
         <input type="number" [placeholder]="'products.sale_price_placeholder' | translate" [(ngModel)]="newProduct.sale_price" />
+      </div>
+      <div class="form-group">
+        <label>Wholesale Price</label>
+        <input type="number" placeholder="Wholesale Price" [(ngModel)]="newProduct.wholesale_price" />
       </div>
       <div class="form-group">
         <label>{{ 'products.mrp_placeholder' | translate }}</label>
@@ -54,13 +66,90 @@
         <label>{{ 'products.stock_placeholder' | translate }}</label>
         <input type="number" [placeholder]="'products.stock_placeholder' | translate" [(ngModel)]="newProduct.current_stock" />
       </div>
+      </ng-container>
     </div>
+    <p class="hv-hint" *ngIf="newProduct.has_variants">
+      Prices, barcode &amp; stock are set per variant — you'll add them in the next step after saving.
+    </p>
     <div class="form-actions">
       <button class="btn btn-primary" (click)="save()">
         {{ newProduct.id ? ('products.update' | translate) : ('products.save' | translate) }}
       </button>
       <button class="btn btn-ghost" (click)="cancelForm()">{{ 'products.cancel' | translate }}</button>
     </div>
+  </div>
+
+  <!-- VARIANT BUILDER -->
+  <div class="card card-body form-card variant-card" *ngIf="variantFor">
+    <div class="form-card-header">
+      <p class="card-title">Variants of <strong>{{ variantFor.name }}</strong></p>
+      <button class="close-btn" (click)="closeVariants()">✕</button>
+    </div>
+
+    <!-- Existing variants -->
+    <div class="ev-section" *ngIf="existingVariants.length">
+      <p class="ev-title">Existing variants ({{ existingVariants.length }})</p>
+      <div class="ev-chips">
+        <span class="ev-chip" *ngFor="let v of existingVariants">
+          {{ v.variant_name }} <small>· {{ v.barcode || '—' }} · ৳{{ v.sale_price | number }} · stock {{ v.current_stock }}</small>
+        </span>
+      </div>
+    </div>
+
+    <!-- Step 1: attribute axes -->
+    <p class="vb-step">1. Variant Type &amp; Options <small>— e.g. Volume → 250ml, 500ml, 1L (comma or Enter to add)</small></p>
+    <div class="vb-axis" *ngFor="let axis of vbAxes; let ai = index">
+      <input class="vb-type" list="variantTypeList" placeholder="Type (Size / Volume / Color…)" [(ngModel)]="axis.name" />
+      <datalist id="variantTypeList">
+        <option *ngFor="let t of variantTypes" [value]="t.name"></option>
+      </datalist>
+      <div class="vb-opts">
+        <span class="ev-chip opt-chip" *ngFor="let o of axis.options">
+          {{ o }} <button class="chip-x" (click)="removeOption(axis, o)">✕</button>
+        </span>
+        <input class="vb-opt-input" placeholder="Add option…" [(ngModel)]="axis.optionInput"
+               (keyup.enter)="addOption(axis)" (blur)="addOption(axis)" />
+      </div>
+      <button class="btn btn-ghost btn-sm" *ngIf="vbAxes.length > 1" (click)="removeAxis(ai)">✕</button>
+    </div>
+    <div class="vb-axis-actions">
+      <button class="btn btn-ghost btn-sm" (click)="addAxis()">+ Another Type (e.g. Color)</button>
+      <button class="btn btn-primary btn-sm" (click)="generateRows()">Generate Variants ⚡</button>
+    </div>
+
+    <!-- Step 2: editable grid -->
+    <ng-container *ngIf="variantRows.length">
+      <p class="vb-step">2. Set Barcode / Prices / Stock per variant</p>
+      <div class="table-wrapper">
+        <table class="vb-table">
+          <thead>
+            <tr>
+              <th>Variant</th><th>Barcode</th><th>Cost</th><th>Retail</th>
+              <th>Wholesale</th><th>MRP</th><th>Opening Stock</th><th>Min Stock</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of variantRows; let ri = index">
+              <td class="bold">{{ variantFor.name }} <span class="vb-vname">{{ r.variant_name }}</span></td>
+              <td><input [(ngModel)]="r.barcode" placeholder="Barcode" /></td>
+              <td><input type="number" [(ngModel)]="r.average_cost" /></td>
+              <td><input type="number" [(ngModel)]="r.sale_price" /></td>
+              <td><input type="number" [(ngModel)]="r.wholesale_price" /></td>
+              <td><input type="number" [(ngModel)]="r.mrp" /></td>
+              <td><input type="number" [(ngModel)]="r.current_stock" /></td>
+              <td><input type="number" [(ngModel)]="r.minimum_stock" /></td>
+              <td><button class="btn btn-danger btn-sm" (click)="removeRow(ri)">✕</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" [disabled]="savingVariants" (click)="saveVariants()">
+          {{ savingVariants ? 'Saving…' : 'Save ' + variantRows.length + ' Variant(s)' }}
+        </button>
+        <button class="btn btn-ghost" (click)="closeVariants()">{{ 'products.cancel' | translate }}</button>
+      </div>
+    </ng-container>
   </div>
 
   <!-- DESKTOP TABLE -->
@@ -95,46 +184,57 @@
           <tr>
             <th>{{ 'products.col_no' | translate }}</th>
             <th>{{ 'products.col_product' | translate }}</th>
-            <th>{{ 'products.col_sku' | translate }}</th>
-            <th>{{ 'products.col_avg_cost' | translate }}</th>
-            <th>{{ 'products.col_sale' | translate }}</th>
-            <th>{{ 'products.col_mrp' | translate }}</th>
-            <th>{{ 'products.col_stock' | translate }}</th>
-            <th>{{ 'products.col_status' | translate }}</th>
-            <th>{{ 'products.col_actions' | translate }}</th>
+            <th class="right">{{ 'products.col_avg_cost' | translate }}</th>
+            <th class="right">{{ 'products.col_sale' | translate }}</th>
+            <th class="right">{{ 'products.col_mrp' | translate }}</th>
+            <th class="center">{{ 'products.col_stock' | translate }}</th>
+            <th class="right">{{ 'products.col_actions' | translate }}</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="compact-rows">
           <tr *ngFor="let p of products; let i = index" [class.row-inactive]="!p.is_active">
             <td class="muted">{{ (page - 1) * pageSize + i + 1 }}</td>
-            <td class="bold">
-              {{ p.name }}
-              <span class="inactive-tag" *ngIf="!p.is_active">{{ 'products.inactive' | translate }}</span>
-            </td>
-            <td class="muted">{{ p.sku }}</td>
-            <td>{{ p.average_cost | number }}</td>
-            <td>{{ p.sale_price | number }}</td>
-            <td>{{ p.mrp ? (p.mrp | number) : '—' }}</td>
-            <td><span class="stock-chip">{{ p.current_stock }}</span></td>
             <td>
-              <span class="badge" [ngClass]="p.status === 'LOW' ? 'badge-danger' : 'badge-success'">{{ p.status }}</span>
+              <div class="prod-cell">
+                <span class="prod-name">
+                  {{ p.name }}
+                  <span class="variant-tag template" *ngIf="p.has_variants">Template</span>
+                  <span class="variant-tag" *ngIf="p.parent_product_id">Variant</span>
+                  <span class="inactive-tag" *ngIf="!p.is_active">{{ 'products.inactive' | translate }}</span>
+                </span>
+                <span class="prod-barcode" *ngIf="p.barcode">▮ {{ p.barcode }}</span>
+              </div>
+            </td>
+            <td class="right muted">{{ p.average_cost | number }}</td>
+            <td class="right fw7">{{ p.sale_price | number }}</td>
+            <td class="right muted">{{ p.mrp ? (p.mrp | number) : '—' }}</td>
+            <td class="center">
+              <span class="stock-pill"
+                    [ngClass]="p.status === 'OUT' ? 'sp-out' : (p.status === 'LOW' ? 'sp-low' : 'sp-ok')"
+                    [title]="p.status">{{ p.current_stock | number }}</span>
             </td>
             <td>
-              <div class="row-actions">
-                <button class="btn btn-warning btn-sm" (click)="edit(p)">{{ 'products.edit' | translate }}</button>
-                <button class="btn btn-sm" [ngClass]="p.is_active ? 'btn-ghost' : 'btn-success'"
-                  (click)="toggleActive(p)">
-                  {{ p.is_active ? ('products.deactivate' | translate) : ('products.activate' | translate) }}
+              <div class="row-actions right-actions">
+                <button class="chip-btn chip-variants" *ngIf="p.has_variants" (click)="openVariants(p)">Variants</button>
+                <button class="icon-btn" title="Edit" (click)="edit(p)">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
                 </button>
-                <button class="btn btn-danger btn-sm" (click)="delete(p.id)">{{ 'products.delete' | translate }}</button>
+                <button class="icon-btn" [class.ib-success]="!p.is_active"
+                  [title]="p.is_active ? ('products.deactivate' | translate) : ('products.activate' | translate)"
+                  (click)="toggleActive(p)">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+                </button>
+                <button class="icon-btn ib-danger" title="Delete" (click)="delete(p.id)">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
               </div>
             </td>
           </tr>
           <tr *ngIf="loading" class="loading-row">
-            <td colspan="9"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+            <td colspan="7"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
           </tr>
           <tr *ngIf="!loading && products.length === 0">
-            <td colspan="9" class="empty-row">{{ 'products.empty' | translate }}</td>
+            <td colspan="7" class="empty-row">{{ 'products.empty' | translate }}</td>
           </tr>
         </tbody>
       </table>
@@ -172,7 +272,7 @@
               {{ p.name }}
               <span class="inactive-tag" *ngIf="!p.is_active">{{ 'products.inactive' | translate }}</span>
             </div>
-            <div class="mc-sub">{{ p.sku }}</div>
+            <div class="mc-sub">{{ p.barcode || '—' }}</div>
           </div>
         </div>
         <span class="badge" [ngClass]="p.status === 'LOW' ? 'badge-danger' : 'badge-success'">{{ p.status }}</span>
@@ -196,6 +296,7 @@
         </div>
       </div>
       <div class="mc-actions">
+        <button class="btn btn-primary btn-sm" *ngIf="p.has_variants" (click)="openVariants(p)">Variants</button>
         <button class="btn btn-warning btn-sm" (click)="edit(p)">{{ 'products.edit' | translate }}</button>
         <button class="btn btn-sm" [ngClass]="p.is_active ? 'btn-ghost' : 'btn-success'"
           (click)="toggleActive(p)">

@@ -39,3 +39,80 @@
   color: var(--danger-text); background: var(--danger-light); border: 1px solid var(--danger-mid);
   padding: 1px 6px; border-radius: 4px; margin-left: 6px; vertical-align: middle;
 }
+
+/* ══════════════ Variant system ══════════════ */
+.hv-check { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; padding: 8px 0; }
+.hv-check input { width: 16px; height: 16px; accent-color: var(--primary); }
+.hv-check small { color: var(--text-muted); font-weight: 400; }
+.hv-hint { font-size: 12.5px; color: var(--text-muted); background: var(--bg-alt); border-radius: 8px; padding: 8px 12px; margin: 4px 0 0; }
+
+.variant-tag {
+  display: inline-block; margin-left: 6px; padding: 1px 8px; font-size: 10px; font-weight: 700;
+  border-radius: 10px; background: var(--primary-light); color: var(--primary-dark); vertical-align: 1px;
+}
+.variant-tag.template { background: #fef3c7; color: #92400e; }
+
+.variant-card { border: 1.5px solid var(--primary); }
+.vb-step { font-size: 12.5px; font-weight: 700; color: var(--text); margin: 12px 0 6px; }
+.vb-step small { font-weight: 400; color: var(--text-muted); }
+.vb-axis { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; flex-wrap: wrap; }
+.vb-type { width: 190px; padding: 8px 10px; font-size: 13px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); }
+.vb-opts {
+  flex: 1; min-width: 220px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  border: 1px dashed var(--border-strong); border-radius: 8px; padding: 6px 8px;
+}
+.vb-opt-input { border: none; outline: none; background: transparent; font-size: 13px; min-width: 110px; flex: 1; color: var(--text); }
+.ev-section { margin-bottom: 4px; }
+.ev-title { font-size: 12px; font-weight: 700; color: var(--text-muted); margin: 0 0 6px; }
+.ev-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ev-chip {
+  display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; font-size: 12px; font-weight: 600;
+  border-radius: 14px; background: var(--bg-alt); border: 1px solid var(--border); color: var(--text);
+}
+.ev-chip small { color: var(--text-muted); font-weight: 400; }
+.opt-chip { background: var(--primary-light); border-color: var(--primary); color: var(--primary-dark); }
+.chip-x { border: none; background: transparent; cursor: pointer; font-size: 10px; color: inherit; padding: 0; }
+.vb-axis-actions { display: flex; gap: 8px; margin: 6px 0 4px; }
+.vb-table input { width: 90px; padding: 6px 8px; font-size: 12.5px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); }
+.vb-table td { padding: 6px 6px; }
+.vb-vname { color: var(--primary-dark); font-weight: 800; }
+
+/* ══════════════ Compact product table ══════════════ */
+.compact-rows td { padding: 6px 10px; font-size: 13px; }
+th.right, td.right { text-align: right; }
+th.center, td.center { text-align: center; }
+.fw7 { font-weight: 700; }
+
+/* Product cell: name + badges, barcode beneath */
+.prod-cell { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.prod-name { font-weight: 600; color: var(--text); }
+.prod-barcode {
+  font-size: 10.5px; color: var(--text-muted);
+  font-family: ui-monospace, Consolas, monospace; letter-spacing: 0.3px;
+}
+
+/* Stock pill doubles as status: green OK / amber LOW / red OUT */
+.stock-pill {
+  display: inline-block; min-width: 44px; padding: 2px 10px;
+  font-size: 12px; font-weight: 700; border-radius: 12px; text-align: center;
+}
+.sp-ok  { background: #dcfce7; color: #15803d; }
+.sp-low { background: #fef3c7; color: #92400e; }
+.sp-out { background: #fee2e2; color: #b91c1c; }
+
+/* Compact icon actions */
+.right-actions { justify-content: flex-end; gap: 4px; flex-wrap: nowrap; }
+.icon-btn {
+  width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border); border-radius: 6px; background: var(--bg);
+  color: var(--text-muted); cursor: pointer; transition: background .12s, color .12s, border-color .12s;
+}
+.icon-btn:hover { background: var(--surface-hover); color: var(--text); border-color: var(--border-strong); }
+.icon-btn.ib-danger:hover { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+.icon-btn.ib-success { color: #15803d; border-color: #bbf7d0; }
+.chip-btn {
+  padding: 3px 10px; font-size: 11.5px; font-weight: 700;
+  border-radius: 12px; border: 1px solid var(--primary);
+  background: var(--primary-light); color: var(--primary-dark); cursor: pointer;
+}
+.chip-btn:hover { filter: brightness(0.96); }

@@ -21,7 +21,7 @@
     <div class="inline-form">
       <div class="form-group" style="flex:1;max-width:360px">
         <label>{{ 'categories.name_placeholder' | translate }} <span class="req">*</span></label>
-        <input [placeholder]="'categories.name_placeholder' | translate" [(ngModel)]="newCategory.name" />
+        <input autofocus [placeholder]="'categories.name_placeholder' | translate" [(ngModel)]="newCategory.name" />
       </div>
       <button class="btn btn-primary" (click)="save()" style="margin-top:15px">
         {{ newCategory.id ? ('categories.update' | translate) : ('categories.save' | translate) }}

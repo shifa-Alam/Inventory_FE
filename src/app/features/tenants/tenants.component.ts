@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { AutofocusDirective } from '../../shared/directives/autofocus.directive';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
@@ -19,7 +20,7 @@ const B2C_OPTIONS: InvoiceOptions = { show_mrp: false, show_signature: false, sh
 @Component({
   selector: 'app-tenants',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AutofocusDirective],
   templateUrl: './tenants.component.html',
   styleUrls: ['./tenants.component.css']
 })
@@ -27,6 +28,10 @@ export class TenantsComponent implements OnInit {
   tenants: any[] = [];
   loading = false;
   showForm = false;
+
+  /** Esc closes the open form modal — standard desktop expectation. */
+  @HostListener('document:keydown.escape')
+  onEscape() { if (this.showForm) this.cancelForm(); }
   editingId: number | null = null;
   successMsg = '';
   errorMsg = '';

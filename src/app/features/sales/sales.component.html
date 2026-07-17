@@ -217,16 +217,38 @@
           <input class="s-input s-input-date" type="date" [(ngModel)]="delivery_date" />
         </div>
 
+        <!-- Payment method: one-tap pills (faster than a dropdown) -->
+        <div class="summary-line pm-line">
+          <span class="s-label">{{ 'sales.payment_method' | translate }}</span>
+          <div class="pm-pills">
+            <button type="button" class="pm-pill" *ngFor="let m of paymentMethods"
+              [class.active]="payment_method === m.value"
+              (click)="payment_method = m.value">{{ m.label }}</button>
+          </div>
+        </div>
+
+        <!-- Cash tender → change calculator -->
+        <div class="summary-line">
+          <span class="s-label">Cash Received</span>
+          <input class="s-input" type="number" [(ngModel)]="cashReceived"
+                 (ngModelChange)="onCashReceivedChange()" placeholder="0" min="0" />
+        </div>
+        <div class="tender-chips" *ngIf="payable > 0">
+          <button type="button" class="tender-chip exact" (click)="setFullPaid()"
+                  title="F8">Exact ৳{{ payable | number }}</button>
+          <button type="button" class="tender-chip" *ngFor="let n of tenderChips"
+                  (click)="setCashReceived(n)">৳{{ n | number }}</button>
+        </div>
+
         <div class="summary-line">
           <span class="s-label">{{ 'sales.paid_amount' | translate }}</span>
           <input class="s-input" type="number" [(ngModel)]="paid_amount" placeholder="0" min="0" />
         </div>
 
-        <div class="summary-line">
-          <span class="s-label">{{ 'sales.payment_method' | translate }}</span>
-          <select class="s-input" [(ngModel)]="payment_method">
-            <option *ngFor="let m of paymentMethods" [value]="m.value">{{ m.label }}</option>
-          </select>
+        <!-- ফেরত — change to hand back -->
+        <div class="summary-line change-row" *ngIf="changeDue > 0">
+          <span class="s-label change-lbl">Change to Return</span>
+          <span class="s-value change-val">৳{{ changeDue | number }}</span>
         </div>
       </div>
 
@@ -234,12 +256,21 @@
       <div class="action-bar">
         <div class="total-info">
           <span class="total-label">{{ 'sales.balance_due' | translate }}</span>
-          <span class="total-value due-value">৳{{ getTotal() - discount - paid_amount | number }}</span>
+          <span class="total-value due-value">৳{{ payable - paid_amount | number }}</span>
         </div>
         <button class="btn btn-primary btn-lg" (click)="submit()"
-          [disabled]="items.length === 0 || !customer_id">
-          {{ 'sales.complete' | translate }}
+          [disabled]="items.length === 0 || !customer_id || saving">
+          <span *ngIf="saving" class="spinner"></span>
+          {{ saving ? 'Saving…' : ('sales.complete' | translate) }}
         </button>
+      </div>
+
+      <!-- Keyboard shortcut hints (desktop cashiers) -->
+      <div class="shortcut-strip hide-mobile">
+        <span class="sc-hint"><kbd>F4</kbd> Customer</span>
+        <span class="sc-hint"><kbd>F8</kbd> Full Paid</span>
+        <span class="sc-hint"><kbd>F9</kbd> Complete Sale</span>
+        <span class="sc-hint"><kbd>↵</kbd> Add Product</span>
       </div>
 
     </div>
@@ -273,25 +304,42 @@
       <input class="sl-input sl-input-date" type="date" [(ngModel)]="delivery_date" />
     </div>
 
+    <!-- Payment method pills -->
+    <div class="pm-pills sheet-pills">
+      <button type="button" class="pm-pill" *ngFor="let m of paymentMethods"
+        [class.active]="payment_method === m.value"
+        (click)="payment_method = m.value">{{ m.label }}</button>
+    </div>
+
+    <!-- Cash tender + quick chips -->
+    <div class="sheet-line">
+      <span class="sl-label">Cash Received</span>
+      <input class="sl-input" type="number" [(ngModel)]="cashReceived"
+             (ngModelChange)="onCashReceivedChange()" placeholder="0" min="0" />
+    </div>
+    <div class="tender-chips" *ngIf="payable > 0">
+      <button type="button" class="tender-chip exact" (click)="setFullPaid()">Exact ৳{{ payable | number }}</button>
+      <button type="button" class="tender-chip" *ngFor="let n of tenderChips"
+              (click)="setCashReceived(n)">৳{{ n | number }}</button>
+    </div>
+
     <div class="sheet-line">
       <span class="sl-label">{{ 'sales.paid_amount' | translate }}</span>
       <input class="sl-input" type="number" [(ngModel)]="paid_amount" placeholder="0" min="0" />
     </div>
 
-    <div class="sheet-line">
-      <span class="sl-label">{{ 'sales.payment_method' | translate }}</span>
-      <select class="sl-input" [(ngModel)]="payment_method">
-        <option *ngFor="let m of paymentMethods" [value]="m.value">{{ m.label }}</option>
-      </select>
+    <div class="sheet-line change-row" *ngIf="changeDue > 0">
+      <span class="sl-label change-lbl">Change to Return</span>
+      <span class="sl-value change-val">৳{{ changeDue | number }}</span>
     </div>
 
     <div class="sheet-line sheet-due">
       <span class="sl-label">{{ 'sales.balance_due' | translate }}</span>
-      <span class="sl-due">৳{{ getTotal() - discount - paid_amount | number }}</span>
+      <span class="sl-due">৳{{ payable - paid_amount | number }}</span>
     </div>
 
-    <button class="charge-btn" (click)="submit()" [disabled]="items.length === 0 || !customer_id">
-      {{ 'sales.complete' | translate }} · ৳{{ getTotal() - discount | number }}
+    <button class="charge-btn" (click)="submit()" [disabled]="items.length === 0 || !customer_id || saving">
+      {{ saving ? 'Saving…' : (('sales.complete' | translate) + ' · ৳' + (payable | number)) }}
     </button>
   </div>
 
