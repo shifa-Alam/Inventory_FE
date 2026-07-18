@@ -135,6 +135,14 @@
   color: var(--text-muted);
 }
 
+/* The global .table-wrapper rule (max-height: 72vh + overflow-y: auto) is
+   meant for list pages. Inside an invoice document it hides rows behind an
+   inner scrollbar on screen and clips them entirely when printing. */
+.invoice-doc .table-wrapper {
+  max-height: none;
+  overflow: visible;
+}
+
 /* Loading */
 .loading-state {
   text-align: center;
