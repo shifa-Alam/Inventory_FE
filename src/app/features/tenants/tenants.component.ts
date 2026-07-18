@@ -53,7 +53,56 @@ export class TenantsComponent implements OnInit {
 
   constructor(private api: ApiService, private confirmSvc: ConfirmService, private toast: ToastService) {}
 
+  /* subscription renewal modal */
+  renewTenant: any = null;
+  renewMonths = 1;
+  renewEndDate = '';
+  renewSaving = false;
+
   ngOnInit() { this.load(); }
+
+  openRenew(t: any) {
+    this.renewTenant = t;
+    this.renewMonths = 1;
+    this.renewEndDate = t.subscription?.expires_on || '';
+  }
+
+  closeRenew() { this.renewTenant = null; }
+
+  private afterSubscriptionChange(updated: any, msg: string) {
+    this.renewSaving = false;
+    this.toast.success(msg);
+    // Swap the row in place so the list reflects the new expiry immediately.
+    this.tenants = this.tenants.map(t => t.id === updated.id ? updated : t);
+    this.renewTenant = updated;
+  }
+
+  renew() {
+    if (!this.renewTenant) return;
+    this.renewSaving = true;
+    this.api.post(`/tenants/${this.renewTenant.id}/subscription/renew`, { months: this.renewMonths }).subscribe({
+      next: (res: any) => this.afterSubscriptionChange(res, `Subscription extended by ${this.renewMonths} month(s)`),
+      error: (err) => { this.renewSaving = false; this.toast.error(err?.error?.detail || 'Renewal failed'); }
+    });
+  }
+
+  setEndDate() {
+    if (!this.renewTenant || !this.renewEndDate) return;
+    this.renewSaving = true;
+    this.api.put(`/tenants/${this.renewTenant.id}/subscription`, { subscription_end: this.renewEndDate }).subscribe({
+      next: (res: any) => this.afterSubscriptionChange(res, 'Expiry date updated'),
+      error: (err) => { this.renewSaving = false; this.toast.error(err?.error?.detail || 'Update failed'); }
+    });
+  }
+
+  setUnlimited() {
+    if (!this.renewTenant) return;
+    this.renewSaving = true;
+    this.api.put(`/tenants/${this.renewTenant.id}/subscription`, { subscription_end: null }).subscribe({
+      next: (res: any) => this.afterSubscriptionChange(res, 'Subscription set to unlimited'),
+      error: (err) => { this.renewSaving = false; this.toast.error(err?.error?.detail || 'Update failed'); }
+    });
+  }
 
   get isEditing(): boolean { return this.editingId !== null; }
 

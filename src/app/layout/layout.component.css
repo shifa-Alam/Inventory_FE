@@ -475,3 +475,30 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
 }
+
+/* ── Subscription: read-only banner ───────────────────────────── */
+.ro-banner {
+  position: sticky; top: 0; z-index: 60;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 9px 16px;
+  background: var(--danger); color: #fff;
+  font-size: 13px; font-weight: 700; letter-spacing: .2px;
+}
+.ro-banner-icon { font-size: 14px; }
+
+/* ── Subscription: post-login popup ───────────────────────────── */
+.sub-popup-backdrop {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(15, 23, 42, .55);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.sub-popup {
+  background: var(--surface); border-radius: 14px;
+  max-width: 420px; width: 100%; padding: 28px 26px;
+  text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  border-top: 5px solid var(--warning, #d97706);
+}
+.sub-popup-danger { border-top-color: var(--danger); }
+.sub-popup-icon { font-size: 34px; margin-bottom: 8px; }
+.sub-popup h3 { margin: 0 0 8px; font-size: 17px; color: var(--text); }
+.sub-popup p { margin: 0 0 18px; font-size: 13.5px; line-height: 1.6; color: var(--text-muted); }

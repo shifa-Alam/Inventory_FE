@@ -873,6 +873,14 @@ td input[type="number"] {
 
 .mobile-card.mc-warn   { border-left: 3px solid var(--warning); }
 .mobile-card.mc-active { border-left: 3px solid var(--primary); }
+/* Selected/expanded card (e.g. an inline pay panel is open on it) */
+.mobile-card.mc-selected { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary) inset, var(--shadow-sm); }
+
+/* Prominent amount in a card header's top-right corner */
+.mc-amount { font-size: 15px; font-weight: 800; color: var(--text); white-space: nowrap; }
+
+/* Two-column variant of the metric grid (for cards with fewer fields) */
+.mc-grid.mc-grid-2 { grid-template-columns: repeat(2, 1fr); }
 
 .mobile-empty {
   text-align: center;
@@ -1106,16 +1114,14 @@ td input[type="number"] {
    Token-driven: inherits light/dark themes automatically.
 ═══════════════════════════════════════════════════════════════ */
 
-/* ── Page entrance: subtle rise-and-fade on every route change ── */
-.page {
-  animation: page-enter 220ms ease-out;
-}
-@keyframes page-enter {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: none; }
-}
+/* NOTE: no entrance animation on .page.
+   Animating opacity OR transform on the page container turns it into a
+   stacking context / containing block for its position:fixed children,
+   which traps modals & bottom-sheets (which must sit above the mobile
+   bottom-nav, z-index 200) inside the content area. That is exactly how
+   the tenants form's Save/Update button ended up hidden behind the
+   bottom-nav on mobile. Pages therefore render instantly. */
 @media (prefers-reduced-motion: reduce) {
-  .page { animation: none; }
   * { transition-duration: 0.01ms !important; }
 }
 
@@ -1181,4 +1187,18 @@ select:focus-visible,
 
   /* Breathing room above the bottom nav + notch safe area */
   .page { padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
+}
+
+/* ── Subscription read-only lockdown ──────────────────────────────
+   .ro-lock is set on the shell when the tenant is past subscription +
+   grace. Write-style buttons are disabled visually; buttons that stay
+   legitimate in read-only mode (print, export, close/back, popup OK)
+   opt out with .ro-safe. The backend rejects writes regardless — this
+   is UX, not security. */
+.ro-lock .btn-primary:not(.ro-safe),
+.ro-lock .btn-danger:not(.ro-safe),
+.ro-lock button[type="submit"]:not(.ro-safe) {
+  pointer-events: none;
+  opacity: .45 !important;
+  filter: grayscale(.4);
 }

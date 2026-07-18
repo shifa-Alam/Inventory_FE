@@ -112,6 +112,33 @@
     </div>
   </div>
 
+  <!-- PAYMENT -->
+  <div class="card card-body pay-card" *ngIf="items.length > 0">
+    <div class="pay-row">
+      <div class="pay-field">
+        <label class="field-label">{{ 'purchase.payment_method' | translate }}</label>
+        <div class="pm-pills">
+          <button type="button" class="pm-pill" *ngFor="let m of paymentMethods"
+            [class.active]="payment_method === m.value"
+            (click)="payment_method = m.value">{{ m.label }}</button>
+        </div>
+      </div>
+      <div class="pay-field pay-amount">
+        <label class="field-label">{{ 'purchase.paid_amount' | translate }}</label>
+        <div class="pay-input-row">
+          <input type="number" [(ngModel)]="paid_amount" min="0" placeholder="0" />
+          <button type="button" class="tender-chip exact" (click)="setFullPaid()">
+            {{ 'purchase.pay_full' | translate }} ৳{{ getTotal() | number }}
+          </button>
+        </div>
+      </div>
+      <div class="pay-field pay-due">
+        <span class="field-label">{{ 'purchase.due_amount' | translate }}</span>
+        <span class="due-value" [class.due-zero]="getDue() === 0">৳{{ getDue() | number }}</span>
+      </div>
+    </div>
+  </div>
+
   <!-- ACTION BAR -->
   <div class="action-bar">
     <div class="total-info">

@@ -24,6 +24,18 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
   supplier_id = 0;
   suppliers: any[] = [];
 
+  // ── Payment at receiving time ──
+  paid_amount: number | null = null;
+  payment_method = 'CASH';
+  paymentMethods = [
+    { value: 'CASH', label: 'Cash' },
+    { value: 'BKASH', label: 'bKash' },
+    { value: 'NAGAD', label: 'Nagad' },
+    { value: 'CARD', label: 'Card' },
+    { value: 'BANK', label: 'Bank' },
+    { value: 'OTHER', label: 'Other' },
+  ];
+
   productSearch = '';
   filteredProducts: any[] = [];
   selectedIndex = -1;
@@ -204,6 +216,14 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.items.reduce((a, b) => a + (+b.total || 0), 0);
   }
 
+  getDue() {
+    return Math.max(this.getTotal() - (+this.paid_amount! || 0), 0);
+  }
+
+  setFullPaid() {
+    this.paid_amount = this.getTotal();
+  }
+
   save() {
     if (!this.supplier_id || +this.supplier_id === 0) {
       this.toast.warning('Please select a supplier before saving.');
@@ -213,8 +233,19 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
       this.toast.warning('Please add at least one product.');
       return;
     }
+    const paid = +this.paid_amount! || 0;
+    if (paid < 0) {
+      this.toast.warning('Paid amount cannot be negative.');
+      return;
+    }
+    if (paid > this.getTotal()) {
+      this.toast.warning('Paid amount cannot exceed the purchase total.');
+      return;
+    }
     const payload = {
       supplier_id: +this.supplier_id,
+      paid_amount: paid,
+      payment_method: this.payment_method,
       items: this.items.map(i => ({
         product_id: +i.product_id,
         quantity: +i.quantity,
@@ -228,6 +259,8 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
         this.toast.stopSaving(); this.toast.success('Purchase Saved');
         this.items = [];
         this.supplier_id = 0;
+        this.paid_amount = null;
+        this.payment_method = 'CASH';
         this.searchInputRef.nativeElement.focus();
       },
       error: () => { this.toast.stopSaving(); this.toast.error('Failed to save purchase'); }

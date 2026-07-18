@@ -174,3 +174,49 @@ button:disabled {
   .header-supplier { flex-direction: row; align-items: center; gap: 8px; }
   .header-supplier select { width: auto !important; flex: 1; }
 }
+
+/* ── Payment at receiving time ─────────────────────────────────── */
+.pay-card { margin-bottom: 16px; }
+
+.pay-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.pay-field { display: flex; flex-direction: column; gap: 6px; }
+.pay-amount input { width: 140px; }
+
+.pay-input-row { display: flex; align-items: center; gap: 8px; }
+
+.pm-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.pm-pill {
+  padding: 6px 12px; font-size: 12px; font-weight: 700;
+  border: 1.5px solid var(--border); border-radius: 16px;
+  background: var(--bg); color: var(--text-muted); cursor: pointer;
+  transition: border-color .12s, background .12s, color .12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.pm-pill.active {
+  border-color: var(--primary); background: var(--primary-light);
+  color: var(--primary-dark);
+}
+
+.tender-chip {
+  padding: 5px 12px; font-size: 12px; font-weight: 700;
+  border: 1.5px dashed var(--border-strong); border-radius: 8px;
+  background: var(--bg); color: var(--text-muted); cursor: pointer;
+  white-space: nowrap;
+}
+.tender-chip.exact { border-style: solid; color: var(--primary-dark); }
+
+.pay-due { margin-left: auto; align-items: flex-end; }
+.due-value { font-size: 18px; font-weight: 800; color: var(--danger, #dc2626); }
+.due-value.due-zero { color: var(--success, #16a34a); }
+
+@media (max-width: 640px) {
+  .pay-row { flex-direction: column; align-items: stretch; gap: 12px; }
+  .pay-due { margin-left: 0; flex-direction: row; justify-content: space-between; align-items: center; }
+  .pay-amount input { width: 100%; }
+}

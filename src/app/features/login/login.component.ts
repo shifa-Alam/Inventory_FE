@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
+import { SubscriptionService } from '../../core/services/subscription.service';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { LanguageService } from '../../core/services/language.service';
@@ -23,7 +24,7 @@ export class LoginComponent {
   passFocused = false;
   year = new Date().getFullYear();
 
-  constructor(private auth: AuthService, private router: Router, public lang: LanguageService) { }
+  constructor(private auth: AuthService, private router: Router, public lang: LanguageService, private subs: SubscriptionService) { }
 
   login() {
     if (!this.username.trim() || !this.password.trim()) {
@@ -33,8 +34,11 @@ export class LoginComponent {
     this.loading = true;
     this.errorMsg = '';
     this.auth.login({ username: this.username, password: this.password }).subscribe({
-      next: () => {
+      next: (res: any) => {
         // Backend sets httpOnly cookies — nothing to store client-side.
+        // The login response carries the subscription warning/grace message
+        // that must pop up after every login until renewal.
+        this.subs.setFromLogin(res?.subscription ?? null);
         this.loading = false;
         // system_admin has no tenant modules; land it on Users.
         this.router.navigate([this.auth.isSystemAdmin() ? '/users' : '/dashboard']);

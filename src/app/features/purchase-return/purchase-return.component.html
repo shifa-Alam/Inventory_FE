@@ -6,8 +6,52 @@
     </div>
   </div>
 
-  <!-- Purchases to return from -->
-  <div class="card">
+  <!-- Reusable return editor (shared by desktop row + mobile card) -->
+  <ng-template #returnPanel let-p>
+    <div class="pr-panel">
+      <div class="pr-items-scroll">
+        <table class="pr-items">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th class="right">Purchased</th>
+              <th class="right">Returned</th>
+              <th class="right">Returnable</th>
+              <th class="right">Cost</th>
+              <th class="right">Return Qty</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let it of p.items">
+              <td class="bold">{{ it.product_name }}</td>
+              <td class="right">{{ it.quantity }}</td>
+              <td class="right muted">{{ it.returned_qty }}</td>
+              <td class="right">{{ it.returnable }}</td>
+              <td class="right">৳{{ it.unit_cost ?? it.rate | number:'1.0-2' }}</td>
+              <td class="right">
+                <input type="number" inputmode="decimal" class="pr-qty" [(ngModel)]="it.return_qty"
+                       min="0" [max]="it.returnable"
+                       [class.input-error]="it.return_qty > it.returnable" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pr-foot">
+        <input class="pr-reason" type="text" [(ngModel)]="reason" placeholder="Reason (optional)…" />
+        <div class="pr-total">Return total: <b>৳{{ returnTotal | number:'1.0-2' }}</b></div>
+        <button class="btn btn-primary" [disabled]="!isValid || saving" (click)="save()">
+          <span *ngIf="saving" class="spinner"></span>
+          {{ saving ? 'Saving…' : 'Record Return' }}
+        </button>
+        <button class="btn btn-ghost" (click)="clearSelection()">Cancel</button>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- ══════════ Purchases to return from ══════════ -->
+  <div class="card desktop-table">
     <div class="card-header-row">
       <span class="card-title" style="margin-bottom:0">Select Purchase</span>
       <input class="pr-search" type="text" [(ngModel)]="searchInvoice" (ngModelChange)="onSearch()"
@@ -39,48 +83,9 @@
                 </button>
               </td>
             </tr>
-
-            <!-- inline return panel -->
             <tr class="pr-row" *ngIf="selected?.id === p.id">
               <td colspan="6">
-                <div class="pr-panel">
-                  <table class="pr-items">
-                    <thead>
-                      <tr>
-                        <th>Product</th>
-                        <th class="right">Purchased</th>
-                        <th class="right">Returned</th>
-                        <th class="right">Returnable</th>
-                        <th class="right">Cost</th>
-                        <th class="right">Return Qty</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr *ngFor="let it of selected.items">
-                        <td class="bold">{{ it.product_name }}</td>
-                        <td class="right">{{ it.quantity }}</td>
-                        <td class="right muted">{{ it.returned_qty }}</td>
-                        <td class="right">{{ it.returnable }}</td>
-                        <td class="right">৳{{ it.unit_cost ?? it.rate | number:'1.0-2' }}</td>
-                        <td class="right">
-                          <input type="number" class="pr-qty" [(ngModel)]="it.return_qty"
-                                 min="0" [max]="it.returnable"
-                                 [class.input-error]="it.return_qty > it.returnable" />
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                  <div class="pr-foot">
-                    <input class="pr-reason" type="text" [(ngModel)]="reason" placeholder="Reason (optional)…" />
-                    <div class="pr-total">Return total: <b>৳{{ returnTotal | number:'1.0-2' }}</b></div>
-                    <button class="btn btn-primary" [disabled]="!isValid || saving" (click)="save()">
-                      <span *ngIf="saving" class="spinner"></span>
-                      {{ saving ? 'Saving…' : 'Record Return' }}
-                    </button>
-                    <button class="btn btn-ghost" (click)="clearSelection()">Cancel</button>
-                  </div>
-                </div>
+                <ng-container *ngTemplateOutlet="returnPanel; context: { $implicit: selected }"></ng-container>
               </td>
             </tr>
           </ng-container>
@@ -97,8 +102,37 @@
     <app-paginator [page]="purchasePage" [pages]="purchasePages" [total]="purchaseTotal" [pageSize]="purchasePageSize" (pageChange)="onPurchasePage($event)"></app-paginator>
   </div>
 
-  <!-- History -->
-  <div class="card">
+  <!-- Select purchase — mobile cards -->
+  <div class="mobile-list">
+    <div class="mobile-meta">
+      <span class="mobile-title">Select Purchase</span>
+      <input class="pr-search" type="text" [(ngModel)]="searchInvoice" (ngModelChange)="onSearch()" placeholder="Filter by invoice…" />
+    </div>
+    <div class="mobile-loading" *ngIf="loadingPurchases"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
+    <div class="mobile-empty" *ngIf="!loadingPurchases && purchases.length === 0"><p>No purchases found.</p></div>
+
+    <div class="mobile-card" *ngFor="let p of purchases" [class.mc-selected]="selected?.id === p.id">
+      <div class="mc-top">
+        <div>
+          <div class="mc-title mono">{{ p.invoice_no || p.purchase_no }}</div>
+          <div class="mc-sub">{{ p.supplier_name || '—' }} · {{ p.created_at | date:'dd MMM yy' }}</div>
+        </div>
+        <span class="due-chip" *ngIf="p.due_amount > 0">৳{{ p.due_amount | number:'1.0-2' }}</span>
+      </div>
+      <div class="mc-grid mc-grid-2">
+        <div class="mc-field"><span class="mc-lbl">Total</span><span class="mc-val">৳{{ p.total_amount | number:'1.0-2' }}</span></div>
+        <div class="mc-field"><span class="mc-lbl">Due</span><span class="mc-val danger" *ngIf="p.due_amount > 0">৳{{ p.due_amount | number:'1.0-2' }}</span><span class="mc-val muted" *ngIf="p.due_amount <= 0">—</span></div>
+      </div>
+      <div class="mc-actions">
+        <button class="btn btn-primary btn-sm" (click)="selectPurchase(p)">{{ selected?.id === p.id ? 'Close' : 'Return' }}</button>
+      </div>
+      <ng-container *ngIf="selected?.id === p.id" [ngTemplateOutlet]="returnPanel" [ngTemplateOutletContext]="{ $implicit: selected }"></ng-container>
+    </div>
+    <app-paginator [page]="purchasePage" [pages]="purchasePages" [total]="purchaseTotal" [pageSize]="purchasePageSize" (pageChange)="onPurchasePage($event)"></app-paginator>
+  </div>
+
+  <!-- ══════════ History ══════════ -->
+  <div class="card desktop-table">
     <div class="card-header-row">
       <span class="card-title" style="margin-bottom:0">Return History</span>
       <span class="count-badge">{{ histTotal }} records</span>
@@ -132,6 +166,31 @@
           </tr>
         </tbody>
       </table>
+    </div>
+    <app-paginator [page]="histPage" [pages]="histPages" [total]="histTotal" [pageSize]="histPageSize" (pageChange)="onHistPage($event)"></app-paginator>
+  </div>
+
+  <!-- Return history — mobile cards -->
+  <div class="mobile-list">
+    <div class="mobile-meta">
+      <span class="mobile-title">Return History</span>
+      <span class="count-badge">{{ histTotal }} records</span>
+    </div>
+    <div class="mobile-loading" *ngIf="loadingHistory"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
+    <div class="mobile-empty" *ngIf="!loadingHistory && history.length === 0"><p>No purchase returns recorded yet.</p></div>
+
+    <div class="mobile-card" *ngFor="let r of history">
+      <div class="mc-top">
+        <div>
+          <div class="mc-title mono">{{ r.invoice_no || r.return_no }}</div>
+          <div class="mc-sub">{{ r.supplier_name || '—' }} · {{ r.created_at | date:'dd MMM yy, hh:mm a' }}</div>
+        </div>
+        <span class="mc-amount">৳{{ r.total_amount | number:'1.0-2' }}</span>
+      </div>
+      <div class="mc-grid mc-grid-2">
+        <div class="mc-field"><span class="mc-lbl">Ref</span><span class="mc-val"><span class="ref-badge">{{ r.return_no }}</span></span></div>
+        <div class="mc-field"><span class="mc-lbl">Reason</span><span class="mc-val muted">{{ r.reason || '—' }}</span></div>
+      </div>
     </div>
     <app-paginator [page]="histPage" [pages]="histPages" [total]="histTotal" [pageSize]="histPageSize" (pageChange)="onHistPage($event)"></app-paginator>
   </div>

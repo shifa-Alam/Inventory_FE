@@ -9,6 +9,8 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, throwError, Observable } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
+import { SubscriptionService } from '../services/subscription.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 // Shared state for concurrent 401 handling (module-level singletons).
 let isRefreshing = false;
@@ -59,6 +61,8 @@ function handle401(
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const auth   = inject(AuthService);
+  const subs   = inject(SubscriptionService);
+  const toast  = inject(ToastService);
 
   // Attach CSRF token to outgoing request.
   const outReq = addCsrf(req, auth.getCsrfToken());
@@ -73,6 +77,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         !req.url.includes('/auth/login')
       ) {
         return handle401(req, next, auth, router);
+      }
+      // Backend read-only lockdown (subscription past grace): surface it
+      // clearly and flip the UI into read-only mode immediately.
+      if (err.status === 403 && typeof err.error?.detail === 'string' &&
+          err.error.detail.startsWith('Subscription expired')) {
+        subs.markReadOnly();
+        toast.error(err.error.detail);
       }
       return throwError(() => err);
     })

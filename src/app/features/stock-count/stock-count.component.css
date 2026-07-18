@@ -1,4 +1,6 @@
-.count-card { margin-bottom: 14px; }
+/* overflow: visible — the global .card { overflow: hidden } clips the
+   absolutely-positioned .sc-dropdown otherwise (same fix as sales/purchase) */
+.count-card { margin-bottom: 14px; overflow: visible; }
 
 /* product picker */
 .sc-search { position: relative; }

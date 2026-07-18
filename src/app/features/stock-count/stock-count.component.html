@@ -71,7 +71,7 @@
   </div>
 
   <!-- History -->
-  <div class="card">
+  <div class="card desktop-table">
     <div class="card-header-row">
       <span class="card-title" style="margin-bottom:0">Count History</span>
       <span class="count-badge">{{ total }} records</span>
@@ -111,6 +111,34 @@
           </tr>
         </tbody>
       </table>
+    </div>
+    <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPage($event)"></app-paginator>
+  </div>
+
+  <!-- Count history — mobile cards -->
+  <div class="mobile-list">
+    <div class="mobile-meta">
+      <span class="mobile-title">Count History</span>
+      <span class="count-badge">{{ total }} records</span>
+    </div>
+    <div class="mobile-loading" *ngIf="loadingHistory"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
+    <div class="mobile-empty" *ngIf="!loadingHistory && history.length === 0"><p>No stock counts recorded yet.</p></div>
+
+    <div class="mobile-card" *ngFor="let c of history">
+      <div class="mc-top">
+        <div>
+          <div class="mc-title">{{ c.product_name }}</div>
+          <div class="mc-sub"><span class="ref-badge">{{ c.count_no }}</span> · {{ c.created_at | date:'dd MMM yy, hh:mm a' }}</div>
+        </div>
+        <span class="var-chip" [class.neg]="c.difference < 0" [class.pos]="c.difference > 0">
+          {{ c.difference > 0 ? '+' : '' }}{{ c.difference }}
+        </span>
+      </div>
+      <div class="mc-grid">
+        <div class="mc-field"><span class="mc-lbl">System</span><span class="mc-val">{{ c.system_qty }}</span></div>
+        <div class="mc-field"><span class="mc-lbl">Counted</span><span class="mc-val">{{ c.counted_qty }}</span></div>
+        <div class="mc-field"><span class="mc-lbl">Value Impact</span><span class="mc-val" [class.danger]="c.value_impact < 0">৳{{ c.value_impact | number:'1.0-2' }}</span></div>
+      </div>
     </div>
     <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPage($event)"></app-paginator>
   </div>

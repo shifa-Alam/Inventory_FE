@@ -4,6 +4,7 @@ import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/rou
 import { TranslatePipe } from '@ngx-translate/core';
 import { LanguageService } from '../core/services/language.service';
 import { AuthService } from '../core/services/auth.service';
+import { SubscriptionService } from '../core/services/subscription.service';
 import { ToastComponent } from '../shared/components/toast/toast.component';
 import { ConfirmModalComponent } from '../shared/components/confirm-modal/confirm-modal.component';
 
@@ -17,17 +18,26 @@ import { ConfirmModalComponent } from '../shared/components/confirm-modal/confir
 export class LayoutComponent {
   sidebarOpen = false;
   isDark = false;
+  /** One-time popup after login (expiry warning / grace / read-only). */
+  subPopup: string | null = null;
   currentUser: { username: string; role: string; tenant_id: number | null } | null = null;
 
   constructor(
     public lang: LanguageService,
     public auth: AuthService,
+    public subs: SubscriptionService,
     private router: Router
   ) {
     this.currentUser = this.auth.getCurrentUser();
     this.isDark = localStorage.getItem('theme') === 'dark';
     this.applyTheme();
+    if (!this.isSystemAdmin) {
+      this.subPopup = this.subs.consumePopup();   // set only right after login
+      this.subs.refresh();                        // reload-safe banner state
+    }
   }
+
+  closeSubPopup() { this.subPopup = null; }
 
   get isSystemAdmin(): boolean { return this.currentUser?.role === 'system_admin'; }
 

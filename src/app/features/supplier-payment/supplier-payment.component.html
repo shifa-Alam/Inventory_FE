@@ -27,8 +27,42 @@
     </div>
   </div>
 
-  <!-- Pending purchases -->
-  <div class="card">
+  <!-- Reusable inline pay panel (shared by desktop table row + mobile card) -->
+  <ng-template #payPanel let-inv>
+    <div class="pay-panel">
+      <div class="pay-info">
+        <div class="pi-row"><span class="pi-lbl">Invoice</span><span class="pi-val fw">{{ inv.invoice_no }}</span></div>
+        <div class="pi-row"><span class="pi-lbl">Supplier</span><span class="pi-val">{{ inv.supplier_name || '—' }}</span></div>
+        <div class="pi-row"><span class="pi-lbl">Due</span><span class="pi-val due">৳{{ fmt(maxDue) }}</span></div>
+        <div class="pi-row"><span class="pi-lbl">After Payment</span><span class="pi-val" [class.ok]="afterPayment === 0">৳{{ fmt(afterPayment) }}</span></div>
+      </div>
+      <div class="pay-form">
+        <div class="pay-fields">
+          <div class="amount-row">
+            <input type="number" inputmode="decimal" [(ngModel)]="payAmount" placeholder="Amount" min="0" [max]="maxDue" />
+            <button class="btn btn-ghost btn-sm" (click)="setFullPay()">Full</button>
+          </div>
+          <div class="pm-pills">
+            <button type="button" *ngFor="let m of paymentMethods" class="pm-pill"
+                    [class.active]="payMethod === m.value" (click)="payMethod = m.value">{{ m.label }}</button>
+          </div>
+          <input type="text" [(ngModel)]="payNote" placeholder="Note (optional)" />
+        </div>
+        <div class="pay-actions">
+          <button class="btn btn-primary" [disabled]="!isValid || paying" (click)="pay()">
+            <span *ngIf="paying" class="spinner"></span>
+            {{ paying ? 'Saving…' : 'Record Payment' }}
+          </button>
+          <button class="btn btn-ghost" (click)="clearSelection()">Cancel</button>
+        </div>
+        <p class="hint-error" *ngIf="errorMsg">{{ errorMsg }}</p>
+        <p class="hint-success" *ngIf="successMsg">{{ successMsg }}</p>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- ══════════ Pending purchases ══════════ -->
+  <div class="card desktop-table">
     <div class="card-header-row">
       <span class="card-title" style="margin-bottom:0">Pending Purchase Invoices</span>
       <span class="count-badge">{{ invoiceTotal }} with due</span>
@@ -60,40 +94,9 @@
                 </button>
               </td>
             </tr>
-
-            <!-- Inline pay panel -->
             <tr class="pay-row" *ngIf="selected?.id === inv.id">
               <td colspan="6">
-                <div class="pay-panel">
-                  <div class="pay-info">
-                    <div class="pi-row"><span class="pi-lbl">Invoice</span><span class="pi-val fw">{{ inv.invoice_no }}</span></div>
-                    <div class="pi-row"><span class="pi-lbl">Supplier</span><span class="pi-val">{{ inv.supplier_name || '—' }}</span></div>
-                    <div class="pi-row"><span class="pi-lbl">Due</span><span class="pi-val due">৳{{ fmt(maxDue) }}</span></div>
-                    <div class="pi-row"><span class="pi-lbl">After Payment</span><span class="pi-val" [class.ok]="afterPayment === 0">৳{{ fmt(afterPayment) }}</span></div>
-                  </div>
-                  <div class="pay-form">
-                    <div class="pay-fields">
-                      <div class="amount-row">
-                        <input type="number" [(ngModel)]="payAmount" placeholder="Amount" min="0" [max]="maxDue" />
-                        <button class="btn btn-ghost btn-sm" (click)="setFullPay()">Full</button>
-                      </div>
-                      <div class="pm-pills">
-                        <button type="button" *ngFor="let m of paymentMethods" class="pm-pill"
-                                [class.active]="payMethod === m.value" (click)="payMethod = m.value">{{ m.label }}</button>
-                      </div>
-                      <input type="text" [(ngModel)]="payNote" placeholder="Note (optional)" />
-                    </div>
-                    <div class="pay-actions">
-                      <button class="btn btn-primary" [disabled]="!isValid || paying" (click)="pay()">
-                        <span *ngIf="paying" class="spinner"></span>
-                        {{ paying ? 'Saving…' : 'Record Payment' }}
-                      </button>
-                      <button class="btn btn-ghost" (click)="clearSelection()">Cancel</button>
-                    </div>
-                    <p class="hint-error" *ngIf="errorMsg">{{ errorMsg }}</p>
-                    <p class="hint-success" *ngIf="successMsg">{{ successMsg }}</p>
-                  </div>
-                </div>
+                <ng-container *ngTemplateOutlet="payPanel; context: { $implicit: inv }"></ng-container>
               </td>
             </tr>
           </ng-container>
@@ -110,8 +113,38 @@
     <app-paginator [page]="invoicePage" [pages]="invoicePages" [total]="invoiceTotal" [pageSize]="invoicePageSize" (pageChange)="onInvoicePage($event)"></app-paginator>
   </div>
 
-  <!-- Payment history -->
-  <div class="card">
+  <!-- Pending purchases — mobile cards -->
+  <div class="mobile-list">
+    <div class="mobile-meta">
+      <span class="mobile-title">Pending Invoices</span>
+      <span class="count-badge">{{ invoiceTotal }} with due</span>
+    </div>
+    <div class="mobile-loading" *ngIf="loadingInvoices"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
+    <div class="mobile-empty" *ngIf="!loadingInvoices && invoices.length === 0"><p>🎉 No outstanding supplier dues.</p></div>
+
+    <div class="mobile-card" *ngFor="let inv of invoices" [class.mc-selected]="selected?.id === inv.id">
+      <div class="mc-top">
+        <div>
+          <div class="mc-title mono">{{ inv.invoice_no || inv.purchase_no }}</div>
+          <div class="mc-sub">{{ inv.supplier_name || '—' }}</div>
+        </div>
+        <span class="due-chip">৳{{ inv.due_amount | number:'1.0-2' }}</span>
+      </div>
+      <div class="mc-grid">
+        <div class="mc-field"><span class="mc-lbl">Total</span><span class="mc-val">৳{{ inv.total_amount | number:'1.0-2' }}</span></div>
+        <div class="mc-field"><span class="mc-lbl">Paid</span><span class="mc-val">৳{{ inv.paid_amount | number:'1.0-2' }}</span></div>
+        <div class="mc-field"><span class="mc-lbl">Due</span><span class="mc-val danger">৳{{ inv.due_amount | number:'1.0-2' }}</span></div>
+      </div>
+      <div class="mc-actions">
+        <button class="btn btn-primary btn-sm" (click)="select(inv)">{{ selected?.id === inv.id ? 'Close' : 'Pay' }}</button>
+      </div>
+      <ng-container *ngIf="selected?.id === inv.id" [ngTemplateOutlet]="payPanel" [ngTemplateOutletContext]="{ $implicit: inv }"></ng-container>
+    </div>
+    <app-paginator [page]="invoicePage" [pages]="invoicePages" [total]="invoiceTotal" [pageSize]="invoicePageSize" (pageChange)="onInvoicePage($event)"></app-paginator>
+  </div>
+
+  <!-- ══════════ Payment history ══════════ -->
+  <div class="card desktop-table">
     <div class="card-header-row">
       <span class="card-title" style="margin-bottom:0">Payment History</span>
       <span class="count-badge">{{ histTotal }} records</span>
@@ -145,6 +178,31 @@
           </tr>
         </tbody>
       </table>
+    </div>
+    <app-paginator [page]="histPage" [pages]="histPages" [total]="histTotal" [pageSize]="histPageSize" (pageChange)="onHistPage($event)"></app-paginator>
+  </div>
+
+  <!-- Payment history — mobile cards -->
+  <div class="mobile-list">
+    <div class="mobile-meta">
+      <span class="mobile-title">Payment History</span>
+      <span class="count-badge">{{ histTotal }} records</span>
+    </div>
+    <div class="mobile-loading" *ngIf="loadingHistory"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
+    <div class="mobile-empty" *ngIf="!loadingHistory && history.length === 0"><p>No supplier payments recorded yet.</p></div>
+
+    <div class="mobile-card" *ngFor="let p of history">
+      <div class="mc-top">
+        <div>
+          <div class="mc-title mono">{{ p.invoice_no || p.reference_no }}</div>
+          <div class="mc-sub">{{ p.supplier_name || '—' }} · {{ p.created_at | date:'dd MMM yy, hh:mm a' }}</div>
+        </div>
+        <span class="mc-amount">৳{{ p.amount | number:'1.0-2' }}</span>
+      </div>
+      <div class="mc-grid mc-grid-2">
+        <div class="mc-field"><span class="mc-lbl">Reference</span><span class="mc-val"><span class="ref-badge">{{ p.reference_no }}</span></span></div>
+        <div class="mc-field"><span class="mc-lbl">Note</span><span class="mc-val muted">{{ p.note || '—' }}</span></div>
+      </div>
     </div>
     <app-paginator [page]="histPage" [pages]="histPages" [total]="histTotal" [pageSize]="histPageSize" (pageChange)="onHistPage($event)"></app-paginator>
   </div>

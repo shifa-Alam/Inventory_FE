@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject } from 'rxjs';
-import { debounceTime, switchMap } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
+import { catchError, debounceTime, switchMap } from 'rxjs/operators';
 import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
@@ -36,7 +36,13 @@ export class StockCountComponent implements OnInit {
   ngOnInit() {
     this.search$.pipe(
       debounceTime(300),
-      switchMap(v => v ? this.api.get(`/products/search?q=${encodeURIComponent(v)}`) : [])
+      // catchError inside switchMap: an API failure must not kill the
+      // outer subscription, or search silently stops working afterwards
+      switchMap(v => v
+        ? this.api.get(`/products/search?q=${encodeURIComponent(v)}`).pipe(
+            catchError(() => { this.searching = false; return of([]); })
+          )
+        : [])
     ).subscribe({
       next: (res: any) => { this.results = res.data ?? res; this.searching = false; },
       error: () => { this.searching = false; }

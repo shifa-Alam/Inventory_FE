@@ -15,7 +15,10 @@
 /* inline return panel */
 .pr-row td { padding: 0 !important; border-bottom: 2px solid var(--primary-mid) !important; }
 .pr-panel { padding: 14px 18px; background: var(--primary-light); }
-.pr-items { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 8px; overflow: hidden; }
+/* On narrow cards the return-qty grid stays tabular but scrolls inside the
+   focused editor, so the page itself never scrolls sideways. */
+.pr-items-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; }
+.pr-items { width: 100%; min-width: 440px; border-collapse: collapse; background: var(--surface); border-radius: 8px; overflow: hidden; }
 .pr-items th {
   font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
   color: var(--text-muted); padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border);
