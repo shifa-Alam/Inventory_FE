@@ -583,7 +583,7 @@
     min-height: 100dvh;
     position: relative;
     overflow: hidden;
-    background: #0C0D19;
+    background: #ffffff;
     font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
     padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
   }
@@ -599,7 +599,7 @@
   .m-blob-1 {
     width: 340px;
     height: 340px;
-    background: rgba(99, 102, 241, 0.28);
+    background: rgba(99, 102, 241, 0.10);
     top: -130px;
     right: -100px;
   }
@@ -607,7 +607,7 @@
   .m-blob-2 {
     width: 280px;
     height: 280px;
-    background: rgba(139, 92, 246, 0.18);
+    background: rgba(139, 92, 246, 0.08);
     bottom: -100px;
     left: -110px;
   }
@@ -655,14 +655,14 @@
   .m-app-name {
     font-size: 28px;
     font-weight: 800;
-    color: #F0F1FF;
+    color: #0f172a;
     letter-spacing: -0.7px;
     margin: 0 0 6px;
   }
 
   .m-tagline {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.32);
+    color: #64748b;
     margin: 0;
     letter-spacing: 0.2px;
   }
@@ -672,6 +672,13 @@
     display: flex;
     flex-direction: column;
     gap: 14px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px 22px;
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.05),
+      0 8px 30px rgba(15, 23, 42, 0.06),
+      0 0 0 1px rgba(15, 23, 42, 0.04);
     animation: m-in 0.5s 0.1s cubic-bezier(0.2, 0, 0, 1) both;
   }
 
@@ -683,14 +690,14 @@
   .m-form-title {
     font-size: 18px;
     font-weight: 700;
-    color: #E8EAFF;
+    color: #111827;
     letter-spacing: -0.3px;
     margin: 0 0 3px;
   }
 
   .m-form-sub {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.3);
+    color: #6b7280;
     margin: 0;
   }
 
@@ -710,7 +717,7 @@
   .m-label {
     font-size: 12px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.45);
+    color: #374151;
     letter-spacing: 0.1px;
     padding-left: 2px;
   }
@@ -720,15 +727,15 @@
     display: flex;
     align-items: center;
     border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid #e5e7eb;
+    background: #fafafa;
     transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
   }
 
   .m-input-wrap.m-focused {
-    border-color: rgba(99, 102, 241, 0.7);
-    background: rgba(99, 102, 241, 0.07);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.14);
+    border-color: #6366f1;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
   }
 
   .m-input-wrap input {
@@ -740,14 +747,14 @@
     outline: none;
     font-size: 16px;
     font-weight: 400;
-    color: #F0F1FF;
+    color: #111827;
     font-family: inherit;
     line-height: 1;
-    caret-color: #818cf8;
+    caret-color: #6366f1;
   }
 
   .m-input-wrap input::placeholder {
-    color: rgba(255, 255, 255, 0.18);
+    color: #9ca3af;
     font-weight: 400;
   }
 
@@ -758,7 +765,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: rgba(255, 255, 255, 0.25);
+    color: #9ca3af;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -767,7 +774,7 @@
   }
 
   .m-eye:active {
-    color: #818cf8;
+    color: #6366f1;
   }
 
   /* ── Error ── */
@@ -775,9 +782,9 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: rgba(239, 68, 68, 0.1);
-    color: #fca5a5;
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
     border-radius: 12px;
     padding: 11px 14px;
     font-size: 13px;
@@ -790,7 +797,7 @@
     width: 100%;
     height: 54px;
     margin-top: 4px;
-    background: #6366f1;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     color: #fff;
     border: none;
     border-radius: 14px;
@@ -835,10 +842,10 @@
     align-items: center;
     gap: 6px;
     padding: 8px 18px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1.5px solid #e5e7eb;
     border-radius: 20px;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.3);
+    background: #fff;
+    color: #6b7280;
     font-size: 12.5px;
     font-weight: 500;
     font-family: inherit;
@@ -848,8 +855,8 @@
   }
 
   .m-lang:active {
-    border-color: rgba(99, 102, 241, 0.5);
-    color: #818cf8;
+    border-color: #6366f1;
+    color: #6366f1;
   }
 
   /* ── Footer ── */
@@ -865,18 +872,18 @@
 
   .m-powered {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.2);
+    color: #94a3b8;
   }
 
   .m-powered strong {
-    color: rgba(255, 255, 255, 0.4);
+    color: #475569;
     font-weight: 700;
     letter-spacing: 0.1px;
   }
 
   .m-copy {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.12);
+    color: #cbd5e1;
   }
 
   /* ── Animations ── */

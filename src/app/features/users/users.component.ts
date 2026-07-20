@@ -33,7 +33,7 @@ export class UsersComponent implements OnInit {
   username = '';
   password = '';
   confirmPassword = '';
-  role = 'staff';
+  role = 'cashier';
   successMsg = '';
   errorMsg = '';
 
@@ -142,7 +142,7 @@ export class UsersComponent implements OnInit {
     this.username = '';
     this.password = '';
     this.confirmPassword = '';
-    this.role = 'staff';
+    this.role = 'cashier';
     this.selectedTenantId = null;
     this.successMsg = '';
     this.errorMsg = '';

@@ -18,6 +18,7 @@ import { ConfirmService } from '../../shared/services/confirm.service';
 export class ProductsComponent implements OnInit {
   products: any[] = [];
   categories: any[] = [];
+  units: any[] = [];
   loading = false;
 
   filterName = '';
@@ -54,6 +55,7 @@ export class ProductsComponent implements OnInit {
   ngOnInit() {
     this.load();
     this.loadCategories();
+    this.loadUnits();
   }
 
   load() {
@@ -75,6 +77,71 @@ export class ProductsComponent implements OnInit {
     });
   }
 
+  loadUnits() {
+    this.api.get('/units/').subscribe({
+      next: (res: any) => { this.units = res.data ?? res; },
+      error: () => {}
+    });
+  }
+
+  /** Resolve a unit id to its display name for labels. */
+  unitName(id: number | null): string {
+    const u = this.units.find(x => x.id === +(id as any));
+    return u ? (u.symbol || u.name) : '';
+  }
+
+  // ── Units of measure (per-product multi-unit) ──
+  addUnitRow() {
+    this.newProduct.units = [...(this.newProduct.units || []), { unit_id: null, factor: null }];
+  }
+
+  removeUnitRow(i: number) {
+    const removed = this.newProduct.units[i];
+    this.newProduct.units.splice(i, 1);
+    // A default that pointed at the removed unit no longer has a factor.
+    if (removed && +this.newProduct.purchase_unit_id === +removed.unit_id) this.newProduct.purchase_unit_id = null;
+    if (removed && +this.newProduct.sale_unit_id === +removed.unit_id) this.newProduct.sale_unit_id = null;
+  }
+
+  /** Units selectable as the default purchase/sale unit: base + configured. */
+  defaultUnitOptions(): any[] {
+    const opts: any[] = [];
+    const base = this.units.find(u => u.id === +this.newProduct.base_unit_id);
+    if (base) opts.push(base);
+    for (const row of (this.newProduct.units || [])) {
+      const u = this.units.find(x => x.id === +row.unit_id);
+      if (u && !opts.find(o => o.id === u.id)) opts.push(u);
+    }
+    return opts;
+  }
+
+  private unitsPayload(): any[] {
+    return (this.newProduct.units || [])
+      .filter((r: any) => r.unit_id && +r.factor > 0)
+      .map((r: any) => ({ unit_id: +r.unit_id, factor: +r.factor }));
+  }
+
+  /** Client-side guard so an incomplete unit row surfaces nicely. */
+  unitsValid(): boolean {
+    for (const r of (this.newProduct.units || [])) {
+      if (!r.unit_id || !(+r.factor > 0)) { this.toast.error('Each unit needs a unit and a factor'); return false; }
+    }
+    return true;
+  }
+
+  private buildPayload() {
+    const p = this.newProduct;
+    return {
+      name: p.name, barcode: p.barcode, category_id: p.category_id,
+      average_cost: p.average_cost, sale_price: p.sale_price, wholesale_price: p.wholesale_price,
+      mrp: p.mrp, minimum_stock: p.minimum_stock,
+      base_unit_id: p.base_unit_id || null,
+      purchase_unit_id: p.purchase_unit_id || null,
+      sale_unit_id: p.sale_unit_id || null,
+      units: this.unitsPayload(),
+    };
+  }
+
   loadCategories() {
     this.api.get('/categories/').subscribe({
       next: (res: any) => { this.categories = res.data ?? res; },
@@ -90,12 +157,15 @@ export class ProductsComponent implements OnInit {
   save() {
     if (!this.newProduct.name?.trim()) { this.toast.error('Product name is required'); return; }
     if (!+this.newProduct.category_id) { this.toast.error('Please select a category'); return; }
+    if (!this.unitsValid()) return;
     this.newProduct.id ? this.update() : this.create();
   }
 
   create() {
     this.toast.startSaving();
-    this.api.post('/products/', this.newProduct).subscribe({
+    const payload = { ...this.buildPayload(), current_stock: this.newProduct.current_stock,
+                      has_variants: this.newProduct.has_variants };
+    this.api.post('/products/', payload).subscribe({
       next: (created: any) => {
         this.toast.stopSaving(); this.toast.success('Product Added'); this.load(); this.reset();
         // A new template goes straight into the variant builder.
@@ -106,9 +176,8 @@ export class ProductsComponent implements OnInit {
   }
 
   update() {
-    const { name, barcode, category_id, average_cost, sale_price, wholesale_price, mrp, minimum_stock } = this.newProduct;
     this.toast.startSaving();
-    this.api.put(`/products/${this.newProduct.id}`, { name, barcode, category_id, average_cost, sale_price, wholesale_price, mrp, minimum_stock }).subscribe({
+    this.api.put(`/products/${this.newProduct.id}`, this.buildPayload()).subscribe({
       next: () => { this.toast.stopSaving(); this.toast.success('Product Updated'); this.load(); this.reset(); },
       error: (err: any) => { this.toast.stopSaving(); this.toast.error(err?.error?.detail || 'Failed to update product'); }
     });
@@ -116,7 +185,11 @@ export class ProductsComponent implements OnInit {
 
   openAdd() { this.resetFields(); this.showForm = true; }
   cancelForm() { this.resetFields(); this.showForm = false; }
-  edit(item: any) { this.newProduct = { ...item }; this.showForm = true; }
+  edit(item: any) {
+    // Deep-copy the units list so form edits don't mutate the table row.
+    this.newProduct = { ...item, units: (item.units || []).map((u: any) => ({ ...u })) };
+    this.showForm = true;
+  }
 
   toggleActive(p: any) {
     this.api.patch(`/products/${p.id}/toggle-active`, {}).subscribe({
@@ -135,7 +208,8 @@ export class ProductsComponent implements OnInit {
 
   blankProduct() {
     return { id: 0, name: '', barcode: '', category_id: 0, average_cost: 0, sale_price: 0,
-             wholesale_price: 0, mrp: 0, minimum_stock: 0, current_stock: 0, has_variants: false };
+             wholesale_price: 0, mrp: 0, minimum_stock: 0, current_stock: 0, has_variants: false,
+             base_unit_id: null, purchase_unit_id: null, sale_unit_id: null, units: [] };
   }
 
   resetFields() { this.newProduct = this.blankProduct(); }

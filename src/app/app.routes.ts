@@ -5,6 +5,7 @@ import { ProductsComponent } from './features/products/products.component';
 import { LayoutComponent } from './layout/layout.component';
 import { SuppliersComponent } from './features/suppliers/suppliers.component';
 import { CategoriesComponent } from './features/categories/categories.component';
+import { UnitsComponent } from './features/units/units.component';
 import { SalesComponent } from './features/sales/sales.component';
 import { CustomersComponent } from './features/customers/customers.component';
 import { PurchaseComponent } from './features/purchase/purchase.component';
@@ -41,6 +42,7 @@ export const routes: Routes = [
         children: [
             { path: 'dashboard', component: DashboardComponent },
             { path: 'categories', component: CategoriesComponent },
+            { path: 'units', component: UnitsComponent },
             { path: 'products', component: ProductsComponent },
             { path: 'billing', component: SalesComponent },
             { path: 'customers', component: CustomersComponent },

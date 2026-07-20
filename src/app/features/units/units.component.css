@@ -1,0 +1,21 @@
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(15, 23, 42, .5);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-card {
+  background: var(--surface); border-radius: 12px; padding: 24px;
+  width: 100%; max-width: 420px; box-shadow: 0 18px 50px rgba(0,0,0,.25);
+}
+.modal-card h3 { margin: 0 0 14px; font-size: 16px; }
+.u-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.u-form .form-group { display: flex; flex-direction: column; gap: 5px; }
+.u-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.req { color: var(--danger); }
+
+@media (max-width: 640px) {
+  .modal-backdrop { align-items: flex-end; padding: 0; }
+  .modal-card { max-width: none; border-radius: 16px 16px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); }
+  .u-form { grid-template-columns: 1fr; }
+  .u-actions .btn { flex: 1; }
+}

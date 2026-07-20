@@ -40,6 +40,8 @@ export class LayoutComponent {
   closeSubPopup() { this.subPopup = null; }
 
   get isSystemAdmin(): boolean { return this.currentUser?.role === 'system_admin'; }
+  /** Owner or Manager — sees purchases, returns, stock, reports, suppliers. */
+  get canManage(): boolean { return this.auth.canManage(); }
 
   toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
   closeSidebar()  { this.sidebarOpen = false; }

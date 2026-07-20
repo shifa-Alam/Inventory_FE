@@ -47,7 +47,8 @@
         <select [(ngModel)]="role">
           <option *ngIf="isSystemAdmin" value="system_admin">{{ 'users.role_system_admin' | translate }}</option>
           <option *ngIf="isSystemAdmin" value="admin">{{ 'users.role_admin' | translate }}</option>
-          <option value="staff">{{ 'users.role_staff' | translate }}</option>
+          <option *ngIf="!isSystemAdmin" value="manager">{{ 'users.role_manager' | translate }}</option>
+          <option *ngIf="!isSystemAdmin" value="cashier">{{ 'users.role_cashier' | translate }}</option>
         </select>
       </div>
       <div class="form-group" *ngIf="isSystemAdmin">

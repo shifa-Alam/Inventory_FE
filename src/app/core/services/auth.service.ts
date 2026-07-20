@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { skipErrorToast } from '../interceptors/error.interceptor';
 
 interface SessionInfo {
   username: string;
@@ -64,15 +65,30 @@ export class AuthService {
     return this.getSessionInfo();
   }
 
-  isSystemAdmin(): boolean {
-    return this.getCurrentUser()?.role === 'system_admin';
+  /** Current role, with the legacy 'staff' name mapped onto 'cashier'. */
+  role(): string {
+    const r = this.getCurrentUser()?.role ?? '';
+    return r === 'staff' ? 'cashier' : r;
   }
+
+  isSystemAdmin(): boolean { return this.role() === 'system_admin'; }
+  isAdmin(): boolean { return this.role() === 'admin'; }
+  isManager(): boolean { return this.role() === 'manager'; }
+  isCashier(): boolean { return this.role() === 'cashier'; }
+
+  /** Owner or Manager — may run purchases, returns, stock, reports, settings-lite. */
+  canManage(): boolean { return this.isAdmin() || this.isManager(); }
+
+  /** May see purchase cost / profit (everyone except the cashier). */
+  canSeeCost(): boolean { return !this.isCashier(); }
 
   getRoleLabel(role: string): string {
     const map: Record<string, string> = {
       system_admin: 'System Admin',
-      admin: 'Admin',
-      staff: 'Staff',
+      admin: 'Owner / Admin',
+      manager: 'Manager',
+      cashier: 'Cashier',
+      staff: 'Cashier',
     };
     return map[role] ?? role;
   }
@@ -81,13 +97,20 @@ export class AuthService {
 
   login(data: { username: string; password: string }): Observable<any> {
     // withCredentials so the browser stores the Set-Cookie headers from the response.
-    return this.http.post(`${this.baseUrl}/auth/login`, data, { withCredentials: true });
+    // skipErrorToast: the login form shows an inline error instead of a toast.
+    return this.http.post(`${this.baseUrl}/auth/login`, data, {
+      withCredentials: true, context: skipErrorToast(),
+    });
   }
 
   /** Call the refresh endpoint — browser automatically sends the
    *  refresh_token httpOnly cookie (Path=/auth/refresh). */
   refresh(): Observable<any> {
-    return this.http.post(`${this.baseUrl}/auth/refresh`, {}, { withCredentials: true });
+    // skipErrorToast: a failed background refresh just redirects to login;
+    // no need to flash an error toast.
+    return this.http.post(`${this.baseUrl}/auth/refresh`, {}, {
+      withCredentials: true, context: skipErrorToast(),
+    });
   }
 
   /** Tell the backend to clear all auth cookies, then clear local state. */
