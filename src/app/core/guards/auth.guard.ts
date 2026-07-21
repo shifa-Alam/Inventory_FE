@@ -13,6 +13,7 @@ const MANAGER_ONLY = [
   '/supplier-payment', '/payment-ledger', '/operator-summary',
   '/suppliers', '/sale-return', '/aging', '/stock', '/stock-ledger',
   '/stock-count', '/product-waste', '/expenses', '/categories', '/units', '/users',
+  '/products/import',
 ];
 
 export const authGuard: CanActivateFn = (_route, state) => {
