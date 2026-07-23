@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from '../../core/services/api.service';
+import { AuthService } from '../../core/services/auth.service';
+import { ConfirmService } from '../../shared/services/confirm.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { localDateStr } from '../../shared/utils/date.utils';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
@@ -55,7 +58,29 @@ export class SalesListComponent implements OnInit {
   paying = false;
 
 
-  constructor(private api: ApiService, private router: Router) {}
+  constructor(
+    private api: ApiService,
+    private router: Router,
+    public auth: AuthService,
+    private confirmSvc: ConfirmService,
+    private toast: ToastService,
+  ) {}
+
+  /** Owner/Manager may void a sale; cashiers may not. */
+  get canManage(): boolean { return this.auth.canManage(); }
+
+  async cancelSale(s: any) {
+    const ok = await this.confirmSvc.open(
+      `Void sale ${s.invoice_no}? This restocks the items, unwinds the customer's due and reverses any payment.`,
+      { confirmLabel: 'Void Sale', danger: true },
+    );
+    if (!ok) return;
+    this.api.post(`/sales/${s.id}/cancel`, {}).subscribe({
+      next: () => { this.toast.success(`Sale ${s.invoice_no} voided`); this.load(); },
+      // error toast is handled globally by the error interceptor
+      error: () => {},
+    });
+  }
 
   ngOnInit() {
     const today = localDateStr();

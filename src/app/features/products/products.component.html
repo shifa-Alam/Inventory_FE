@@ -66,6 +66,55 @@
         <label>{{ 'products.stock_placeholder' | translate }}</label>
         <input type="number" [placeholder]="'products.stock_placeholder' | translate" [(ngModel)]="newProduct.current_stock" />
       </div>
+
+      <!-- ── Units of measure (optional) ── -->
+      <div class="form-group unit-full">
+        <label class="unit-section">Units of measure <span class="unit-hint">— prices, cost &amp; stock are in the base unit; leave blank for single-unit products</span></label>
+      </div>
+      <div class="form-group">
+        <label>Base unit <span class="unit-sub">(stock kept in this)</span></label>
+        <select [(ngModel)]="newProduct.base_unit_id">
+          <option [ngValue]="null">— None —</option>
+          <option *ngFor="let u of units" [ngValue]="u.id">{{ u.name }}{{ u.symbol ? ' (' + u.symbol + ')' : '' }}</option>
+        </select>
+      </div>
+
+      <!-- Extra transacting units: the product can be bought/sold in any of
+           these (e.g. Dozen = 12 base). The operator picks per line. -->
+      <div class="form-group unit-full" *ngIf="newProduct.base_unit_id">
+        <label>Other units <span class="unit-sub">(e.g. buy by Dozen = 12, sell by Piece)</span></label>
+        <div class="unit-row" *ngFor="let row of newProduct.units; let i = index">
+          <select [(ngModel)]="row.unit_id" [ngModelOptions]="{ standalone: true }">
+            <option [ngValue]="null">— Select unit —</option>
+            <option *ngFor="let u of units" [ngValue]="u.id"
+                    [disabled]="u.id === newProduct.base_unit_id">{{ u.name }}{{ u.symbol ? ' (' + u.symbol + ')' : '' }}</option>
+          </select>
+          <span class="unit-eq">=</span>
+          <input type="number" min="0.000001" step="any" [(ngModel)]="row.factor"
+                 [ngModelOptions]="{ standalone: true }" placeholder="qty in base" />
+          <span class="unit-eq">{{ unitName(newProduct.base_unit_id) || 'base' }}</span>
+          <button type="button" class="unit-del" (click)="removeUnitRow(i)" title="Remove">✕</button>
+        </div>
+        <button type="button" class="unit-add" (click)="addUnitRow()">+ Add unit</button>
+      </div>
+
+      <!-- Default unit pre-selected on a new purchase / sale line -->
+      <div class="form-group unit-pair" *ngIf="newProduct.base_unit_id">
+        <div>
+          <label>Default purchase unit</label>
+          <select [(ngModel)]="newProduct.purchase_unit_id">
+            <option [ngValue]="null">— Base ({{ unitName(newProduct.base_unit_id) }}) —</option>
+            <option *ngFor="let u of defaultUnitOptions()" [ngValue]="u.id">{{ u.name }}</option>
+          </select>
+        </div>
+        <div>
+          <label>Default sale unit</label>
+          <select [(ngModel)]="newProduct.sale_unit_id">
+            <option [ngValue]="null">— Base ({{ unitName(newProduct.base_unit_id) }}) —</option>
+            <option *ngFor="let u of defaultUnitOptions()" [ngValue]="u.id">{{ u.name }}</option>
+          </select>
+        </div>
+      </div>
       </ng-container>
     </div>
     <p class="hv-hint" *ngIf="newProduct.has_variants">

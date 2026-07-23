@@ -68,7 +68,13 @@
         <tbody>
           <tr *ngFor="let item of items; let i = index">
             <td class="muted">{{ i + 1 }}</td>
-            <td class="bold">{{ item.product_name }}</td>
+            <td class="bold">{{ item.product_name }}
+              <select *ngIf="item.unitOptions?.length > 1" class="line-unit"
+                      [(ngModel)]="item.unit_id" (ngModelChange)="onLineUnitChange(item)">
+                <option *ngFor="let o of item.unitOptions" [ngValue]="o.id">{{ o.name }}</option>
+              </select>
+              <small *ngIf="!(item.unitOptions?.length > 1) && item.unit_label" class="unit-tag">/ {{ item.unit_label }}</small>
+            </td>
             <td><input #qtyInput type="number" [(ngModel)]="item.quantity" min="1" (ngModelChange)="onQtyChange(item)" /></td>
             <td><input type="number" [(ngModel)]="item.total" min="0" (ngModelChange)="onTotalChange(item)" /></td>
             <td class="muted">{{ item.rate | number:'1.0-2' }}</td>
@@ -90,7 +96,13 @@
     <div class="mobile-item-card" *ngFor="let item of items; let i = index">
       <div class="mic-top">
         <span class="mic-num">{{ i + 1 }}</span>
-        <span class="mic-name">{{ item.product_name }}</span>
+        <span class="mic-name">{{ item.product_name }}
+          <select *ngIf="item.unitOptions?.length > 1" class="line-unit"
+                  [(ngModel)]="item.unit_id" (ngModelChange)="onLineUnitChange(item)">
+            <option *ngFor="let o of item.unitOptions" [ngValue]="o.id">{{ o.name }}</option>
+          </select>
+          <small *ngIf="!(item.unitOptions?.length > 1) && item.unit_label" class="unit-tag">/ {{ item.unit_label }}</small>
+        </span>
         <button class="mic-remove" (click)="removeRow(i)">✕</button>
       </div>
       <div class="mic-row">

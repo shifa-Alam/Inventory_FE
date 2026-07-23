@@ -62,6 +62,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   items: any[] = [];
 
   searchSubject = new Subject<string>();
+  unitsMap: Record<number, string> = {};
 
   scanToast: { message: string; type: 'success' | 'error' } | null = null;
   private toastTimer: any;
@@ -74,6 +75,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     this.loadDdCustomers('');
+    this.loadUnits();
     this.searchSubject.pipe(
       debounceTime(300),
       switchMap(v => v ? this.api.get(`/products/search?q=${v}`) : EMPTY),
@@ -92,6 +94,52 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     // Auto-focus so scanner input lands here immediately
     this.searchInputRef.nativeElement.focus();
+  }
+
+  loadUnits() {
+    this.api.get('/units/?is_active=true').subscribe({
+      next: (r: any) => {
+        const list = r.data ?? r ?? [];
+        this.unitsMap = {};
+        for (const u of list) this.unitsMap[u.id] = u.symbol || u.name;
+      },
+      error: () => {}
+    });
+  }
+
+  /** Units this product can be sold in: base (factor 1) + configured. */
+  private buildUnitOptions(product: any): any[] {
+    if (!product?.base_unit_id) return [];
+    const opts: any[] = [{ id: product.base_unit_id, name: this.unitsMap[product.base_unit_id] || 'base', factor: 1 }];
+    for (const u of (product.units || [])) {
+      opts.push({ id: u.unit_id, name: this.unitsMap[u.unit_id] || '', factor: u.factor });
+    }
+    return opts;
+  }
+
+  /** Attach unit dropdown state (options, chosen unit, factor) to a line. */
+  private applyLineUnits(item: any, product: any) {
+    item.unitOptions = this.buildUnitOptions(product);
+    item.unit_id = product.sale_unit_id || product.base_unit_id || null;
+    item.factor = this.lineFactor(item);
+    item.unit_label = item.unit_id ? (this.unitsMap[item.unit_id] || '') : '';
+  }
+
+  private lineFactor(item: any): number {
+    const opt = (item.unitOptions || []).find((o: any) => o.id === +item.unit_id);
+    return opt ? (+opt.factor || 1) : 1;
+  }
+
+  /** Max quantity sellable in the line's current unit (stock is in base). */
+  maxUnitQty(item: any): number {
+    const f = +item.factor || 1;
+    return Math.floor((+item.stock || 0) / f);
+  }
+
+  onLineUnitChange(item: any) {
+    item.factor = this.lineFactor(item);
+    item.unit_label = item.unit_id ? (this.unitsMap[item.unit_id] || '') : '';
+    this.clampQuantity(item);
   }
 
   ngOnDestroy() {
@@ -293,21 +341,25 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     const existing = this.items.find(i => i.product_id === product.id);
     if (existing) {
-      if (existing.quantity >= product.current_stock) {
-        this.showToast(`Max stock reached: ${product.name} (${product.current_stock})`, 'error');
+      // Stock is in base units; the line may be in a bigger unit (a Box of 12).
+      const max = this.maxUnitQty(existing);
+      if (existing.quantity >= max) {
+        this.showToast(`Max stock reached: ${product.name} (${max} ${existing.unit_label || ''})`, 'error');
         return;
       }
       existing.quantity++;
       this.showToast(`${product.name} × ${existing.quantity}`, 'success');
     } else {
-      this.items.unshift({
+      const line: any = {
         product_id: product.id,
         product_name: product.name,
         stock: product.current_stock,
         mrp: product.mrp ?? 0,
         quantity: 1,
         rate: product.sale_price
-      });
+      };
+      this.applyLineUnits(line, product);
+      this.items.unshift(line);
       this.showToast(`Added: ${product.name}`, 'success');
       setTimeout(() => this.qtyInputs.first?.nativeElement.focus(), 0);
     }
@@ -315,9 +367,12 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   clampQuantity(item: any) {
     if (item.quantity < 1) item.quantity = 1;
-    if (item.quantity > item.stock) {
-      item.quantity = item.stock;
-      this.showToast(`Max stock for "${item.product_name}" is ${item.stock}`, 'error');
+    // Stock is kept in base units; cap the qty by how many of the line's unit
+    // fit in the available base stock (e.g. 100 pcs = 8 boxes of 12).
+    const max = this.maxUnitQty(item);
+    if (item.quantity > max) {
+      item.quantity = max;
+      this.showToast(`Max stock for "${item.product_name}" is ${max} ${item.unit_label || ''}`, 'error');
     }
   }
 
@@ -339,14 +394,16 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.selectedIndex = -1;
       return;
     }
-    this.items.unshift({
+    const line: any = {
       product_id: product.id,
       product_name: product.name,
       stock: product.current_stock,
       mrp: product.mrp ?? 0,
       quantity: 1,
       rate: product.sale_price
-    });
+    };
+    this.applyLineUnits(line, product);
+    this.items.unshift(line);
     this.filteredProducts = [];
     this.productSearch = '';
     this.selectedIndex = -1;
@@ -387,7 +444,8 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
       items: this.items.map(i => ({
         product_id: +i.product_id,
         quantity: +i.quantity,
-        rate: +i.rate
+        rate: +i.rate,
+        unit_id: i.unit_id || null
       }))
     };
 

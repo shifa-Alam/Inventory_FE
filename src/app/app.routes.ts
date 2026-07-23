@@ -2,9 +2,11 @@ import { Routes } from '@angular/router';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { LoginComponent } from './features/login/login.component';
 import { ProductsComponent } from './features/products/products.component';
+import { ImportProductsComponent } from './features/import-products/import-products.component';
 import { LayoutComponent } from './layout/layout.component';
 import { SuppliersComponent } from './features/suppliers/suppliers.component';
 import { CategoriesComponent } from './features/categories/categories.component';
+import { UnitsComponent } from './features/units/units.component';
 import { SalesComponent } from './features/sales/sales.component';
 import { CustomersComponent } from './features/customers/customers.component';
 import { PurchaseComponent } from './features/purchase/purchase.component';
@@ -41,7 +43,9 @@ export const routes: Routes = [
         children: [
             { path: 'dashboard', component: DashboardComponent },
             { path: 'categories', component: CategoriesComponent },
+            { path: 'units', component: UnitsComponent },
             { path: 'products', component: ProductsComponent },
+            { path: 'products/import', component: ImportProductsComponent },
             { path: 'billing', component: SalesComponent },
             { path: 'customers', component: CustomersComponent },
             { path: 'purchase', component: PurchaseComponent },

@@ -43,6 +43,7 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
   items: any[] = [];
 
   searchSubject = new Subject<string>();
+  unitsMap: Record<number, string> = {};
 
   scanToast: { message: string; type: 'success' | 'error' } | null = null;
   private toastTimer: any;
@@ -65,6 +66,39 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
       error: () => { if (!this.scanInProgress) this.searching = false; }
     });
     this.loadSupplier();
+    this.loadUnits();
+  }
+
+  loadUnits() {
+    this.api.get('/units/?is_active=true').subscribe({
+      next: (r: any) => {
+        const list = r.data ?? r ?? [];
+        this.unitsMap = {};
+        for (const u of list) this.unitsMap[u.id] = u.symbol || u.name;
+      },
+      error: () => {}
+    });
+  }
+
+  /** Units this product can be purchased in: base (factor 1) + configured. */
+  private buildUnitOptions(product: any): any[] {
+    if (!product?.base_unit_id) return [];
+    const opts: any[] = [{ id: product.base_unit_id, name: this.unitsMap[product.base_unit_id] || 'base', factor: 1 }];
+    for (const u of (product.units || [])) {
+      opts.push({ id: u.unit_id, name: this.unitsMap[u.unit_id] || '', factor: u.factor });
+    }
+    return opts;
+  }
+
+  /** Attach unit dropdown state to a freshly-added line. */
+  private applyLineUnits(item: any, product: any) {
+    item.unitOptions = this.buildUnitOptions(product);
+    item.unit_id = product.purchase_unit_id || product.base_unit_id || null;
+    item.unit_label = item.unit_id ? (this.unitsMap[item.unit_id] || '') : '';
+  }
+
+  onLineUnitChange(item: any) {
+    item.unit_label = item.unit_id ? (this.unitsMap[item.unit_id] || '') : '';
   }
 
   ngAfterViewInit() {
@@ -164,13 +198,15 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
       this.showToast(`${product.name} × ${existing.quantity}`, 'success');
     } else {
       const rate = product.last_purchase_price || product.average_cost || 0;
-      this.items.unshift({
+      const line: any = {
         product_id: product.id,
         product_name: product.name,
         quantity: 1,
         rate: rate,
         total: rate
-      });
+      };
+      this.applyLineUnits(line, product);
+      this.items.unshift(line);
       this.showToast(`Added: ${product.name}`, 'success');
     }
   }
@@ -187,13 +223,15 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     const rate = product.last_purchase_price || product.average_cost || 0;
-    this.items.unshift({
+    const line: any = {
       product_id: product.id,
       product_name: product.name,
       quantity: 1,
       rate: rate,
       total: rate
-    });
+    };
+    this.applyLineUnits(line, product);
+    this.items.unshift(line);
     this.filteredProducts = [];
     this.productSearch = '';
     this.selectedIndex = -1;
@@ -249,7 +287,8 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
       items: this.items.map(i => ({
         product_id: +i.product_id,
         quantity: +i.quantity,
-        rate: +i.rate
+        rate: +i.rate,
+        unit_id: i.unit_id || null
       })),
       total_amount: this.getTotal()
     };

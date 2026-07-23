@@ -760,7 +760,9 @@
     "col_actions": "Actions",
     "edit": "Edit",
     "delete": "Delete",
-    "empty": "No users found."
+    "empty": "No users found.",
+    "role_manager": "Manager",
+    "role_cashier": "Cashier"
   },
   "expenses": {
     "title": "Expenses",

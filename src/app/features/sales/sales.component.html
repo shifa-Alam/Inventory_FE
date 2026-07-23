@@ -137,10 +137,16 @@
             <tbody>
               <tr *ngFor="let item of items; let i = index">
                 <td class="col-center muted">{{ i + 1 }}</td>
-                <td class="cell-product bold" [title]="item.product_name">{{ item.product_name }}</td>
+                <td class="cell-product bold" [title]="item.product_name">{{ item.product_name }}
+                  <select *ngIf="item.unitOptions?.length > 1" class="line-unit"
+                          [(ngModel)]="item.unit_id" (ngModelChange)="onLineUnitChange(item)">
+                    <option *ngFor="let o of item.unitOptions" [ngValue]="o.id">{{ o.name }}</option>
+                  </select>
+                  <small *ngIf="!(item.unitOptions?.length > 1) && item.unit_label" class="unit-tag">/ {{ item.unit_label }}</small>
+                </td>
                 <td class="col-center"><span class="stock-chip">{{ item.stock }}</span></td>
                 <td class="col-right mrp-ref">{{ item.mrp ? (item.mrp | number) : '—' }}</td>
-                <td class="cell-input"><input #qtyInput class="input-qty" type="number" [(ngModel)]="item.quantity" min="1" [max]="item.stock" (change)="clampQuantity(item)" /></td>
+                <td class="cell-input"><input #qtyInput class="input-qty" type="number" [(ngModel)]="item.quantity" min="1" [max]="maxUnitQty(item)" (change)="clampQuantity(item)" /></td>
                 <td class="cell-input"><input class="input-rate" type="number" [(ngModel)]="item.rate" min="0" /></td>
                 <td class="col-right cell-total">{{ item.quantity * item.rate | number }}</td>
                 <td class="col-center"><button class="row-remove" (click)="removeRow(i)" title="Remove">✕</button></td>
@@ -159,7 +165,13 @@
         <div class="mobile-item-card" *ngFor="let item of items; let i = index">
           <div class="mic-top">
             <span class="mic-num">{{ i + 1 }}</span>
-            <span class="mic-name">{{ item.product_name }}</span>
+            <span class="mic-name">{{ item.product_name }}
+              <select *ngIf="item.unitOptions?.length > 1" class="line-unit"
+                      [(ngModel)]="item.unit_id" (ngModelChange)="onLineUnitChange(item)">
+                <option *ngFor="let o of item.unitOptions" [ngValue]="o.id">{{ o.name }}</option>
+              </select>
+              <small *ngIf="!(item.unitOptions?.length > 1) && item.unit_label" class="unit-tag">/ {{ item.unit_label }}</small>
+            </span>
             <span class="stock-chip">{{ item.stock }}</span>
             <button class="mic-remove" (click)="removeRow(i)">✕</button>
           </div>
@@ -170,11 +182,11 @@
                 <button class="qty-btn" type="button"
                   (click)="item.quantity = item.quantity - 1; clampQuantity(item)"
                   [disabled]="item.quantity <= 1">−</button>
-                <input #qtyInput type="number" [(ngModel)]="item.quantity" min="1" [max]="item.stock"
+                <input #qtyInput type="number" [(ngModel)]="item.quantity" min="1" [max]="maxUnitQty(item)"
                   (change)="clampQuantity(item)" class="qty-input" />
                 <button class="qty-btn" type="button"
                   (click)="item.quantity = item.quantity + 1; clampQuantity(item)"
-                  [disabled]="item.quantity >= item.stock">+</button>
+                  [disabled]="item.quantity >= maxUnitQty(item)">+</button>
               </div>
             </div>
             <div class="mic-field">
