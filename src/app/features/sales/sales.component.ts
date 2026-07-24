@@ -424,57 +424,6 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.items.reduce((sum, i) => sum + (+i.quantity || 0), 0);
   }
 
-  /** Save the cart as a draft invoice — nothing leaves stock until it is
-   *  finalized from the Sales list. */
-  saveDraft() {
-    if (this.saving) return;
-    if (!this.customer_id || this.customer_id <= 0) {
-      this.toast.warning('Please select a customer before saving a draft.');
-      return;
-    }
-    if (this.items.length === 0) {
-      this.toast.warning('Please add at least one product.');
-      return;
-    }
-    const payload: any = {
-      customer_id: +this.customer_id,
-      is_draft: true,
-      discount: +this.discount,
-      items: this.items.map(i => ({
-        product_id: +i.product_id, quantity: +i.quantity,
-        rate: +i.rate, unit_id: i.unit_id || null,
-      })),
-    };
-    if (this.delivery_date) payload.delivery_date = this.delivery_date;
-
-    this.saving = true;
-    this.toast.startSaving();
-    this.api.post('/sales/', payload).subscribe({
-      next: (res: any) => {
-        this.saving = false;
-        this.toast.stopSaving();
-        this.toast.success(`Draft ${res.invoice_no} saved — stock not deducted yet`);
-        this.resetCart();
-        this.router.navigate(['/sales']);
-      },
-      error: () => { this.saving = false; this.toast.stopSaving(); },
-    });
-  }
-
-  /** Clear the cart back to a fresh sale. */
-  private resetCart() {
-    this.sheetOpen = false;
-    this.paid_amount = 0;
-    this.payment_method = 'CASH';
-    this.cashReceived = null;
-    this.discount = 0;
-    this.delivery_date = localDateStr();
-    this.items = [];
-    this.selectedCustomer = null;
-    this.customer_id = 0;
-    this.clearPhone();
-  }
-
   submit() {
     if (this.saving) return;   // block double-click / repeated F9
     // Every sale must be booked against a registered customer

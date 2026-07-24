@@ -287,12 +287,6 @@
           <span *ngIf="saving" class="spinner"></span>
           {{ saving ? 'Saving…' : ('sales.complete' | translate) }}
         </button>
-        <!-- Draft: prepare the invoice without taking stock out -->
-        <!-- <button class="btn btn-outline btn-draft" (click)="saveDraft()"
-          [disabled]="items.length === 0 || !customer_id || saving"
-          title="Save as draft — stock is NOT deducted until you finalize it">
-          Save as Draft
-        </button> -->
       </div>
 
       <!-- Keyboard shortcut hints (desktop cashiers) -->

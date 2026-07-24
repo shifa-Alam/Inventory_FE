@@ -82,32 +82,6 @@ export class SalesListComponent implements OnInit {
     });
   }
 
-  /** Finalise a draft — this is the moment stock actually leaves. */
-  async finalizeDraft(s: any) {
-    const ok = await this.confirmSvc.open(
-      `Finalize draft ${s.invoice_no}? Stock will be deducted and ৳${s.total_amount} booked as due. ` +
-      `Collect payment afterwards from the Pay button.`,
-      { confirmLabel: 'Finalize' },
-    );
-    if (!ok) return;
-    this.api.post(`/sales/${s.id}/finalize`, {}).subscribe({
-      next: () => { this.toast.success(`${s.invoice_no} finalized — stock updated`); this.load(); },
-      error: () => {},   // global error interceptor shows the reason (e.g. out of stock)
-    });
-  }
-
-  async discardDraft(s: any) {
-    const ok = await this.confirmSvc.open(
-      `Discard draft ${s.invoice_no}? Nothing was posted, so it will simply be removed.`,
-      { confirmLabel: 'Discard', danger: true },
-    );
-    if (!ok) return;
-    this.api.delete(`/sales/${s.id}/draft`).subscribe({
-      next: () => { this.toast.success('Draft discarded'); this.load(); },
-      error: () => {},
-    });
-  }
-
   ngOnInit() {
     const today = localDateStr();
     this.filterDateFrom = today;
