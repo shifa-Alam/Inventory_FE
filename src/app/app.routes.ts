@@ -30,11 +30,12 @@ import { ExpensesComponent } from './features/expenses/expenses.component';
 import { ShiftComponent } from './features/shift/shift.component';
 import { AgingComponent } from './features/aging/aging.component';
 import { authGuard } from './core/guards/auth.guard';
+import { guestGuard } from './core/guards/guest.guard';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
 
-    { path: 'login', component: LoginComponent },
+    { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
 
     {
         path: '',
