@@ -13,7 +13,7 @@
     <!-- product picker -->
     <div class="sc-search" *ngIf="!selected">
       <input type="text" [(ngModel)]="search" (ngModelChange)="onSearch($event)"
-             placeholder="Search product by name or SKU (min 2 chars)…" autocomplete="off" />
+             placeholder="Search product by name or Barcode (min 2 chars)…" autocomplete="off" />
       <div class="sc-dropdown" *ngIf="results.length">
         <div class="sc-item" *ngFor="let p of results" (click)="pick(p)">
           <span class="sc-name">{{ p.name }}</span>
@@ -27,7 +27,7 @@
       <div class="sc-picked">
         <div>
           <div class="sc-picked-name">{{ selected.name }}</div>
-          <div class="sc-picked-sku muted">{{ selected.barcode || selected.sku }}</div>
+          <div class="sc-picked-sku muted">{{ selected.barcode }}</div>
         </div>
         <button class="btn btn-ghost btn-sm" (click)="clearSelection()">Change</button>
       </div>

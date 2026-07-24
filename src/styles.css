@@ -601,35 +601,50 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: po
 table { width: 100%; border-collapse: collapse; }
 
 thead tr {
-  background: var(--bg-alt);
-  border-bottom: 1.5px solid var(--border);
+  background: linear-gradient(180deg, var(--bg-alt), var(--bg));
+  border-bottom: 1px solid var(--border-strong);
 }
 
 th {
-  padding: 10px 14px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
+  padding: 11px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-light);
   text-align: left;
   text-transform: uppercase;
-  letter-spacing: 0.65px;
+  letter-spacing: 0.07em;
   white-space: nowrap;
 }
 
 td {
   padding: 12px 14px;
-  font-size: 14.5px;
+  font-size: 14px;
   color: var(--text);
   border-bottom: 1px solid var(--border-light);
   vertical-align: middle;
 }
 
 tbody tr:last-child td { border-bottom: none; }
+
+/* Compact table density for list-heavy admin pages (tenants, users,
+   categories, units, customers, suppliers, products). Add class="compact-rows"
+   to the <tbody>. */
+.compact-rows td { padding: 6px 10px; font-size: 13px; }
+/* Row hover: a soft wash plus a brand rail on the leading edge, so the eye can
+   track a row across a wide financial table without heavy zebra striping. */
+tbody tr { transition: background var(--transition-fast, .12s); }
 tbody tr:hover { background: var(--surface-hover); }
+tbody tr:hover td:first-child { box-shadow: inset 3px 0 0 var(--primary); }
 
 td.bold  { font-weight: 600; }
 td.muted { color: var(--text-muted); }
-td.right { text-align: right !important; font-weight: 500; }
+/* Money and quantity columns line up digit-for-digit. */
+td.right, th.right, td.num, .amount, .money {
+  text-align: right !important;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
 th.right { text-align: right; }
 
 .row-actions { display: flex; gap: 5px; }

@@ -68,6 +68,22 @@ export class UsersComponent implements OnInit {
 
   get isEditing(): boolean { return this.editingId !== null; }
 
+  /** Roles selectable in the dropdown. The assignable set depends on who is
+   *  logged in, but when editing we also inject the user's current role if it
+   *  isn't in that set — otherwise the <select> has no matching option and
+   *  renders blank (e.g. a system-admin editing a cashier). */
+  roleOptions(): { value: string; labelKey: string }[] {
+    const opts = this.isSystemAdmin
+      ? [{ value: 'system_admin', labelKey: 'users.role_system_admin' },
+         { value: 'admin', labelKey: 'users.role_admin' }]
+      : [{ value: 'manager', labelKey: 'users.role_manager' },
+         { value: 'cashier', labelKey: 'users.role_cashier' }];
+    if (this.isEditing && this.role && !opts.some(o => o.value === this.role)) {
+      opts.unshift({ value: this.role, labelKey: 'users.role_' + this.role });
+    }
+    return opts;
+  }
+
   get isValid(): boolean {
     if (this.username.trim().length < 3) return false;
     if (!this.isEditing) {
@@ -93,6 +109,9 @@ export class UsersComponent implements OnInit {
     this.password = '';
     this.confirmPassword = '';
     this.role = u.role;
+    // Show the user's current tenant in the (edit-locked) selector — the
+    // backend ignores tenant_id on update, so it can't be reassigned here.
+    this.selectedTenantId = u.tenant_id ?? null;
     this.successMsg = '';
     this.errorMsg = '';
     this.showForm = true;

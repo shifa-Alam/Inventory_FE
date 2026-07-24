@@ -79,7 +79,7 @@
             <th>{{ 'common.actions' | translate }}</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="compact-rows">
           <tr *ngFor="let s of suppliers; let i = index">
             <td class="muted">{{ (page - 1) * pageSize + i + 1 }}</td>
             <td><div class="supplier-name">{{ s.name }}</div></td>

@@ -91,7 +91,7 @@
             <th>{{ 'customers.col_actions' | translate }}</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="compact-rows">
           <tr *ngFor="let c of customers; let i = index">
             <td class="muted">{{ (page - 1) * pageSize + i + 1 }}</td>
             <td><div class="customer-name">{{ c.name }}</div></td>

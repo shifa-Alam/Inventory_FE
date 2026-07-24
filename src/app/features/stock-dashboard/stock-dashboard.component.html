@@ -57,7 +57,7 @@
   <div class="filter-bar">
     <div class="search-wrap">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" [(ngModel)]="searchText" (ngModelChange)="onSearchChange()" placeholder="Search product or SKU…" />
+      <input type="text" [(ngModel)]="searchText" (ngModelChange)="onSearchChange()" placeholder="Search product or Barcode…" />
     </div>
     <div class="filter-selects">
       <select [(ngModel)]="filterCategory" (ngModelChange)="onFilterChange()">
@@ -89,7 +89,7 @@
           <tr>
             <th class="col-no">#</th>
             <th>Product</th>
-            <th>SKU</th>
+            <th>Barcode</th>
             <th>Category</th>
             <th class="right">Buy</th>
             <th class="right">Sale</th>
@@ -105,9 +105,9 @@
             [class.row-out]="s.status === 'OUT'">
             <td class="col-no muted">{{ (page-1)*pageSize+i+1 }}</td>
             <td><span class="product-name">{{ s.name }}</span></td>
-            <td><span class="sku-tag">{{ s.barcode || s.sku }}</span></td>
+            <td><span class="sku-tag">{{ s.barcode }}</span></td>
             <td class="muted">{{ s.category }}</td>
-            <td class="right">{{ s.average_cost | number }}</td>
+            <td class="right">{{ s.average_cost | number:'1.0-2' }}</td>
             <td class="right">{{ s.sale_price | number }}</td>
             <td class="right mrp-cell">{{ s.mrp ? (s.mrp | number) : '—' }}</td>
             <td class="center">
@@ -156,7 +156,7 @@
           <span class="mc-num">{{ (page-1)*pageSize+i+1 }}</span>
           <div>
             <div class="mc-name">{{ s.name }}</div>
-            <span class="sku-tag">{{ s.barcode || s.sku }}</span>
+            <span class="sku-tag">{{ s.barcode }}</span>
           </div>
         </div>
         <span class="status-pill dot-ok" *ngIf="s.status==='OK'">● OK</span>
@@ -174,7 +174,7 @@
         </div>
         <div class="mc-field">
           <span class="mc-lbl">Buy Price</span>
-          <span class="mc-val">{{ s.average_cost | number }}</span>
+          <span class="mc-val">{{ s.average_cost | number:'1.0-2' }}</span>
         </div>
         <div class="mc-field">
           <span class="mc-lbl">Sale Price</span>

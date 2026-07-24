@@ -45,18 +45,16 @@
       <div class="form-group">
         <label>{{ 'users.role_label' | translate }} <span class="req">*</span></label>
         <select [(ngModel)]="role">
-          <option *ngIf="isSystemAdmin" value="system_admin">{{ 'users.role_system_admin' | translate }}</option>
-          <option *ngIf="isSystemAdmin" value="admin">{{ 'users.role_admin' | translate }}</option>
-          <option *ngIf="!isSystemAdmin" value="manager">{{ 'users.role_manager' | translate }}</option>
-          <option *ngIf="!isSystemAdmin" value="cashier">{{ 'users.role_cashier' | translate }}</option>
+          <option *ngFor="let r of roleOptions()" [value]="r.value">{{ r.labelKey | translate }}</option>
         </select>
       </div>
       <div class="form-group" *ngIf="isSystemAdmin">
         <label>Tenant</label>
-        <select [(ngModel)]="selectedTenantId">
+        <select [(ngModel)]="selectedTenantId" [disabled]="isEditing">
           <option [ngValue]="null">— Select Tenant —</option>
           <option *ngFor="let t of tenants" [ngValue]="t.id">{{ t.name }}</option>
         </select>
+        <small class="field-hint" *ngIf="isEditing">🔒 A user's tenant can't be changed after creation.</small>
       </div>
       <div class="form-footer">
         <button class="btn btn-primary" (click)="save()" [disabled]="!isValid || loading">
@@ -89,7 +87,7 @@
             <th>{{ 'users.col_actions' | translate }}</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="compact-rows">
           <tr *ngFor="let u of users; let i = index" [class.row-highlight]="editingId === u.id">
             <td class="muted">{{ (page - 1) * pageSize + i + 1 }}</td>
             <td class="bold">{{ u.username }}</td>

@@ -62,9 +62,13 @@
         <label>{{ 'products.minimum_stock_placeholder' | translate }}</label>
         <input type="number" [placeholder]="'products.minimum_stock_placeholder' | translate" [(ngModel)]="newProduct.minimum_stock" />
       </div>
-      <div class="form-group" *ngIf="!newProduct.id">
+      <div class="form-group">
         <label>{{ 'products.stock_placeholder' | translate }}</label>
-        <input type="number" [placeholder]="'products.stock_placeholder' | translate" [(ngModel)]="newProduct.current_stock" />
+        <input type="number" [placeholder]="'products.stock_placeholder' | translate"
+               [(ngModel)]="newProduct.current_stock" [disabled]="!!newProduct.id" />
+        <small class="field-hint" *ngIf="newProduct.id">
+          🔒 Stock changes through purchase, sale &amp; stock-count — not editable here.
+        </small>
       </div>
 
       <!-- ── Units of measure (optional) ── -->
@@ -73,10 +77,13 @@
       </div>
       <div class="form-group">
         <label>Base unit <span class="unit-sub">(stock kept in this)</span></label>
-        <select [(ngModel)]="newProduct.base_unit_id">
+        <select [(ngModel)]="newProduct.base_unit_id" [disabled]="!!newProduct.id">
           <option [ngValue]="null">— None —</option>
           <option *ngFor="let u of units" [ngValue]="u.id">{{ u.name }}{{ u.symbol ? ' (' + u.symbol + ')' : '' }}</option>
         </select>
+        <small class="field-hint" *ngIf="newProduct.id">
+          🔒 Base unit can't be changed after creation — stock &amp; cost history depend on it.
+        </small>
       </div>
 
       <!-- Extra transacting units: the product can be bought/sold in any of
@@ -254,7 +261,7 @@
                 <span class="prod-barcode" *ngIf="p.barcode">▮ {{ p.barcode }}</span>
               </div>
             </td>
-            <td class="right muted">{{ p.average_cost | number }}</td>
+            <td class="right muted">{{ p.average_cost | number:'1.0-2' }}</td>
             <td class="right fw7">{{ p.sale_price | number }}</td>
             <td class="right muted">{{ p.mrp ? (p.mrp | number) : '—' }}</td>
             <td class="center">
@@ -329,7 +336,7 @@
       <div class="mc-grid">
         <div class="mc-field">
           <span class="mc-lbl">{{ 'products.col_avg_cost' | translate }}</span>
-          <span class="mc-val">{{ p.average_cost | number }}</span>
+          <span class="mc-val">{{ p.average_cost | number:'1.0-2' }}</span>
         </div>
         <div class="mc-field">
           <span class="mc-lbl">{{ 'products.col_sale' | translate }}</span>

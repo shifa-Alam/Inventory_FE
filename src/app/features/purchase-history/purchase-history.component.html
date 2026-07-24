@@ -56,9 +56,9 @@
             <th>{{ 'purchase_history.col_action' | translate }}</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="compact-rows">
           <tr *ngFor="let p of purchases">
-            <td class="muted">{{ p.created_at | date:'dd MMM yyyy' }}</td>
+            <td class="muted">{{ p.created_at | date:'dd MMM yyyy, hh:mm a' }}</td>
             <td class="bold">{{ p.invoice_no }}</td>
             <td>{{ p.supplier_name }}</td>
             <td class="right fw7">৳{{ p.total_amount | number:'1.0-2' }}</td>
@@ -127,7 +127,7 @@
         <div class="mc-name-wrap">
           <div>
             <div class="mc-title">{{ p.invoice_no }}</div>
-            <div class="mc-sub">{{ p.created_at | date:'dd MMM yyyy' }} · {{ p.supplier_name }}</div>
+            <div class="mc-sub">{{ p.created_at | date:'dd MMM yy, hh:mm a' }} · {{ p.supplier_name }}</div>
           </div>
         </div>
         <span class="badge badge-info">{{ 'purchase_history.status_purchased' | translate }}</span>
