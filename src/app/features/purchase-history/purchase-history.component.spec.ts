@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { testProviders } from '../../testing/test-providers';
 
 import { PurchaseHistoryComponent } from './purchase-history.component';
 
@@ -8,7 +9,8 @@ describe('PurchaseHistoryComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PurchaseHistoryComponent]
+      imports: [PurchaseHistoryComponent],
+      providers: testProviders
     })
     .compileComponents();
 

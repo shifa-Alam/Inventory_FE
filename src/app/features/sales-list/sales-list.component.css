@@ -147,3 +147,5 @@
 .mb-return-item:last-child { border-bottom: none; }
 .mb-ret-name { font-size: 12px; font-weight: 600; margin-bottom: 3px; }
 .mb-ret-row  { display: flex; align-items: center; gap: 6px; }
+
+.badge-draft { background: #e0e7ff; color: #4338ca; }

@@ -397,19 +397,51 @@
 .sc-val { font-size: 17px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
 .sc-val.neg { color: var(--danger); }
 
-/* Mini stat grid (orders / financials / inventory) */
-.mini-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 14px; }
-.mini-card {
-  display: flex; flex-direction: column; gap: 3px; align-items: flex-start;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; padding: 12px 14px; transition: box-shadow .15s, transform .1s;
+/* Mini stat grid (orders / financials / inventory)
+   Fluid columns so the row always fills the width instead of leaving a gap,
+   and column-reverse puts the label ABOVE the number — matching the KPI cards
+   above, so the whole dashboard reads in one consistent rhythm. */
+.mini-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+  gap: 12px; margin-bottom: 16px;
 }
+.mini-card {
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column-reverse; gap: 6px; align-items: flex-start;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 180%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg, 14px); padding: 13px 16px 15px;
+  transition: box-shadow .18s ease, transform .18s ease, border-color .18s ease;
+}
+/* A hairline accent rail, tinted by the figure's state. */
+.mini-card::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--primary); opacity: .5;
+}
+.mini-card:has(.mini-val.ok)::before     { background: var(--success); opacity: .8; }
+.mini-card:has(.mini-val.warn)::before   { background: var(--warning); opacity: .8; }
+.mini-card:has(.mini-val.danger)::before,
+.mini-card:has(.mini-val.neg)::before    { background: var(--danger);  opacity: .8; }
+
 .mini-card.clickable { cursor: pointer; }
-.mini-card.clickable:hover { box-shadow: var(--shadow-sm); transform: translateY(-1px); border-color: var(--primary); }
-.mini-val { font-size: 19px; font-weight: 800; color: var(--text); letter-spacing: -0.4px; }
-.mini-val.ok { color: #16a34a; } .mini-val.warn { color: #d97706; }
+.mini-card.clickable:hover {
+  box-shadow: var(--shadow-md, 0 6px 18px rgba(15,23,42,.08));
+  transform: translateY(-2px); border-color: var(--primary);
+}
+.mini-card.clickable:active { transform: translateY(0); }
+
+.mini-val {
+  font-size: 22px; font-weight: 800; color: var(--text);
+  letter-spacing: -0.6px; line-height: 1.1;
+  font-variant-numeric: tabular-nums;   /* figures line up column to column */
+}
+.mini-val.ok { color: var(--success); } .mini-val.warn { color: var(--warning); }
 .mini-val.danger { color: var(--danger); } .mini-val.neg { color: var(--danger); }
-.mini-lbl { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+.mini-lbl {
+  font-size: 10.5px; font-weight: 700; color: var(--text-light);
+  text-transform: uppercase; letter-spacing: .06em;
+}
 
 /* Chart trend toggle */
 .chart-head-right { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }

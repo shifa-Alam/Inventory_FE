@@ -23,16 +23,20 @@
           {{ 'sales.customer_label' | translate }} <span class="req-star">*</span>
         </label>
         <div class="cust-dd-wrap" (keydown.escape)="ddOpen=false" (focusout)="onDdFocusOut($event)">
-          <div class="cust-dd-box" (click)="openDropdown()"
-               [class.dd-required]="!selectedCustomer && items.length > 0"
-               [class.dd-selected]="!!selectedCustomer">
-            <svg class="dd-user-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          <div class="cust-dd-box" (click)="openDropdown()" [class.dd-required]="!selectedCustomer && items.length > 0"
+            [class.dd-selected]="!!selectedCustomer">
+            <svg class="dd-user-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
             </svg>
             <span class="cust-dd-val" [class.placeholder]="!selectedCustomer">
               {{ selectedCustomer ? selectedCustomer.name : 'Customer *' }}
             </span>
-            <svg class="dd-caret" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg class="dd-caret" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"
+              viewBox="0 0 24 24">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
           </div>
           <div class="cust-dd-panel" *ngIf="ddOpen">
             <input #ddSearch type="text" class="cust-dd-search" [(ngModel)]="ddQuery"
@@ -52,9 +56,8 @@
       <div class="cust-field cust-field-phone">
         <label class="field-label hide-mobile">{{ 'sales.phone_search_label' | translate }}</label>
         <div class="cust-phone-wrap">
-          <input type="tel" class="cust-phone-input" [(ngModel)]="customerPhone"
-            (ngModelChange)="onPhoneChange($event)" [placeholder]="'sales.phone_search_ph' | translate"
-            autocomplete="off" />
+          <input type="tel" class="cust-phone-input" [(ngModel)]="customerPhone" (ngModelChange)="onPhoneChange($event)"
+            [placeholder]="'sales.phone_search_ph' | translate" autocomplete="off" />
           <button *ngIf="customerPhone" class="btn-cancel-customer" (click)="clearPhone()">✕</button>
         </div>
         <div class="cust-phone-results" *ngIf="phoneResults.length > 0">
@@ -66,7 +69,8 @@
         <div *ngIf="phoneNotFound" class="phone-not-found">
           <span class="not-found-label">Not found</span>
           <input type="text" [(ngModel)]="newCustomerName" placeholder="Enter name" class="cust-name-input" />
-          <button class="btn-save-customer" [disabled]="!newCustomerName.trim()" (click)="savePhoneCustomer()">Save</button>
+          <button class="btn-save-customer" [disabled]="!newCustomerName.trim()"
+            (click)="savePhoneCustomer()">Save</button>
         </div>
       </div>
 
@@ -82,7 +86,11 @@
       <!-- SEARCH — identical structure to New Purchase -->
       <div class="card card-body search-wrap">
         <div class="search-input-row">
-          <svg class="search-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <svg class="search-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
           <input #searchInput type="text" [placeholder]="'sales.search_placeholder' | translate"
             [(ngModel)]="productSearch" (ngModelChange)="onSearchChange($event)" (keydown)="onKeyDown($event)" />
           <div class="search-spinner" *ngIf="searching"></div>
@@ -102,7 +110,10 @@
               </span>
             </div>
             <span class="dp-add" aria-hidden="true">
-              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
             </span>
           </div>
         </div>
@@ -138,15 +149,17 @@
               <tr *ngFor="let item of items; let i = index">
                 <td class="col-center muted">{{ i + 1 }}</td>
                 <td class="cell-product bold" [title]="item.product_name">{{ item.product_name }}
-                  <select *ngIf="item.unitOptions?.length > 1" class="line-unit"
-                          [(ngModel)]="item.unit_id" (ngModelChange)="onLineUnitChange(item)">
+                  <select *ngIf="item.unitOptions?.length > 1" class="line-unit" [(ngModel)]="item.unit_id"
+                    (ngModelChange)="onLineUnitChange(item)">
                     <option *ngFor="let o of item.unitOptions" [ngValue]="o.id">{{ o.name }}</option>
                   </select>
-                  <small *ngIf="!(item.unitOptions?.length > 1) && item.unit_label" class="unit-tag">/ {{ item.unit_label }}</small>
+                  <small *ngIf="!(item.unitOptions?.length > 1) && item.unit_label" class="unit-tag">/ {{
+                    item.unit_label }}</small>
                 </td>
                 <td class="col-center"><span class="stock-chip">{{ item.stock }}</span></td>
                 <td class="col-right mrp-ref">{{ item.mrp ? (item.mrp | number) : '—' }}</td>
-                <td class="cell-input"><input #qtyInput class="input-qty" type="number" [(ngModel)]="item.quantity" min="1" [max]="maxUnitQty(item)" (change)="clampQuantity(item)" /></td>
+                <td class="cell-input"><input #qtyInput class="input-qty" type="number" [(ngModel)]="item.quantity"
+                    min="1" [max]="maxUnitQty(item)" (change)="clampQuantity(item)" /></td>
                 <td class="cell-input"><input class="input-rate" type="number" [(ngModel)]="item.rate" min="0" /></td>
                 <td class="col-right cell-total">{{ item.quantity * item.rate | number }}</td>
                 <td class="col-center"><button class="row-remove" (click)="removeRow(i)" title="Remove">✕</button></td>
@@ -166,11 +179,12 @@
           <div class="mic-top">
             <span class="mic-num">{{ i + 1 }}</span>
             <span class="mic-name">{{ item.product_name }}
-              <select *ngIf="item.unitOptions?.length > 1" class="line-unit"
-                      [(ngModel)]="item.unit_id" (ngModelChange)="onLineUnitChange(item)">
+              <select *ngIf="item.unitOptions?.length > 1" class="line-unit" [(ngModel)]="item.unit_id"
+                (ngModelChange)="onLineUnitChange(item)">
                 <option *ngFor="let o of item.unitOptions" [ngValue]="o.id">{{ o.name }}</option>
               </select>
-              <small *ngIf="!(item.unitOptions?.length > 1) && item.unit_label" class="unit-tag">/ {{ item.unit_label }}</small>
+              <small *ngIf="!(item.unitOptions?.length > 1) && item.unit_label" class="unit-tag">/ {{ item.unit_label
+                }}</small>
             </span>
             <span class="stock-chip">{{ item.stock }}</span>
             <button class="mic-remove" (click)="removeRow(i)">✕</button>
@@ -179,13 +193,11 @@
             <div class="mic-field mic-qty">
               <span class="mic-lbl">{{ 'sales.col_qty' | translate }}</span>
               <div class="qty-stepper">
-                <button class="qty-btn" type="button"
-                  (click)="item.quantity = item.quantity - 1; clampQuantity(item)"
+                <button class="qty-btn" type="button" (click)="item.quantity = item.quantity - 1; clampQuantity(item)"
                   [disabled]="item.quantity <= 1">−</button>
                 <input #qtyInput type="number" [(ngModel)]="item.quantity" min="1" [max]="maxUnitQty(item)"
                   (change)="clampQuantity(item)" class="qty-input" />
-                <button class="qty-btn" type="button"
-                  (click)="item.quantity = item.quantity + 1; clampQuantity(item)"
+                <button class="qty-btn" type="button" (click)="item.quantity = item.quantity + 1; clampQuantity(item)"
                   [disabled]="item.quantity >= maxUnitQty(item)">+</button>
               </div>
             </div>
@@ -216,7 +228,8 @@
 
         <div class="summary-line">
           <span class="s-label">{{ 'sales.discount' | translate }}</span>
-          <input class="s-input s-input-discount" type="number" [(ngModel)]="discount" placeholder="0" min="0" [max]="getTotal()" />
+          <input class="s-input s-input-discount" type="number" [(ngModel)]="discount" placeholder="0" min="0"
+            [max]="getTotal()" />
         </div>
 
         <div class="summary-line net-row" *ngIf="discount > 0">
@@ -234,22 +247,21 @@
           <span class="s-label">{{ 'sales.payment_method' | translate }}</span>
           <div class="pm-pills">
             <button type="button" class="pm-pill" *ngFor="let m of paymentMethods"
-              [class.active]="payment_method === m.value"
-              (click)="payment_method = m.value">{{ m.label }}</button>
+              [class.active]="payment_method === m.value" (click)="payment_method = m.value">{{ m.label }}</button>
           </div>
         </div>
 
         <!-- Cash tender → change calculator -->
         <div class="summary-line">
           <span class="s-label">Cash Received</span>
-          <input class="s-input" type="number" [(ngModel)]="cashReceived"
-                 (ngModelChange)="onCashReceivedChange()" placeholder="0" min="0" />
+          <input class="s-input" type="number" [(ngModel)]="cashReceived" (ngModelChange)="onCashReceivedChange()"
+            placeholder="0" min="0" />
         </div>
         <div class="tender-chips" *ngIf="payable > 0">
-          <button type="button" class="tender-chip exact" (click)="setFullPaid()"
-                  title="F8">Exact ৳{{ payable | number }}</button>
-          <button type="button" class="tender-chip" *ngFor="let n of tenderChips"
-                  (click)="setCashReceived(n)">৳{{ n | number }}</button>
+          <button type="button" class="tender-chip exact" (click)="setFullPaid()" title="F8">Exact ৳{{ payable | number
+            }}</button>
+          <button type="button" class="tender-chip" *ngFor="let n of tenderChips" (click)="setCashReceived(n)">৳{{ n |
+            number }}</button>
         </div>
 
         <div class="summary-line">
@@ -275,6 +287,12 @@
           <span *ngIf="saving" class="spinner"></span>
           {{ saving ? 'Saving…' : ('sales.complete' | translate) }}
         </button>
+        <!-- Draft: prepare the invoice without taking stock out -->
+        <!-- <button class="btn btn-outline btn-draft" (click)="saveDraft()"
+          [disabled]="items.length === 0 || !customer_id || saving"
+          title="Save as draft — stock is NOT deducted until you finalize it">
+          Save as Draft
+        </button> -->
       </div>
 
       <!-- Keyboard shortcut hints (desktop cashiers) -->
@@ -303,7 +321,8 @@
 
     <div class="sheet-line">
       <span class="sl-label">{{ 'sales.discount' | translate }}</span>
-      <input class="sl-input sl-input-discount" type="number" [(ngModel)]="discount" placeholder="0" min="0" [max]="getTotal()" />
+      <input class="sl-input sl-input-discount" type="number" [(ngModel)]="discount" placeholder="0" min="0"
+        [max]="getTotal()" />
     </div>
 
     <div class="sheet-line" *ngIf="discount > 0">
@@ -318,21 +337,20 @@
 
     <!-- Payment method pills -->
     <div class="pm-pills sheet-pills">
-      <button type="button" class="pm-pill" *ngFor="let m of paymentMethods"
-        [class.active]="payment_method === m.value"
+      <button type="button" class="pm-pill" *ngFor="let m of paymentMethods" [class.active]="payment_method === m.value"
         (click)="payment_method = m.value">{{ m.label }}</button>
     </div>
 
     <!-- Cash tender + quick chips -->
     <div class="sheet-line">
       <span class="sl-label">Cash Received</span>
-      <input class="sl-input" type="number" [(ngModel)]="cashReceived"
-             (ngModelChange)="onCashReceivedChange()" placeholder="0" min="0" />
+      <input class="sl-input" type="number" [(ngModel)]="cashReceived" (ngModelChange)="onCashReceivedChange()"
+        placeholder="0" min="0" />
     </div>
     <div class="tender-chips" *ngIf="payable > 0">
       <button type="button" class="tender-chip exact" (click)="setFullPaid()">Exact ৳{{ payable | number }}</button>
-      <button type="button" class="tender-chip" *ngFor="let n of tenderChips"
-              (click)="setCashReceived(n)">৳{{ n | number }}</button>
+      <button type="button" class="tender-chip" *ngFor="let n of tenderChips" (click)="setCashReceived(n)">৳{{ n |
+        number }}</button>
     </div>
 
     <div class="sheet-line">
@@ -360,7 +378,9 @@
     <span class="cb-total">৳{{ getTotal() - discount | number }}</span>
     <span class="cb-action">
       {{ 'sales.complete' | translate }}
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <polyline points="9 18 15 12 9 6" />
+      </svg>
     </span>
   </button>
 

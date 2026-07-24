@@ -179,7 +179,7 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
           this.showToast(`Not found: ${sku}`, 'error');
           return;
         }
-        const product = res.find((p: any) => p.barcode === sku || p.sku === sku) ?? res[0];
+        const product = res.find((p: any) => p.barcode === sku) ?? res[0];
         this.addOrIncrement(product);
       },
       error: () => {
@@ -195,6 +195,7 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
     const existing = this.items.find(i => i.product_id === product.id);
     if (existing) {
       existing.quantity++;
+      this.onQtyChange(existing);   // keep line + grand total in sync with the new qty
       this.showToast(`${product.name} × ${existing.quantity}`, 'success');
     } else {
       const rate = product.last_purchase_price || product.average_cost || 0;
