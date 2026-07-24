@@ -7,6 +7,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
 import { ToastService } from '../../shared/services/toast.service';
 import { ConfirmService } from '../../shared/services/confirm.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-customers',
@@ -34,7 +35,8 @@ export class CustomersComponent implements OnInit {
   onEscape() { if (this.showForm) this.cancelForm(); }
   newCustomer = { id: 0, name: '', phone: '', address: '', credit_limit: 0, current_due: 0 };
 
-  constructor(private api: ApiService, private toast: ToastService, private confirmSvc: ConfirmService) {}
+  constructor(private api: ApiService, private toast: ToastService,
+              private confirmSvc: ConfirmService, public auth: AuthService) {}
 
   ngOnInit() { this.load(); }
 

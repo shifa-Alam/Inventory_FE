@@ -10,13 +10,13 @@
   <div class="card card-body credit-card">
     <div>
       <span class="credit-label">SMS credits left</span>
-      <span class="credit-value">{{ settings.sms_credit_balance | number }}</span>
+      <span class="credit-value">{{ credits | number }}</span>
     </div>
     <span class="credit-hint">Each reminder uses 1 SMS. Top-ups are billed to your plan.</span>
   </div>
 
-  <!-- Settings -->
-  <div class="card card-body">
+  <!-- Settings (owner/admin only) -->
+  <div class="card card-body" *ngIf="isAdmin">
     <p class="card-title">SMS settings</p>
     <div class="form-grid">
       <div class="form-group">
