@@ -29,6 +29,7 @@ import { TenantsComponent } from './features/tenants/tenants.component';
 import { ExpensesComponent } from './features/expenses/expenses.component';
 import { ShiftComponent } from './features/shift/shift.component';
 import { AgingComponent } from './features/aging/aging.component';
+import { NotificationSettingsComponent } from './features/notification-settings/notification-settings.component';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 
@@ -70,7 +71,8 @@ export const routes: Routes = [
             { path: 'tenants', component: TenantsComponent },
             { path: 'expenses', component: ExpensesComponent },
             { path: 'shift', component: ShiftComponent },
-            { path: 'aging', component: AgingComponent }
+            { path: 'aging', component: AgingComponent },
+            { path: 'notifications', component: NotificationSettingsComponent }
         ]
     },
 

@@ -1,0 +1,76 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2>Notifications</h2>
+      <p class="sub">SMS reminders &amp; alerts for your shop</p>
+    </div>
+  </div>
+
+  <!-- SMS credit balance -->
+  <div class="card card-body credit-card">
+    <div>
+      <span class="credit-label">SMS credits left</span>
+      <span class="credit-value">{{ settings.sms_credit_balance | number }}</span>
+    </div>
+    <span class="credit-hint">Each reminder uses 1 SMS. Top-ups are billed to your plan.</span>
+  </div>
+
+  <!-- Settings -->
+  <div class="card card-body">
+    <p class="card-title">SMS settings</p>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Send SMS reminders</label>
+        <label class="switch-row">
+          <input type="checkbox" [(ngModel)]="settings.sms_enabled" />
+          <span>{{ settings.sms_enabled ? 'On' : 'Off' }}</span>
+        </label>
+      </div>
+      <div class="form-group">
+        <label>Sender / shop name <span class="hint">(shown in the SMS)</span></label>
+        <input type="text" maxlength="30" placeholder="e.g. Amira Traders"
+               [(ngModel)]="settings.sender_name" />
+      </div>
+      <div class="form-group">
+        <label>Message language</label>
+        <select [(ngModel)]="settings.language">
+          <option value="bn">বাংলা</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" (click)="save()" [disabled]="saving">
+        {{ saving ? 'Saving…' : 'Save settings' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Recent sends -->
+  <div class="card">
+    <div class="card-header-row">
+      <span class="card-title" style="margin-bottom:0">Recent reminders</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr><th>When</th><th>Type</th><th>To</th><th>Status</th><th class="right">Cost</th></tr>
+        </thead>
+        <tbody class="compact-rows">
+          <tr *ngFor="let r of log">
+            <td class="muted">{{ r.created_at | date:'dd MMM yy, hh:mm a' }}</td>
+            <td>{{ r.type }}</td>
+            <td>{{ r.recipient || '—' }}</td>
+            <td>
+              <span class="badge" [ngClass]="r.status === 'SENT' ? 'badge-success' : 'badge-danger'">{{ r.status }}</span>
+            </td>
+            <td class="right muted">{{ r.cost_credits }}</td>
+          </tr>
+          <tr *ngIf="log.length === 0">
+            <td colspan="5" class="empty-row">No reminders sent yet.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

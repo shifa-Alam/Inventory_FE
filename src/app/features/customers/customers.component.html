@@ -106,6 +106,8 @@
             </td>
             <td>
               <div class="row-actions">
+                <button class="btn btn-outline btn-sm" *ngIf="c.current_due > 0" (click)="remind(c)"
+                        title="Send SMS due reminder">📩 SMS</button>
                 <button class="btn btn-warning btn-sm" (click)="edit(c)">{{ 'customers.edit' | translate }}</button>
                 <button class="btn btn-danger btn-sm" (click)="delete(c.id)">{{ 'customers.delete' | translate }}</button>
               </div>
@@ -159,6 +161,7 @@
         </div>
       </div>
       <div class="mc-actions">
+        <button class="btn btn-outline btn-sm" *ngIf="c.current_due > 0" (click)="remind(c)">📩 SMS</button>
         <button class="btn btn-warning btn-sm" (click)="edit(c)">{{ 'customers.edit' | translate }}</button>
         <button class="btn btn-danger btn-sm" (click)="delete(c.id)">{{ 'customers.delete' | translate }}</button>
       </div>

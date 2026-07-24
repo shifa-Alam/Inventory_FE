@@ -85,6 +85,19 @@ export class CustomersComponent implements OnInit {
     });
   }
 
+  /** Send an SMS due-reminder to a customer who owes money. */
+  async remind(c: any) {
+    if (!(c.current_due > 0)) return;
+    if (!await this.confirmSvc.open(
+      `Send an SMS due reminder to ${c.name} for ৳${c.current_due}?`,
+      { confirmLabel: 'Send SMS' })) return;
+    this.api.post('/notifications/due-reminder', { customer_id: c.id }).subscribe({
+      next: (res: any) => this.toast.success(
+        `Reminder sent to ${res.recipient} — ${res.credits_left} SMS left`),
+      error: (err: any) => this.toast.error(err?.error?.detail || 'Failed to send reminder'),
+    });
+  }
+
   async delete(id: number) {
     if (!await this.confirmSvc.open('Deactivate this customer? Their purchase history is kept.')) return;
     this.api.delete(`/customers/${id}`).subscribe({
