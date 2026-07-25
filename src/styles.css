@@ -1,9 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap');
 @import url('https://fonts.maateen.me/solaiman-lipi/font.css');
 
-body.lang-bn,
-body.lang-bn * {
-  font-family: 'SolaimanLipi', 'Inter', sans-serif !important;
+/* App-wide typography: English/Latin renders in Inter, Bangla glyphs fall
+   through to SolaimanLipi — on every screen and in both UI languages (the
+   browser picks the first font in the stack that has each glyph). Set on the
+   base stack below (html, body) and echoed into components that declare their
+   own font-family (invoices, login).
+
+   Angular Material's prebuilt theme puts a `.mat-typography` class on <body>
+   and hard-codes Roboto on its typography classes (specificity beats a plain
+   `body` rule). Re-declare the same selectors here — they live later in the
+   bundle, so this wins — to route Bangla to SolaimanLipi app-wide. */
+.mat-typography,
+.mat-typography h1, .mat-typography h2, .mat-typography h3,
+.mat-typography h4, .mat-typography h5, .mat-typography h6,
+.mat-display-large, .mat-display-medium, .mat-display-small,
+.mat-headline-large, .mat-headline-medium, .mat-headline-small,
+.mat-title-large, .mat-title-medium, .mat-title-small,
+.mat-body-large, .mat-body-medium, .mat-body-small,
+.mat-label-large, .mat-label-medium, .mat-label-small {
+  font-family: 'Inter', 'SolaimanLipi', 'Segoe UI', system-ui, sans-serif;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -186,7 +202,7 @@ body.dark {
 
 html, body {
   height: 100%;
-  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  font-family: 'Inter', 'SolaimanLipi', 'Segoe UI', system-ui, sans-serif;
   font-size: 15px;
   line-height: 1.5;
   color: var(--text);

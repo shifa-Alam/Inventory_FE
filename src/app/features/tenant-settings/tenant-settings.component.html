@@ -1,0 +1,298 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2>{{ 'settings.title' | translate }}</h2>
+      <p class="sub">{{ 'settings.subtitle' | translate }}</p>
+    </div>
+    <button *ngIf="isAdmin" class="btn btn-primary" (click)="save()" [disabled]="saving || loading">
+      {{ (saving ? 'common.saving' : 'settings.save') | translate }}
+    </button>
+  </div>
+
+  <div *ngIf="!isAdmin" class="card card-body readonly-note">
+    {{ 'settings.readonly_note' | translate }}
+  </div>
+
+  <div *ngIf="loading" class="card card-body muted">{{ 'common.loading' | translate }}</div>
+
+  <fieldset class="settings-form" [disabled]="!isAdmin" *ngIf="!loading">
+
+    <!-- ── Business Information ─────────────────────────────────────────── -->
+    <div class="card card-body">
+      <p class="card-title">{{ 'settings.section_business' | translate }}</p>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>{{ 'settings.business_name' | translate }}</label>
+          <input type="text" maxlength="150" [(ngModel)]="model.name" name="name" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.business_type' | translate }}</label>
+          <select [(ngModel)]="model.business_type" name="business_type">
+            <option value="B2C">{{ 'settings.b2c' | translate }}</option>
+            <option value="B2B">{{ 'settings.b2b' | translate }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.tagline' | translate }}</label>
+          <input type="text" maxlength="150" [(ngModel)]="model.tagline" name="tagline" />
+        </div>
+        <div class="form-group full">
+          <label>{{ 'settings.business_description' | translate }}</label>
+          <input type="text" maxlength="500" [(ngModel)]="model.settings.business_description" name="business_description" />
+        </div>
+        <div class="form-group full">
+          <label>{{ 'settings.address' | translate }}</label>
+          <input type="text" maxlength="300" [(ngModel)]="model.address" name="address" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.phone' | translate }}</label>
+          <input type="text" maxlength="20" [(ngModel)]="model.phone" name="phone" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.mobile' | translate }}</label>
+          <input type="text" maxlength="30" [(ngModel)]="model.settings.mobile" name="mobile" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.email' | translate }}</label>
+          <input type="email" maxlength="150" [(ngModel)]="model.email" name="email" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.website' | translate }}</label>
+          <input type="text" maxlength="150" [(ngModel)]="model.settings.website" name="website" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.bin_vat' | translate }}</label>
+          <input type="text" maxlength="50" [(ngModel)]="model.settings.bin_vat" name="bin_vat" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.trade_license' | translate }}</label>
+          <input type="text" maxlength="50" [(ngModel)]="model.settings.trade_license" name="trade_license" />
+        </div>
+        <div class="form-group full">
+          <label>{{ 'settings.tax_info' | translate }}</label>
+          <input type="text" maxlength="200" [(ngModel)]="model.settings.tax_info" name="tax_info" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Branding ─────────────────────────────────────────────────────── -->
+    <div class="card card-body">
+      <p class="card-title">{{ 'settings.section_branding' | translate }}</p>
+      <p class="card-hint">{{ 'settings.branding_hint' | translate }}</p>
+      <div class="brand-grid">
+        <div class="brand-item">
+          <label>{{ 'settings.shop_logo' | translate }}</label>
+          <div class="brand-preview">
+            <img *ngIf="model.logo_url" [src]="model.logo_url" alt="logo" />
+            <span *ngIf="!model.logo_url" class="brand-empty">{{ 'settings.no_image' | translate }}</span>
+          </div>
+          <input type="file" accept="image/*" (change)="onFile('logo', $event)" [disabled]="uploading['logo']" />
+        </div>
+        <div class="brand-item">
+          <label>{{ 'settings.invoice_logo' | translate }}</label>
+          <div class="brand-preview">
+            <img *ngIf="assetUrl(model.settings.invoice_logo) as u" [src]="u" alt="invoice logo" />
+            <span *ngIf="!model.settings.invoice_logo" class="brand-empty">{{ 'settings.no_image' | translate }}</span>
+          </div>
+          <input type="file" accept="image/*" (change)="onFile('invoice_logo', $event)" [disabled]="uploading['invoice_logo']" />
+        </div>
+        <div class="brand-item">
+          <label>{{ 'settings.favicon' | translate }}</label>
+          <div class="brand-preview">
+            <img *ngIf="assetUrl(model.settings.favicon) as u" [src]="u" alt="favicon" />
+            <span *ngIf="!model.settings.favicon" class="brand-empty">{{ 'settings.no_image' | translate }}</span>
+          </div>
+          <input type="file" accept="image/*,.ico" (change)="onFile('favicon', $event)" [disabled]="uploading['favicon']" />
+        </div>
+        <div class="brand-item">
+          <label>{{ 'settings.banner' | translate }}</label>
+          <div class="brand-preview">
+            <img *ngIf="assetUrl(model.settings.banner) as u" [src]="u" alt="banner" />
+            <span *ngIf="!model.settings.banner" class="brand-empty">{{ 'settings.no_image' | translate }}</span>
+          </div>
+          <input type="file" accept="image/*" (change)="onFile('banner', $event)" [disabled]="uploading['banner']" />
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>{{ 'settings.accent_color' | translate }}</label>
+          <input type="color" [(ngModel)]="model.accent_color" name="accent_color" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Language ─────────────────────────────────────────────────────── -->
+    <div class="card card-body">
+      <p class="card-title">{{ 'settings.section_language' | translate }}</p>
+      <p class="card-hint">{{ 'settings.language_hint' | translate }}</p>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>{{ 'settings.default_language' | translate }}</label>
+          <select [(ngModel)]="model.settings.default_language" name="default_language">
+            <option value="en">English</option>
+            <option value="bn">বাংলা</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Invoice Settings ─────────────────────────────────────────────── -->
+    <div class="card card-body">
+      <p class="card-title">{{ 'settings.section_invoice' | translate }}</p>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>{{ 'settings.paper_size' | translate }}</label>
+          <select [(ngModel)]="model.options.paper_size" name="paper_size">
+            <option *ngFor="let p of paperSizes" [ngValue]="p.value">{{ p.key | translate }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.invoice_template' | translate }}</label>
+          <select [(ngModel)]="model.invoice_template" name="invoice_template">
+            <option *ngFor="let t of templates" [value]="t">{{ ('settings.tpl_' + t) | translate }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.invoice_title' | translate }}</label>
+          <input type="text" maxlength="100" [(ngModel)]="model.options.invoice_title" name="invoice_title" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.currency_symbol' | translate }}</label>
+          <input type="text" maxlength="8" [(ngModel)]="model.options.currency_symbol" name="currency_symbol" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.currency_position' | translate }}</label>
+          <select [(ngModel)]="model.options.currency_position" name="currency_position">
+            <option value="before">{{ 'settings.pos_before' | translate }}</option>
+            <option value="after">{{ 'settings.pos_after' | translate }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.print_language' | translate }}</label>
+          <select [(ngModel)]="model.options.print_language" name="print_language">
+            <option value="en">English</option>
+            <option value="bn">বাংলা</option>
+            <option value="bilingual">{{ 'settings.bilingual' | translate }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.invoice_copies' | translate }}</label>
+          <input type="number" min="1" max="5" [(ngModel)]="model.options.invoice_copies" name="invoice_copies" />
+        </div>
+        <div class="form-group full">
+          <label>{{ 'settings.footer_note' | translate }}</label>
+          <input type="text" maxlength="300" [(ngModel)]="model.footer_note" name="footer_note" />
+        </div>
+        <div class="form-group full" *ngIf="model.options.show_terms">
+          <label>{{ 'settings.terms_text' | translate }}</label>
+          <textarea rows="2" maxlength="1000" [(ngModel)]="model.options.terms_text" name="terms_text"></textarea>
+        </div>
+      </div>
+
+      <p class="card-subtitle">{{ 'settings.show_hide' | translate }}</p>
+      <div class="toggle-grid">
+        <label class="chk"><input type="checkbox" [(ngModel)]="model.options.show_qr" name="show_qr" /> {{ 'settings.show_qr' | translate }}</label>
+        <label class="chk"><input type="checkbox" [(ngModel)]="model.options.show_barcode" name="show_barcode" /> {{ 'settings.show_barcode' | translate }}</label>
+        <label class="chk"><input type="checkbox" [(ngModel)]="model.options.show_customer" name="show_customer" /> {{ 'settings.show_customer' | translate }}</label>
+        <label class="chk"><input type="checkbox" [(ngModel)]="model.options.show_salesperson" name="show_salesperson" /> {{ 'settings.show_salesperson' | translate }}</label>
+        <label class="chk"><input type="checkbox" [(ngModel)]="model.options.show_sku" name="show_sku" /> {{ 'settings.show_sku' | translate }}</label>
+        <label class="chk"><input type="checkbox" [(ngModel)]="model.options.show_discount" name="show_discount" /> {{ 'settings.show_discount' | translate }}</label>
+        <label class="chk"><input type="checkbox" [(ngModel)]="model.options.show_savings" name="show_savings" /> {{ 'settings.show_savings' | translate }}</label>
+        <label class="chk"><input type="checkbox" [(ngModel)]="model.options.show_terms" name="show_terms" /> {{ 'settings.show_terms' | translate }}</label>
+        <label class="chk"><input type="checkbox" [(ngModel)]="model.options.show_mrp" name="show_mrp" /> {{ 'settings.show_mrp' | translate }}</label>
+        <label class="chk"><input type="checkbox" [(ngModel)]="model.options.show_signature" name="show_signature" /> {{ 'settings.show_signature' | translate }}</label>
+        <label class="chk"><input type="checkbox" [(ngModel)]="model.options.show_status" name="show_status" /> {{ 'settings.show_status' | translate }}</label>
+        <label class="chk"><input type="checkbox" [(ngModel)]="model.options.show_paid_due" name="show_paid_due" /> {{ 'settings.show_paid_due' | translate }}</label>
+        <label class="chk"><input type="checkbox" [(ngModel)]="model.options.show_footer_contact" name="show_footer_contact" /> {{ 'settings.show_footer_contact' | translate }}</label>
+        <label class="chk"><input type="checkbox" [(ngModel)]="model.options.bangla_digits" name="bangla_digits" /> {{ 'settings.bangla_digits' | translate }}</label>
+        <label class="chk"><input type="checkbox" [(ngModel)]="model.options.auto_print" name="auto_print" /> {{ 'settings.auto_print' | translate }}</label>
+      </div>
+    </div>
+
+    <!-- ── General Preferences ──────────────────────────────────────────── -->
+    <div class="card card-body">
+      <p class="card-title">{{ 'settings.section_general' | translate }}</p>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>{{ 'settings.currency' | translate }}</label>
+          <input type="text" maxlength="10" [(ngModel)]="model.settings.currency" name="currency" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.decimal_precision' | translate }}</label>
+          <input type="number" min="0" max="4" [(ngModel)]="model.settings.decimal_precision" name="decimal_precision" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.number_format' | translate }}</label>
+          <input type="text" maxlength="20" [(ngModel)]="model.settings.number_format" name="number_format" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.tax_mode' | translate }}</label>
+          <select [(ngModel)]="model.settings.tax_mode" name="tax_mode">
+            <option value="none">{{ 'settings.tax_none' | translate }}</option>
+            <option value="inclusive">{{ 'settings.tax_inclusive' | translate }}</option>
+            <option value="exclusive">{{ 'settings.tax_exclusive' | translate }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.date_format' | translate }}</label>
+          <input type="text" maxlength="30" [(ngModel)]="model.settings.date_format" name="date_format" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.time_format' | translate }}</label>
+          <select [(ngModel)]="model.settings.time_format" name="time_format">
+            <option value="12h">{{ 'settings.time_12h' | translate }}</option>
+            <option value="24h">{{ 'settings.time_24h' | translate }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.timezone' | translate }}</label>
+          <input type="text" maxlength="50" [(ngModel)]="model.settings.timezone" name="timezone" />
+        </div>
+        <div class="form-group full">
+          <label>{{ 'settings.receipt_footer' | translate }}</label>
+          <input type="text" maxlength="300" [(ngModel)]="model.settings.receipt_footer" name="receipt_footer" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Printing Preferences ─────────────────────────────────────────── -->
+    <div class="card card-body">
+      <p class="card-title">{{ 'settings.section_printing' | translate }}</p>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>{{ 'settings.thermal_margin' | translate }}</label>
+          <input type="number" min="0" max="20" [(ngModel)]="model.settings.thermal_margin" name="thermal_margin" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.font_size' | translate }}</label>
+          <input type="number" min="8" max="24" [(ngModel)]="model.settings.font_size" name="font_size" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.header_align' | translate }}</label>
+          <select [(ngModel)]="model.settings.header_align" name="header_align">
+            <option *ngFor="let a of aligns" [value]="a">{{ ('settings.align_' + a) | translate }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.footer_align' | translate }}</label>
+          <select [(ngModel)]="model.settings.footer_align" name="footer_align">
+            <option *ngFor="let a of aligns" [value]="a">{{ ('settings.align_' + a) | translate }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{{ 'settings.print_preview' | translate }}</label>
+          <label class="switch-row">
+            <input type="checkbox" [(ngModel)]="model.settings.print_preview" name="print_preview" />
+            <span>{{ (model.settings.print_preview ? 'settings.on' : 'settings.off') | translate }}</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions" *ngIf="isAdmin">
+      <button class="btn btn-primary" (click)="save()" [disabled]="saving">
+        {{ (saving ? 'common.saving' : 'settings.save') | translate }}
+      </button>
+    </div>
+  </fieldset>
+</div>

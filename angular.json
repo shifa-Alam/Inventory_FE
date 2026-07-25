@@ -20,6 +20,11 @@
               "zone.js"
             ],
             "tsConfig": "tsconfig.app.json",
+            "allowedCommonJsDependencies": [
+              "html2pdf.js",
+              "jsbarcode",
+              "qrcode"
+            ],
             "assets": [
               {
                 "glob": "**/*",

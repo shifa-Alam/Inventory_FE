@@ -107,14 +107,14 @@
             <td>
               <div class="row-actions">
                 <button class="btn btn-outline btn-sm" *ngIf="c.current_due > 0 && auth.canManage()" (click)="remind(c)"
-                        title="Send SMS due reminder">📩 SMS</button>
+                        [title]="'customers.sms_tooltip' | translate">📩 {{ 'customers.sms_btn' | translate }}</button>
                 <button class="btn btn-warning btn-sm" (click)="edit(c)">{{ 'customers.edit' | translate }}</button>
                 <button class="btn btn-danger btn-sm" (click)="delete(c.id)">{{ 'customers.delete' | translate }}</button>
               </div>
             </td>
           </tr>
           <tr *ngIf="loading" class="loading-row">
-            <td colspan="8"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+            <td colspan="8"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
           </tr>
           <tr *ngIf="!loading && customers.length === 0">
             <td colspan="8" class="empty-row"><div class="empty-icon">👤</div>{{ 'customers.empty' | translate }}</td>
@@ -131,7 +131,7 @@
       <span class="mobile-title">{{ 'customers.list_title' | translate }}</span>
       <span class="count-badge">{{ total }}</span>
     </div>
-    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
+    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
     <div class="mobile-empty" *ngIf="!loading && customers.length === 0"><div class="empty-icon">👤</div><p>{{ 'customers.empty' | translate }}</p></div>
     <div class="mobile-card" *ngFor="let c of customers; let i = index" [class.mc-warn]="c.current_due > 0">
       <div class="mc-top">
@@ -148,20 +148,20 @@
       </div>
       <div class="mc-grid">
         <div class="mc-field">
-          <span class="mc-lbl">Address</span>
+          <span class="mc-lbl">{{ 'customers.col_address' | translate }}</span>
           <span class="mc-val muted">{{ c.address || '—' }}</span>
         </div>
         <div class="mc-field">
-          <span class="mc-lbl">Credit Limit</span>
+          <span class="mc-lbl">{{ 'customers.col_credit' | translate }}</span>
           <span class="mc-val">৳{{ c.credit_limit | number }}</span>
         </div>
         <div class="mc-field">
-          <span class="mc-lbl">Due</span>
+          <span class="mc-lbl">{{ 'common.due' | translate }}</span>
           <span class="mc-val" [class.due]="c.current_due > 0">৳{{ c.current_due | number }}</span>
         </div>
       </div>
       <div class="mc-actions">
-        <button class="btn btn-outline btn-sm" *ngIf="c.current_due > 0 && auth.canManage()" (click)="remind(c)">📩 SMS</button>
+        <button class="btn btn-outline btn-sm" *ngIf="c.current_due > 0 && auth.canManage()" [title]="'customers.sms_tooltip' | translate" (click)="remind(c)">📩 {{ 'customers.sms_btn' | translate }}</button>
         <button class="btn btn-warning btn-sm" (click)="edit(c)">{{ 'customers.edit' | translate }}</button>
         <button class="btn btn-danger btn-sm" (click)="delete(c.id)">{{ 'customers.delete' | translate }}</button>
       </div>

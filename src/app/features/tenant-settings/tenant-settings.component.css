@@ -1,0 +1,63 @@
+.settings-form {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;                 /* fieldset default min-width breaks the grid */
+}
+.settings-form:disabled { opacity: .85; }
+
+.readonly-note {
+  color: var(--text-muted);
+  background: var(--warning-bg, #fff8e6);
+  margin-bottom: 12px;
+}
+
+.card-hint { font-size: 12.5px; color: var(--text-light); margin: -4px 0 12px; }
+.card-subtitle {
+  font-size: 12px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: .5px; margin: 16px 0 8px;
+}
+
+/* Let long fields span the whole row. */
+.form-group.full { grid-column: 1 / -1; }
+
+/* Toggle checklist. */
+.toggle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px 16px;
+}
+.chk {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 500; color: var(--text);
+  text-transform: none; letter-spacing: 0;
+}
+.chk input { width: 16px; height: 16px; flex: none; }
+
+.switch-row { display: flex; align-items: center; gap: 8px; font-weight: 600; text-transform: none; letter-spacing: 0; }
+.switch-row input { width: 18px; height: 18px; }
+
+/* Branding uploads. */
+.brand-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.brand-item { display: flex; flex-direction: column; gap: 8px; }
+.brand-item > label {
+  font-size: 12.5px; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: .5px;
+}
+.brand-preview {
+  height: 96px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px dashed var(--border, #d0d5dd);
+  border-radius: 8px;
+  background: var(--surface-2, #f8fafc);
+  overflow: hidden;
+  padding: 6px;
+}
+.brand-preview img { max-height: 100%; max-width: 100%; object-fit: contain; }
+.brand-empty { font-size: 12px; color: var(--text-light); }
+.brand-item input[type="file"] { font-size: 12px; }

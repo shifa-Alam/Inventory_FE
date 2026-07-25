@@ -65,7 +65,7 @@
             </td>
           </tr>
           <tr *ngIf="loading" class="loading-row">
-            <td colspan="4"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+            <td colspan="4"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
           </tr>
           <tr *ngIf="!loading && categories.length === 0">
             <td colspan="4" class="empty-row">{{ 'categories.empty' | translate }}</td>
@@ -82,7 +82,7 @@
       <span class="mobile-title">{{ 'categories.title' | translate }}</span>
       <span class="count-badge">{{ total }}</span>
     </div>
-    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
+    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
     <div class="mobile-empty" *ngIf="!loading && categories.length === 0"><p>{{ 'categories.empty' | translate }}</p></div>
     <div class="mobile-card" *ngFor="let c of categories; let i = index">
       <div class="mc-top">

@@ -37,7 +37,7 @@
             [class.has-value]="selectedCustomer"
           />
           <div class="search-spinner" *ngIf="searchingCustomer"></div>
-          <button class="clear-customer" *ngIf="selectedCustomer && !searchingCustomer" (click)="clearCustomer()" title="Clear">×</button>
+          <button class="clear-customer" *ngIf="selectedCustomer && !searchingCustomer" (click)="clearCustomer()" [title]="'common.clear' | translate">×</button>
           <div class="search-progress-h" *ngIf="searchingCustomer"></div>
           <div class="customer-dropdown" *ngIf="showCustomerDropdown || searchingCustomer">
             <div class="dp-loading" *ngIf="searchingCustomer && customerResults.length === 0">

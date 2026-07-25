@@ -223,8 +223,8 @@
         </select>
         <select [(ngModel)]="filterStatus" (ngModelChange)="applyFilter()">
           <option value="">{{ 'products.filter_all_status' | translate }}</option>
-          <option value="OK">OK</option>
-          <option value="LOW">LOW</option>
+          <option value="OK">{{ 'stock.status_ok' | translate }}</option>
+          <option value="LOW">{{ 'stock.status_low' | translate }}</option>
         </select>
         <select [(ngModel)]="filterActive" (ngModelChange)="applyFilter()">
           <option value="">{{ 'products.filter_all_active' | translate }}</option>

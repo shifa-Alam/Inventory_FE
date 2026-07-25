@@ -94,7 +94,7 @@
             <td><button class="btn btn-warning btn-sm" (click)="edit(s)">{{ 'customers.edit' | translate }}</button></td>
           </tr>
           <tr *ngIf="loading" class="loading-row">
-            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
           </tr>
           <tr *ngIf="!loading && suppliers.length === 0">
             <td colspan="6" class="empty-row"><div class="empty-icon">🏪</div>{{ 'suppliers.empty' | translate }}</td>
@@ -111,7 +111,7 @@
       <span class="mobile-title">{{ 'suppliers.list_title' | translate }}</span>
       <span class="count-badge">{{ total }}</span>
     </div>
-    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
+    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
     <div class="mobile-empty" *ngIf="!loading && suppliers.length === 0"><div class="empty-icon">🏪</div><p>{{ 'suppliers.empty' | translate }}</p></div>
     <div class="mobile-card" *ngFor="let s of suppliers; let i = index" [class.mc-warn]="s.opening_due > 0">
       <div class="mc-top">
@@ -128,11 +128,11 @@
       </div>
       <div class="mc-grid">
         <div class="mc-field">
-          <span class="mc-lbl">Address</span>
+          <span class="mc-lbl">{{ 'common.address' | translate }}</span>
           <span class="mc-val muted">{{ s.address || '—' }}</span>
         </div>
         <div class="mc-field">
-          <span class="mc-lbl">Due</span>
+          <span class="mc-lbl">{{ 'common.due' | translate }}</span>
           <span class="mc-val" [class.due]="s.opening_due > 0">৳{{ s.opening_due | number }}</span>
         </div>
       </div>

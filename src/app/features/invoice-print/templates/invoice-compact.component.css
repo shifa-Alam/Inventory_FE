@@ -117,3 +117,8 @@
   .cpt-footer { page-break-inside: avoid; }
   .cpt-sig-line { border-top-color: #000 !important; }
 }
+
+/* Tenant-settings additions: per-line SKU, codes, terms */
+.cpt-sku { font-size: 10px; color: #6b7280; letter-spacing: .4px; }
+.cpt-codes { display: flex; align-items: center; justify-content: center; gap: 24px; margin: 10px 0; }
+.cpt-terms { font-size: 11px; color: #374151; margin: 8px 0; }

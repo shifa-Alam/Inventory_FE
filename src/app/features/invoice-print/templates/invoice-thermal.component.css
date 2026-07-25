@@ -8,7 +8,7 @@
   box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 20px 60px rgba(0,0,0,0.12);
   color: #000;
   padding: 14px 12px;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Courier New', Courier, 'SolaimanLipi', monospace;
   font-size: 11px;
   line-height: 1.35;
 }
@@ -55,3 +55,9 @@
   .th-item { page-break-inside: avoid; }
   .th-totals, .th-footer { page-break-inside: avoid; }
 }
+
+/* Tenant-settings additions: title, per-line SKU, codes, terms */
+.th-title { font-weight: 700; margin-top: 4px; }
+.th-item-sku { font-size: 10px; color: #555; letter-spacing: .5px; }
+.th-codes { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 6px 0; }
+.th-terms { font-size: 10.5px; text-align: center; margin: 4px 0; }

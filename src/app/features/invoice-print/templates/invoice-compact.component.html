@@ -12,9 +12,12 @@
       </div>
     </div>
     <div class="cpt-meta">
-      <div class="cpt-title">{{ 'invoice.badge' | translate }}</div>
+      <div class="cpt-title">{{ settings.options.invoice_title || ('invoice.badge' | translate) }}</div>
       <div class="cpt-meta-line"><b>{{ 'invoice.invoice_no' | translate }}:</b> {{ invoice?.invoice_no }}</div>
       <div class="cpt-meta-line"><b>{{ invoice?.delivery_date ? 'Delivery' : ('invoice.date' | translate) }}:</b> {{ (invoice?.delivery_date || invoice?.created_at) | date:'dd/MM/yyyy' }}</div>
+      <div class="cpt-meta-line" *ngIf="settings.options.show_salesperson && (invoice?.created_by || invoice?.salesperson_name)">
+        <b>{{ 'invoice.salesperson' | translate }}:</b> {{ invoice?.salesperson_name || invoice?.created_by }}
+      </div>
       <div class="cpt-meta-line" *ngIf="settings.options.show_status">
         <span class="cpt-status" [class.paid]="(invoice?.due_amount ?? 1) <= 0">
           {{ (invoice?.due_amount ?? 1) <= 0 ? ('invoice.status_paid' | translate) : ('invoice.status_due' | translate) }}
@@ -24,7 +27,7 @@
   </div>
 
   <!-- ── Customer ── -->
-  <div class="cpt-customer">
+  <div class="cpt-customer" *ngIf="settings.options.show_customer">
     <span class="cpt-cust-label">{{ 'invoice.bill_to' | translate }}:</span>
     <span class="cpt-cust-name">{{ invoice?.customer_name || ('invoice.walk_in' | translate) }}</span>
     <span class="cpt-cust-extra" *ngIf="invoice?.customer_phone">· {{ invoice?.customer_phone }}</span>
@@ -46,34 +49,51 @@
     <tbody>
       <tr *ngFor="let item of invoice?.items; let i = index">
         <td class="c">{{ i + 1 }}</td>
-        <td>{{ item.product_name }}</td>
+        <td>
+          {{ item.product_name }}
+          <div class="cpt-sku" *ngIf="settings.options.show_sku && item.barcode">{{ item.barcode }}</div>
+        </td>
         <td class="c">{{ item.quantity }}</td>
-        <td class="r" *ngIf="settings.options.show_mrp">{{ item.mrp ? (item.mrp | number) : '—' }}</td>
-        <td class="r">{{ item.rate | number }}</td>
-        <td class="r amt">{{ item.quantity * item.rate | number }}</td>
+        <td class="r" *ngIf="settings.options.show_mrp">{{ item.mrp ? (item.mrp | invMoney:settings:false) : '—' }}</td>
+        <td class="r">{{ item.rate | invMoney:settings:false }}</td>
+        <td class="r amt">{{ item.quantity * item.rate | invMoney:settings:false }}</td>
       </tr>
     </tbody>
   </table>
 
   <!-- ── Totals ── -->
   <div class="cpt-totals">
-    <div class="cpt-t-row" *ngIf="invoice?.discount_amount > 0">
-      <span>{{ 'invoice.subtotal' | translate }}</span><span>৳ {{ invoice?.subtotal | number }}</span>
+    <div class="cpt-t-row" *ngIf="settings.options.show_discount && invoice?.discount_amount > 0">
+      <span>{{ 'invoice.subtotal' | translate }}</span><span>{{ invoice?.subtotal | invMoney:settings }}</span>
     </div>
-    <div class="cpt-t-row" *ngIf="invoice?.discount_amount > 0">
-      <span>{{ 'invoice.discount' | translate }}</span><span>− ৳ {{ invoice?.discount_amount | number }}</span>
+    <div class="cpt-t-row" *ngIf="settings.options.show_discount && invoice?.discount_amount > 0">
+      <span>{{ 'invoice.discount' | translate }}</span><span>− {{ invoice?.discount_amount | invMoney:settings }}</span>
     </div>
     <div class="cpt-t-row cpt-t-total">
-      <span>{{ 'invoice.net_total' | translate }}</span><span>৳ {{ invoice?.total_amount | number }}</span>
+      <span>{{ 'invoice.net_total' | translate }}</span><span>{{ invoice?.total_amount | invMoney:settings }}</span>
+    </div>
+    <div class="cpt-t-row" *ngIf="settings.options.show_savings && savings > 0">
+      <span>{{ 'invoice.savings' | translate }}</span><span>{{ savings | invMoney:settings }}</span>
     </div>
     <ng-container *ngIf="settings.options.show_paid_due">
       <div class="cpt-t-row">
-        <span>{{ 'invoice.paid' | translate }}</span><span>− ৳ {{ invoice?.paid_amount | number }}</span>
+        <span>{{ 'invoice.paid' | translate }}</span><span>− {{ invoice?.paid_amount | invMoney:settings }}</span>
       </div>
       <div class="cpt-t-row cpt-t-due" [style.border-top-color]="settings.accent_color">
-        <span>{{ 'invoice.balance_due' | translate }}</span><span>৳ {{ invoice?.due_amount | number }}</span>
+        <span>{{ 'invoice.balance_due' | translate }}</span><span>{{ invoice?.due_amount | invMoney:settings }}</span>
       </div>
     </ng-container>
+  </div>
+
+  <!-- ── Codes ── -->
+  <div class="cpt-codes" *ngIf="(settings.options.show_barcode || settings.options.show_qr) && invoice?.invoice_no">
+    <app-invoice-code *ngIf="settings.options.show_barcode" type="barcode" [value]="invoice?.invoice_no"></app-invoice-code>
+    <app-invoice-code *ngIf="settings.options.show_qr" type="qr" [value]="invoice?.invoice_no" [size]="96"></app-invoice-code>
+  </div>
+
+  <!-- ── Terms ── -->
+  <div class="cpt-terms" *ngIf="settings.options.show_terms && settings.options.terms_text">
+    <b>{{ 'invoice.terms' | translate }}:</b> {{ settings.options.terms_text }}
   </div>
 
   <!-- ── Footer ── -->

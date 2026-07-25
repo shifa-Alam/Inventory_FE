@@ -3,16 +3,16 @@
   <div class="no-print" style="margin-bottom:20px">
     <div class="page-header" style="margin-bottom:0">
       <div>
-        <h2>Purchase Invoice</h2>
+        <h2>{{ 'purchase_view.title' | translate }}</h2>
         <p class="sub">Amira Traders — Wholesale System</p>
       </div>
       <button class="btn btn-ghost" (click)="location.back()" style="margin-right:8px">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        Back
+        {{ 'purchase_view.back' | translate }}
       </button>
       <button class="btn btn-primary ro-safe" (click)="print()">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        Print
+        {{ 'purchase_view.print' | translate }}
       </button>
     </div>
   </div>
@@ -26,9 +26,9 @@
         <div class="company-sub">Wholesale Distribution System · Dhaka, Bangladesh</div>
       </div>
       <div class="inv-meta">
-        <div class="inv-badge">PURCHASE ORDER</div>
-        <div class="inv-detail"><span>Invoice</span><b>#{{ purchase.id }}</b></div>
-        <div class="inv-detail"><span>Date</span><b>{{ purchase.created_at | date:'dd MMM yyyy' }}</b></div>
+        <div class="inv-badge">{{ 'purchase_view.purchase_order' | translate }}</div>
+        <div class="inv-detail"><span>{{ 'purchase_view.invoice_no' | translate }}</span><b>#{{ purchase.id }}</b></div>
+        <div class="inv-detail"><span>{{ 'purchase_view.date' | translate }}</span><b>{{ purchase.created_at | date:'dd MMM yyyy' }}</b></div>
       </div>
     </div>
 
@@ -36,7 +36,7 @@
 
     <!-- Supplier -->
     <div class="supplier-block">
-      <span class="block-label">Supplier</span>
+      <span class="block-label">{{ 'purchase_view.supplier' | translate }}</span>
       <span class="block-value">{{ purchase.supplier_name }}</span>
     </div>
 
@@ -46,10 +46,10 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Product</th>
-            <th>Qty</th>
-            <th>Rate</th>
-            <th>Total</th>
+            <th>{{ 'purchase_view.product' | translate }}</th>
+            <th>{{ 'purchase_view.qty' | translate }}</th>
+            <th>{{ 'purchase_view.rate' | translate }}</th>
+            <th>{{ 'purchase_view.total' | translate }}</th>
           </tr>
         </thead>
         <tbody>
@@ -67,7 +67,7 @@
     <!-- Totals -->
     <div class="totals-block">
       <div class="total-row highlight">
-        <span>Total Amount</span>
+        <span>{{ 'purchase_view.total_amount' | translate }}</span>
         <b>{{ purchase.total_amount | number }}</b>
       </div>
     </div>
@@ -76,18 +76,18 @@
     <div class="doc-footer">
       <div class="sig-block">
         <div class="sig-line"></div>
-        <span>Prepared By</span>
+        <span>{{ 'purchase_view.prepared_by' | translate }}</span>
       </div>
       <div class="sig-block">
         <div class="sig-line"></div>
-        <span>Authorized Signature</span>
+        <span>{{ 'purchase_view.authorized_sig' | translate }}</span>
       </div>
     </div>
 
   </div>
 
   <div *ngIf="!purchase" class="loading-state">
-    Loading purchase details…
+    {{ 'purchase_view.loading' | translate }}
   </div>
 
 </div>

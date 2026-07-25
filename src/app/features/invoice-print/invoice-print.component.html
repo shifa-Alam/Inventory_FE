@@ -23,7 +23,7 @@
   </div>
 
   <!-- Loading (invoice or tenant settings still on the way) -->
-  <div *ngIf="loading || !settings" class="inv-loading">Loading invoice…</div>
+  <div *ngIf="loading || !settings" class="inv-loading">{{ 'invoice.loading' | translate }}</div>
 
   <!-- ══ Invoice Document — template picked per tenant ══
        1. A bespoke component registered for this tenant_id (TENANT_TEMPLATES) wins.
