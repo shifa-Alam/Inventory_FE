@@ -22,7 +22,7 @@
         </div>
         <div class="ph-fg ph-fg-grow">
           <label class="ph-lbl">{{ 'purchase_history.col_invoice' | translate }}</label>
-          <input class="ph-inp" placeholder="e.g. PUR-001" [(ngModel)]="filterInvoice" (ngModelChange)="onInvoiceInput()" />
+          <input class="ph-inp" [placeholder]="'purchase_history.filter_invoice_ph' | translate" [(ngModel)]="filterInvoice" (ngModelChange)="onInvoiceInput()" />
         </div>
         <div class="ph-fg ph-fg-grow">
           <label class="ph-lbl">{{ 'purchase_history.col_supplier' | translate }}</label>
@@ -100,7 +100,7 @@
         </div>
         <div class="ph-fg ph-fg-grow">
           <label class="ph-lbl">{{ 'purchase_history.col_invoice' | translate }}</label>
-          <input class="ph-inp" placeholder="e.g. PUR-001" [(ngModel)]="filterInvoice" (ngModelChange)="onInvoiceInput()" />
+          <input class="ph-inp" [placeholder]="'purchase_history.filter_invoice_ph' | translate" [(ngModel)]="filterInvoice" (ngModelChange)="onInvoiceInput()" />
         </div>
         <div class="ph-fg ph-fg-grow">
           <label class="ph-lbl">{{ 'purchase_history.col_supplier' | translate }}</label>
@@ -112,15 +112,15 @@
       </div>
       <div class="ph-quick-row">
         <div class="ph-qbts">
-          <button class="ph-qb" [class.ph-qb-active]="activeQuick === 'today'" (click)="setToday()">Today</button>
-          <button class="ph-qb" [class.ph-qb-active]="activeQuick === 'week'"  (click)="setThisWeek()">Week</button>
-          <button class="ph-qb" [class.ph-qb-active]="activeQuick === 'month'" (click)="setThisMonth()">Month</button>
-          <button class="ph-qb" [class.ph-qb-active]="activeQuick === 'all'"   (click)="setAllTime()">All</button>
-          <button class="ph-qb ph-qb-clear" (click)="clearFilter()">Reset</button>
+          <button class="ph-qb" [class.ph-qb-active]="activeQuick === 'today'" (click)="setToday()">{{ 'sales_list.btn_today' | translate }}</button>
+          <button class="ph-qb" [class.ph-qb-active]="activeQuick === 'week'"  (click)="setThisWeek()">{{ 'sales_list.btn_week_short' | translate }}</button>
+          <button class="ph-qb" [class.ph-qb-active]="activeQuick === 'month'" (click)="setThisMonth()">{{ 'sales_list.btn_month_short' | translate }}</button>
+          <button class="ph-qb" [class.ph-qb-active]="activeQuick === 'all'"   (click)="setAllTime()">{{ 'sales_list.btn_all_short' | translate }}</button>
+          <button class="ph-qb ph-qb-clear" (click)="clearFilter()">{{ 'sales_list.btn_reset' | translate }}</button>
         </div>
       </div>
     </div>
-    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
+    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
     <div class="mobile-empty" *ngIf="!loading && purchases.length === 0"><p>{{ 'purchase_history.empty' | translate }}</p></div>
     <div class="mobile-card" *ngFor="let p of purchases">
       <div class="mc-top">

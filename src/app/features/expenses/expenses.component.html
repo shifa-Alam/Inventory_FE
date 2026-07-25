@@ -40,11 +40,11 @@
             <option [ngValue]="0">{{ 'expenses.type_placeholder' | translate }}</option>
             <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.name }}</option>
           </select>
-          <button type="button" class="btn btn-ghost btn-sm" (click)="showNewCategory = !showNewCategory" title="Add new type">+</button>
+          <button type="button" class="btn btn-ghost btn-sm" (click)="showNewCategory = !showNewCategory" [title]="'expenses.add_type_title' | translate">+</button>
         </div>
         <div *ngIf="showNewCategory" style="display:flex; gap:6px; margin-top:6px">
-          <input autofocus type="text" [(ngModel)]="newCategoryName" placeholder="New expense type" style="flex:1" (keyup.enter)="addCategory()" />
-          <button type="button" class="btn btn-primary btn-sm" (click)="addCategory()">Add</button>
+          <input autofocus type="text" [(ngModel)]="newCategoryName" [placeholder]="'expenses.new_type_placeholder' | translate" style="flex:1" (keyup.enter)="addCategory()" />
+          <button type="button" class="btn btn-primary btn-sm" (click)="addCategory()">{{ 'expenses.add_type_btn' | translate }}</button>
         </div>
       </div>
 
@@ -102,7 +102,7 @@
             <th>{{ 'expenses.type_label' | translate }}</th>
             <th class="text-right">{{ 'common.amount' | translate }}</th>
             <th>{{ 'expenses.notes_label' | translate }}</th>
-            <th>Ref</th>
+            <th>{{ 'expenses.col_ref' | translate }}</th>
             <th>{{ 'common.actions' | translate }}</th>
           </tr>
         </thead>
@@ -116,10 +116,10 @@
             <td><span class="ref-no">{{ e.expense_no }}</span></td>
             <td>
               <div class="action-btns">
-                <button class="icon-btn edit-btn" (click)="edit(e)" title="Edit">
+                <button class="icon-btn edit-btn" (click)="edit(e)" [title]="'common.edit' | translate">
                   <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 </button>
-                <button class="icon-btn delete-btn" (click)="delete(e.id)" title="Delete">
+                <button class="icon-btn delete-btn" (click)="delete(e.id)" [title]="'common.delete' | translate">
                   <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                 </button>
               </div>

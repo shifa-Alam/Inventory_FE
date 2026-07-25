@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { ConfirmService } from '../../shared/services/confirm.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-units',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './units.component.html',
   styleUrls: ['./units.component.css'],
 })
@@ -21,7 +22,7 @@ export class UnitsComponent implements OnInit {
   @HostListener('document:keydown.escape')
   onEscape() { if (this.showForm) this.cancelForm(); }
 
-  constructor(private api: ApiService, private confirmSvc: ConfirmService, private toast: ToastService) {}
+  constructor(private api: ApiService, private confirmSvc: ConfirmService, private toast: ToastService, private translate: TranslateService) {}
 
   ngOnInit() { this.load(); }
 
@@ -38,19 +39,19 @@ export class UnitsComponent implements OnInit {
   edit(u: any) { this.newUnit = { ...u }; this.showForm = true; }
 
   save() {
-    if (!this.newUnit.name?.trim()) { this.toast.error('Unit name is required'); return; }
+    if (!this.newUnit.name?.trim()) { this.toast.error(this.translate.instant('units.name_required')); return; }
     const payload = { name: this.newUnit.name.trim(), symbol: this.newUnit.symbol?.trim() || null };
     const req = this.newUnit.id > 0
       ? this.api.put(`/units/${this.newUnit.id}`, payload)
       : this.api.post('/units/', payload);
     req.subscribe({
-      next: () => { this.toast.success(this.newUnit.id ? 'Unit updated' : 'Unit added'); this.load(); this.cancelForm(); },
+      next: () => { this.toast.success(this.newUnit.id ? this.translate.instant('units.updated') : this.translate.instant('units.added')); this.load(); this.cancelForm(); },
       error: () => {},   // global interceptor toasts the backend message
     });
   }
 
   async delete(u: any) {
-    if (!await this.confirmSvc.open(`Deactivate unit "${u.name}"? Products keep their history.`, { confirmLabel: 'Deactivate', danger: true })) return;
+    if (!await this.confirmSvc.open(this.translate.instant('units.deactivate_confirm', { name: u.name }), { confirmLabel: this.translate.instant('units.deactivate'), danger: true })) return;
     this.api.delete(`/units/${u.id}`).subscribe({ next: () => this.load(), error: () => {} });
   }
 }

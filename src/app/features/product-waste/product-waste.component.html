@@ -51,7 +51,7 @@
           <tr>
             <th style="width:36px">#</th>
             <th>{{ 'product_waste.col_product' | translate }}</th>
-            <th style="width:80px">Stock</th>
+            <th style="width:80px">{{ 'product_waste.col_stock' | translate }}</th>
             <th style="width:110px">{{ 'product_waste.qty_label' | translate }}</th>
             <th>{{ 'product_waste.reason_label' | translate }}</th>
             <th style="width:44px"></th>
@@ -71,14 +71,14 @@
               <input #qtyInput type="number" [(ngModel)]="item.quantity" min="1" [max]="item.current_stock" [class.qty-error]="item.quantity > item.current_stock" />
             </td>
             <td>
-              <input type="text" [(ngModel)]="item.reason" placeholder="Enter reason…" class="reason-input" />
+              <input type="text" [(ngModel)]="item.reason" [placeholder]="'product_waste.enter_reason_placeholder' | translate" class="reason-input" />
             </td>
             <td>
-              <button class="btn btn-danger btn-sm icon-btn" (click)="removeRow(i)" title="Remove">✕</button>
+              <button class="btn btn-danger btn-sm icon-btn" (click)="removeRow(i)" [title]="'product_waste.remove' | translate">✕</button>
             </td>
           </tr>
           <tr *ngIf="wasteItems.length === 0">
-            <td colspan="6" class="empty-row"><span class="empty-icon">🗑</span> Scan or search a product to add it to the waste list</td>
+            <td colspan="6" class="empty-row"><span class="empty-icon">🗑</span> {{ 'product_waste.add_product_hint' | translate }}</td>
           </tr>
         </tbody>
       </table>
@@ -88,7 +88,7 @@
   <!-- ITEMS — mobile cards -->
   <div class="show-mobile" style="margin-bottom:14px">
     <div class="mobile-empty" *ngIf="wasteItems.length === 0">
-      <span class="empty-icon">🗑</span><br>Scan or search a product to add it to the waste list
+      <span class="empty-icon">🗑</span><br>{{ 'product_waste.add_product_hint' | translate }}
     </div>
     <div class="mobile-card" *ngFor="let item of wasteItems; let i = index">
       <div class="mc-top">
@@ -103,7 +103,7 @@
       </div>
       <div class="wm-fields">
         <div class="wm-field">
-          <span class="mc-lbl">Stock</span>
+          <span class="mc-lbl">{{ 'product_waste.col_stock' | translate }}</span>
           <span class="stock-chip" [class.stock-low]="item.current_stock < 5">{{ item.current_stock }}</span>
         </div>
         <div class="wm-field">
@@ -113,7 +113,7 @@
         </div>
         <div class="wm-field wm-field-reason">
           <span class="mc-lbl">{{ 'product_waste.reason_label' | translate }}</span>
-          <input type="text" [(ngModel)]="item.reason" placeholder="Enter reason…" class="mic-input" />
+          <input type="text" [(ngModel)]="item.reason" [placeholder]="'product_waste.enter_reason_placeholder' | translate" class="mic-input" />
         </div>
       </div>
     </div>
@@ -121,17 +121,17 @@
 
   <!-- ACTION BAR -->
   <div class="action-bar" *ngIf="wasteItems.length > 0">
-    <span class="items-count">{{ wasteItems.length }} product{{ wasteItems.length > 1 ? 's' : '' }} · {{ adjustmentType | titlecase }}</span>
+    <span class="items-count">{{ wasteItems.length }} {{ (wasteItems.length > 1 ? 'product_waste.products_word' : 'product_waste.product_word') | translate }} · {{ adjustmentType | titlecase }}</span>
     <div class="ab-right">
       <label class="adj-type-label">
-        Adjustment type
+        {{ 'product_waste.adjustment_type' | translate }}
         <select [(ngModel)]="adjustmentType" class="adj-type-select">
           <option *ngFor="let t of adjustmentTypes" [value]="t">{{ t | titlecase }}</option>
         </select>
       </label>
       <button class="btn btn-danger btn-lg" (click)="save()" [disabled]="saving">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-        {{ saving ? 'Saving…' : 'Record Adjustment' }}
+        {{ (saving ? 'common.saving' : 'product_waste.record_adjustment') | translate }}
       </button>
     </div>
   </div>
@@ -142,40 +142,40 @@
     <div class="wh-filter-bar">
       <div class="wh-filter-row">
         <div class="wh-fg">
-          <label class="wh-lbl">From</label>
+          <label class="wh-lbl">{{ 'common.from' | translate }}</label>
           <input type="date" class="wh-inp" [(ngModel)]="filterDateFrom" (change)="activeQuick=''; applyFilter()" />
         </div>
         <div class="wh-fg">
-          <label class="wh-lbl">To</label>
+          <label class="wh-lbl">{{ 'common.to' | translate }}</label>
           <input type="date" class="wh-inp" [(ngModel)]="filterDateTo" (change)="activeQuick=''; applyFilter()" />
         </div>
         <div class="wh-fg wh-fg-grow">
-          <label class="wh-lbl">Waste No</label>
-          <input class="wh-inp" placeholder="e.g. WS-0001" [(ngModel)]="filterWasteNo" (ngModelChange)="applyFilter()" />
+          <label class="wh-lbl">{{ 'product_waste.col_waste_no' | translate }}</label>
+          <input class="wh-inp" [placeholder]="'product_waste.waste_no_placeholder' | translate" [(ngModel)]="filterWasteNo" (ngModelChange)="applyFilter()" />
         </div>
         <div class="wh-fg wh-fg-grow" style="position:relative">
-          <label class="wh-lbl">Product / Barcode</label>
+          <label class="wh-lbl">{{ 'product_waste.product_barcode_label' | translate }}</label>
           <input
             #productFilterInput
             class="wh-inp"
             [class.wh-inp-scanning]="filterProductSearching"
-            placeholder="Type name or scan barcode…"
+            [placeholder]="'product_waste.product_filter_placeholder' | translate"
             [(ngModel)]="filterProduct"
             (ngModelChange)="onProductFilterChange()"
             (keydown)="onProductFilterKey($event)"
           />
           <span class="wh-scan-spinner" *ngIf="filterProductSearching"></span>
-          <button class="wh-clear-x" *ngIf="filterProduct && !filterProductSearching" (click)="filterProduct=''; filterProductId=null; applyFilter()" title="Clear">✕</button>
+          <button class="wh-clear-x" *ngIf="filterProduct && !filterProductSearching" (click)="filterProduct=''; filterProductId=null; applyFilter()" [title]="'common.clear' | translate">✕</button>
         </div>
       </div>
       <div class="wh-quick-row">
-        <span class="wh-count">{{ historyTotal }} records</span>
+        <span class="wh-count">{{ historyTotal }} {{ 'common.records' | translate }}</span>
         <div class="wh-qbts">
-          <button class="wh-qb" [class.wh-qb-active]="activeQuick === 'today'" (click)="setToday()">Today</button>
-          <button class="wh-qb" [class.wh-qb-active]="activeQuick === 'week'"  (click)="setThisWeek()">This Week</button>
-          <button class="wh-qb" [class.wh-qb-active]="activeQuick === 'month'" (click)="setThisMonth()">This Month</button>
-          <button class="wh-qb" [class.wh-qb-active]="activeQuick === 'all'"   (click)="setAllTime()">All Time</button>
-          <button class="wh-qb wh-qb-clear" (click)="clearFilter()">Reset</button>
+          <button class="wh-qb" [class.wh-qb-active]="activeQuick === 'today'" (click)="setToday()">{{ 'common.today' | translate }}</button>
+          <button class="wh-qb" [class.wh-qb-active]="activeQuick === 'week'"  (click)="setThisWeek()">{{ 'common.this_week' | translate }}</button>
+          <button class="wh-qb" [class.wh-qb-active]="activeQuick === 'month'" (click)="setThisMonth()">{{ 'common.this_month' | translate }}</button>
+          <button class="wh-qb" [class.wh-qb-active]="activeQuick === 'all'"   (click)="setAllTime()">{{ 'common.all_time' | translate }}</button>
+          <button class="wh-qb wh-qb-clear" (click)="clearFilter()">{{ 'common.reset' | translate }}</button>
         </div>
       </div>
     </div>
@@ -187,7 +187,7 @@
           <tr>
             <th>{{ 'product_waste.col_date' | translate }}</th>
             <th>{{ 'product_waste.col_waste_no' | translate }}</th>
-            <th>Type</th>
+            <th>{{ 'product_waste.col_type' | translate }}</th>
             <th>{{ 'product_waste.col_product' | translate }}</th>
             <th>{{ 'product_waste.col_qty' | translate }}</th>
             <th>{{ 'product_waste.col_reason' | translate }}</th>
@@ -195,7 +195,7 @@
         </thead>
         <tbody>
           <tr *ngIf="loadingWastes" class="loading-row">
-            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
           </tr>
           <tr *ngFor="let w of wastes">
             <td class="muted">{{ w.created_at | date:'dd MMM yyyy, hh:mm a' }}</td>
@@ -214,7 +214,7 @@
 
     <!-- Mobile history cards -->
     <div class="show-mobile" style="padding:10px 12px">
-      <div class="mobile-loading" *ngIf="loadingWastes"><div class="loading-spinner"></div> Loading…</div>
+      <div class="mobile-loading" *ngIf="loadingWastes"><div class="loading-spinner"></div> {{ 'common.loading' | translate }}</div>
       <div class="mobile-empty" *ngIf="!loadingWastes && wastes.length === 0">{{ 'product_waste.history_empty' | translate }}</div>
       <div class="mobile-card" *ngFor="let w of wastes">
         <div class="mc-top">

@@ -6,7 +6,7 @@ import { ToastService } from '../../shared/services/toast.service';
 import { Subject, EMPTY } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
 
 interface WasteItem {
@@ -69,7 +69,7 @@ export class ProductWasteComponent implements OnInit, AfterViewInit, OnDestroy {
   private toastTimer: any;
   private scanInProgress = false;
 
-  constructor(private api: ApiService, private toast: ToastService) {}
+  constructor(private api: ApiService, private toast: ToastService, private translate: TranslateService) {}
 
   ngOnInit() {
     this.searchSubject.pipe(
@@ -244,13 +244,13 @@ export class ProductWasteComponent implements OnInit, AfterViewInit, OnDestroy {
       next: (res: any) => {
         this.scanInProgress = false;
         const results = res.data ?? res;
-        if (!results?.length) { this.showToast(`Not found: ${sku}`, 'error'); return; }
+        if (!results?.length) { this.showToast(this.translate.instant('product_waste.not_found', { sku }), 'error'); return; }
         const product = results.find((p: any) => p.barcode === sku) ?? results[0];
         this.selectProduct(product);
       },
       error: () => {
         this.scanInProgress = false;
-        this.showToast(`Not found: ${sku}`, 'error');
+        this.showToast(this.translate.instant('product_waste.not_found', { sku }), 'error');
       }
     });
   }
@@ -275,7 +275,7 @@ export class ProductWasteComponent implements OnInit, AfterViewInit, OnDestroy {
         quantity: 1,
         reason: ''
       });
-      this.showToast(`Added: ${product.name}`, 'success');
+      this.showToast(this.translate.instant('product_waste.added', { name: product.name }), 'success');
       setTimeout(() => this.qtyInputs.first?.nativeElement.focus(), 50);
     }
     this.filteredProducts = [];
@@ -295,20 +295,20 @@ export class ProductWasteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   save() {
     if (this.wasteItems.length === 0) {
-      this.toast.warning('Add at least one product to waste.');
+      this.toast.warning(this.translate.instant('product_waste.add_one_product'));
       return;
     }
     for (const item of this.wasteItems) {
       if (!item.quantity || item.quantity < 1) {
-        this.toast.warning(`Invalid quantity for ${item.product_name}.`);
+        this.toast.warning(this.translate.instant('product_waste.invalid_quantity', { name: item.product_name }));
         return;
       }
       if (item.quantity > item.current_stock) {
-        this.toast.error(`Not enough stock for ${item.product_name}. Available: ${item.current_stock}`);
+        this.toast.error(this.translate.instant('product_waste.not_enough_stock', { name: item.product_name, stock: item.current_stock }));
         return;
       }
       if (!item.reason.trim()) {
-        this.toast.warning(`Please enter a reason for ${item.product_name}.`);
+        this.toast.warning(this.translate.instant('product_waste.enter_reason_for', { name: item.product_name }));
         return;
       }
     }
@@ -330,7 +330,7 @@ export class ProductWasteComponent implements OnInit, AfterViewInit, OnDestroy {
     if (index >= requests.length) {
       this.saving = false;
       this.toast.stopSaving();
-      this.toast.success(`${requests.length} waste record(s) saved.`);
+      this.toast.success(this.translate.instant('product_waste.records_saved', { n: requests.length }));
       this.wasteItems = [];
       this.loadWastes();
       this.searchInputRef.nativeElement.focus();
@@ -341,7 +341,7 @@ export class ProductWasteComponent implements OnInit, AfterViewInit, OnDestroy {
       error: (err) => {
         this.saving = false;
         this.toast.stopSaving();
-        this.toast.error(err?.error?.detail || `Failed to save waste record ${index + 1}`);
+        this.toast.error(err?.error?.detail || this.translate.instant('product_waste.save_failed', { n: index + 1 }));
       }
     });
   }

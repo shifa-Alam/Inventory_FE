@@ -7,7 +7,7 @@ import { ToastService } from '../../shared/services/toast.service';
 import { Subject, EMPTY } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { localDateStr } from '../../shared/utils/date.utils';
 
 @Component({
@@ -71,7 +71,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   // Mobile checkout bottom sheet (UI state only)
   sheetOpen = false;
 
-  constructor(private api: ApiService, private toast: ToastService, private router: Router) { }
+  constructor(private api: ApiService, private toast: ToastService, private router: Router, private translate: TranslateService) { }
 
   ngOnInit() {
     this.loadDdCustomers('');
@@ -257,12 +257,12 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     const payload = { name: this.newCustomerName.trim(), phone: this.customerPhone.trim(), address: '', credit_limit: 0, opening_due: 0 };
     this.api.post('/customers/', payload).subscribe({
       next: (res: any) => {
-        this.toast.success(`Customer "${payload.name}" added`);
+        this.toast.success(this.translate.instant('sales.customer_added', { name: payload.name }));
         this.pickCustomer(res);
         this.clearPhone();
         this.loadDdCustomers('');
       },
-      error: () => { this.toast.error('Failed to add customer'); }
+      error: () => { this.toast.error(this.translate.instant('sales.customer_add_failed')); }
     });
   }
 
@@ -319,7 +319,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.searching = false;
         this.filteredProducts = [];
         if (!res?.length) {
-          this.showToast(`Not found: ${sku}`, 'error');
+          this.showToast(this.translate.instant('sales.not_found_sku', { sku }), 'error');
           return;
         }
         const product = res.find((p: any) => p.barcode === sku) ?? res[0];
@@ -329,14 +329,14 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.scanInProgress = false;
         this.searching = false;
         this.filteredProducts = [];
-        this.showToast(`Not found: ${sku}`, 'error');
+        this.showToast(this.translate.instant('sales.not_found_sku', { sku }), 'error');
       }
     });
   }
 
   private addOrIncrement(product: any) {
     if (product.current_stock <= 0) {
-      this.showToast(`Out of stock: ${product.name}`, 'error');
+      this.showToast(this.translate.instant('sales.out_of_stock_named', { name: product.name }), 'error');
       return;
     }
     const existing = this.items.find(i => i.product_id === product.id);
@@ -344,7 +344,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
       // Stock is in base units; the line may be in a bigger unit (a Box of 12).
       const max = this.maxUnitQty(existing);
       if (existing.quantity >= max) {
-        this.showToast(`Max stock reached: ${product.name} (${max} ${existing.unit_label || ''})`, 'error');
+        this.showToast(this.translate.instant('sales.max_stock_reached', { name: product.name, max, unit: existing.unit_label || '' }), 'error');
         return;
       }
       existing.quantity++;
@@ -360,7 +360,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
       };
       this.applyLineUnits(line, product);
       this.items.unshift(line);
-      this.showToast(`Added: ${product.name}`, 'success');
+      this.showToast(this.translate.instant('sales.added_named', { name: product.name }), 'success');
       setTimeout(() => this.qtyInputs.first?.nativeElement.focus(), 0);
     }
   }
@@ -372,7 +372,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     const max = this.maxUnitQty(item);
     if (item.quantity > max) {
       item.quantity = max;
-      this.showToast(`Max stock for "${item.product_name}" is ${max} ${item.unit_label || ''}`, 'error');
+      this.showToast(this.translate.instant('sales.max_stock_for', { name: item.product_name, max, unit: item.unit_label || '' }), 'error');
     }
   }
 
@@ -384,11 +384,11 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectProduct(product: any) {
     if (product.current_stock <= 0) {
-      this.toast.error(`"${product.name}" is out of stock.`);
+      this.toast.error(this.translate.instant('sales.out_of_stock_dot', { name: product.name }));
       return;
     }
     if (this.items.find(i => i.product_id === product.id)) {
-      this.toast.warning('Product already added!');
+      this.toast.warning(this.translate.instant('sales.product_already_added'));
       this.filteredProducts = [];
       this.productSearch = '';
       this.selectedIndex = -1;
@@ -428,11 +428,11 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.saving) return;   // block double-click / repeated F9
     // Every sale must be booked against a registered customer
     if (!this.customer_id || this.customer_id <= 0) {
-      this.toast.warning('Please select a customer before completing the sale.');
+      this.toast.warning(this.translate.instant('sales.select_customer_first'));
       return;
     }
     if (this.items.length === 0) {
-      this.toast.warning('Please add at least one product.');
+      this.toast.warning(this.translate.instant('sales.add_at_least_one'));
       return;
     }
 
@@ -474,7 +474,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
       error: (err) => {
         this.saving = false;
         this.toast.stopSaving();
-        this.toast.error(err?.error?.detail || 'Failed to submit sale');
+        this.toast.error(err?.error?.detail || this.translate.instant('sales.submit_failed'));
       }
     });
   }

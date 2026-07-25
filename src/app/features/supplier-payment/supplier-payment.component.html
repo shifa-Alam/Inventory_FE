@@ -2,27 +2,27 @@
 
   <div class="page-header">
     <div>
-      <h2>Supplier Payments</h2>
-      <p class="sub">Pay down outstanding purchase dues</p>
+      <h2>{{ 'supplier_payment.title' | translate }}</h2>
+      <p class="sub">{{ 'supplier_payment.subtitle' | translate }}</p>
     </div>
   </div>
 
   <!-- Summary chips -->
   <div class="summary-row">
     <div class="summary-chip">
-      <span class="chip-label">Total Payable</span>
+      <span class="chip-label">{{ 'supplier_payment.total_payable' | translate }}</span>
       <span class="chip-value danger">৳{{ fmt(summary.total_payable) }}</span>
     </div>
     <div class="summary-chip">
-      <span class="chip-label">Pending Invoices</span>
+      <span class="chip-label">{{ 'supplier_payment.pending_invoices' | translate }}</span>
       <span class="chip-value">{{ summary.pending_invoices }}</span>
     </div>
     <div class="summary-chip">
-      <span class="chip-label">Paid Today</span>
+      <span class="chip-label">{{ 'supplier_payment.paid_today' | translate }}</span>
       <span class="chip-value">৳{{ fmt(summary.today_payments) }}</span>
     </div>
     <div class="summary-chip">
-      <span class="chip-label">Total Paid</span>
+      <span class="chip-label">{{ 'supplier_payment.total_paid' | translate }}</span>
       <span class="chip-value">৳{{ fmt(summary.total_payments) }}</span>
     </div>
   </div>
@@ -31,29 +31,29 @@
   <ng-template #payPanel let-inv>
     <div class="pay-panel">
       <div class="pay-info">
-        <div class="pi-row"><span class="pi-lbl">Invoice</span><span class="pi-val fw">{{ inv.invoice_no }}</span></div>
-        <div class="pi-row"><span class="pi-lbl">Supplier</span><span class="pi-val">{{ inv.supplier_name || '—' }}</span></div>
-        <div class="pi-row"><span class="pi-lbl">Due</span><span class="pi-val due">৳{{ fmt(maxDue) }}</span></div>
-        <div class="pi-row"><span class="pi-lbl">After Payment</span><span class="pi-val" [class.ok]="afterPayment === 0">৳{{ fmt(afterPayment) }}</span></div>
+        <div class="pi-row"><span class="pi-lbl">{{ 'supplier_payment.invoice' | translate }}</span><span class="pi-val fw">{{ inv.invoice_no }}</span></div>
+        <div class="pi-row"><span class="pi-lbl">{{ 'supplier_payment.supplier' | translate }}</span><span class="pi-val">{{ inv.supplier_name || '—' }}</span></div>
+        <div class="pi-row"><span class="pi-lbl">{{ 'common.due' | translate }}</span><span class="pi-val due">৳{{ fmt(maxDue) }}</span></div>
+        <div class="pi-row"><span class="pi-lbl">{{ 'supplier_payment.after_payment' | translate }}</span><span class="pi-val" [class.ok]="afterPayment === 0">৳{{ fmt(afterPayment) }}</span></div>
       </div>
       <div class="pay-form">
         <div class="pay-fields">
           <div class="amount-row">
-            <input type="number" inputmode="decimal" [(ngModel)]="payAmount" placeholder="Amount" min="0" [max]="maxDue" />
-            <button class="btn btn-ghost btn-sm" (click)="setFullPay()">Full</button>
+            <input type="number" inputmode="decimal" [(ngModel)]="payAmount" [placeholder]="'common.amount' | translate" min="0" [max]="maxDue" />
+            <button class="btn btn-ghost btn-sm" (click)="setFullPay()">{{ 'common.full' | translate }}</button>
           </div>
           <div class="pm-pills">
             <button type="button" *ngFor="let m of paymentMethods" class="pm-pill"
                     [class.active]="payMethod === m.value" (click)="payMethod = m.value">{{ m.label }}</button>
           </div>
-          <input type="text" [(ngModel)]="payNote" placeholder="Note (optional)" />
+          <input type="text" [(ngModel)]="payNote" [placeholder]="'supplier_payment.note_placeholder' | translate" />
         </div>
         <div class="pay-actions">
           <button class="btn btn-primary" [disabled]="!isValid || paying" (click)="pay()">
             <span *ngIf="paying" class="spinner"></span>
-            {{ paying ? 'Saving…' : 'Record Payment' }}
+            {{ paying ? ('common.saving' | translate) : ('supplier_payment.record_payment' | translate) }}
           </button>
-          <button class="btn btn-ghost" (click)="clearSelection()">Cancel</button>
+          <button class="btn btn-ghost" (click)="clearSelection()">{{ 'common.cancel' | translate }}</button>
         </div>
         <p class="hint-error" *ngIf="errorMsg">{{ errorMsg }}</p>
         <p class="hint-success" *ngIf="successMsg">{{ successMsg }}</p>
@@ -64,19 +64,19 @@
   <!-- ══════════ Pending purchases ══════════ -->
   <div class="card desktop-table">
     <div class="card-header-row">
-      <span class="card-title" style="margin-bottom:0">Pending Purchase Invoices</span>
-      <span class="count-badge">{{ invoiceTotal }} with due</span>
+      <span class="card-title" style="margin-bottom:0">{{ 'supplier_payment.pending_purchase_invoices' | translate }}</span>
+      <span class="count-badge">{{ invoiceTotal }} {{ 'supplier_payment.with_due' | translate }}</span>
     </div>
 
     <div class="table-wrapper">
       <table>
         <thead>
           <tr>
-            <th>Invoice</th>
-            <th>Supplier</th>
-            <th class="right">Total</th>
-            <th class="right">Paid</th>
-            <th class="right">Due</th>
+            <th>{{ 'supplier_payment.invoice' | translate }}</th>
+            <th>{{ 'supplier_payment.supplier' | translate }}</th>
+            <th class="right">{{ 'common.total' | translate }}</th>
+            <th class="right">{{ 'common.paid' | translate }}</th>
+            <th class="right">{{ 'common.due' | translate }}</th>
             <th></th>
           </tr>
         </thead>
@@ -90,7 +90,7 @@
               <td class="right"><span class="due-chip">৳{{ inv.due_amount | number:'1.0-2' }}</span></td>
               <td class="right">
                 <button class="btn btn-primary btn-sm" (click)="select(inv)">
-                  {{ selected?.id === inv.id ? 'Close' : 'Pay' }}
+                  {{ selected?.id === inv.id ? ('supplier_payment.close' | translate) : ('supplier_payment.pay' | translate) }}
                 </button>
               </td>
             </tr>
@@ -102,10 +102,10 @@
           </ng-container>
 
           <tr *ngIf="loadingInvoices" class="loading-row">
-            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
           </tr>
           <tr *ngIf="!loadingInvoices && invoices.length === 0">
-            <td colspan="6" class="empty-row">🎉 No outstanding supplier dues.</td>
+            <td colspan="6" class="empty-row">🎉 {{ 'supplier_payment.no_dues' | translate }}</td>
           </tr>
         </tbody>
       </table>
@@ -116,11 +116,11 @@
   <!-- Pending purchases — mobile cards -->
   <div class="mobile-list">
     <div class="mobile-meta">
-      <span class="mobile-title">Pending Invoices</span>
-      <span class="count-badge">{{ invoiceTotal }} with due</span>
+      <span class="mobile-title">{{ 'supplier_payment.pending_invoices' | translate }}</span>
+      <span class="count-badge">{{ invoiceTotal }} {{ 'supplier_payment.with_due' | translate }}</span>
     </div>
-    <div class="mobile-loading" *ngIf="loadingInvoices"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
-    <div class="mobile-empty" *ngIf="!loadingInvoices && invoices.length === 0"><p>🎉 No outstanding supplier dues.</p></div>
+    <div class="mobile-loading" *ngIf="loadingInvoices"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
+    <div class="mobile-empty" *ngIf="!loadingInvoices && invoices.length === 0"><p>🎉 {{ 'supplier_payment.no_dues' | translate }}</p></div>
 
     <div class="mobile-card" *ngFor="let inv of invoices" [class.mc-selected]="selected?.id === inv.id">
       <div class="mc-top">
@@ -131,12 +131,12 @@
         <span class="due-chip">৳{{ inv.due_amount | number:'1.0-2' }}</span>
       </div>
       <div class="mc-grid">
-        <div class="mc-field"><span class="mc-lbl">Total</span><span class="mc-val">৳{{ inv.total_amount | number:'1.0-2' }}</span></div>
-        <div class="mc-field"><span class="mc-lbl">Paid</span><span class="mc-val">৳{{ inv.paid_amount | number:'1.0-2' }}</span></div>
-        <div class="mc-field"><span class="mc-lbl">Due</span><span class="mc-val danger">৳{{ inv.due_amount | number:'1.0-2' }}</span></div>
+        <div class="mc-field"><span class="mc-lbl">{{ 'common.total' | translate }}</span><span class="mc-val">৳{{ inv.total_amount | number:'1.0-2' }}</span></div>
+        <div class="mc-field"><span class="mc-lbl">{{ 'common.paid' | translate }}</span><span class="mc-val">৳{{ inv.paid_amount | number:'1.0-2' }}</span></div>
+        <div class="mc-field"><span class="mc-lbl">{{ 'common.due' | translate }}</span><span class="mc-val danger">৳{{ inv.due_amount | number:'1.0-2' }}</span></div>
       </div>
       <div class="mc-actions">
-        <button class="btn btn-primary btn-sm" (click)="select(inv)">{{ selected?.id === inv.id ? 'Close' : 'Pay' }}</button>
+        <button class="btn btn-primary btn-sm" (click)="select(inv)">{{ selected?.id === inv.id ? ('supplier_payment.close' | translate) : ('supplier_payment.pay' | translate) }}</button>
       </div>
       <ng-container *ngIf="selected?.id === inv.id" [ngTemplateOutlet]="payPanel" [ngTemplateOutletContext]="{ $implicit: inv }"></ng-container>
     </div>
@@ -146,19 +146,19 @@
   <!-- ══════════ Payment history ══════════ -->
   <div class="card desktop-table">
     <div class="card-header-row">
-      <span class="card-title" style="margin-bottom:0">Payment History</span>
-      <span class="count-badge">{{ histTotal }} records</span>
+      <span class="card-title" style="margin-bottom:0">{{ 'supplier_payment.payment_history' | translate }}</span>
+      <span class="count-badge">{{ histTotal }} {{ 'common.records' | translate }}</span>
     </div>
     <div class="table-wrapper">
       <table>
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Reference</th>
-            <th>Invoice</th>
-            <th>Supplier</th>
-            <th class="right">Amount</th>
-            <th>Note</th>
+            <th>{{ 'common.date' | translate }}</th>
+            <th>{{ 'supplier_payment.reference' | translate }}</th>
+            <th>{{ 'supplier_payment.invoice' | translate }}</th>
+            <th>{{ 'supplier_payment.supplier' | translate }}</th>
+            <th class="right">{{ 'common.amount' | translate }}</th>
+            <th>{{ 'common.note' | translate }}</th>
           </tr>
         </thead>
         <tbody>
@@ -171,10 +171,10 @@
             <td class="muted">{{ p.note || '—' }}</td>
           </tr>
           <tr *ngIf="loadingHistory" class="loading-row">
-            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
           </tr>
           <tr *ngIf="!loadingHistory && history.length === 0">
-            <td colspan="6" class="empty-row">No supplier payments recorded yet.</td>
+            <td colspan="6" class="empty-row">{{ 'supplier_payment.no_payments' | translate }}</td>
           </tr>
         </tbody>
       </table>
@@ -185,11 +185,11 @@
   <!-- Payment history — mobile cards -->
   <div class="mobile-list">
     <div class="mobile-meta">
-      <span class="mobile-title">Payment History</span>
-      <span class="count-badge">{{ histTotal }} records</span>
+      <span class="mobile-title">{{ 'supplier_payment.payment_history' | translate }}</span>
+      <span class="count-badge">{{ histTotal }} {{ 'common.records' | translate }}</span>
     </div>
-    <div class="mobile-loading" *ngIf="loadingHistory"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
-    <div class="mobile-empty" *ngIf="!loadingHistory && history.length === 0"><p>No supplier payments recorded yet.</p></div>
+    <div class="mobile-loading" *ngIf="loadingHistory"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
+    <div class="mobile-empty" *ngIf="!loadingHistory && history.length === 0"><p>{{ 'supplier_payment.no_payments' | translate }}</p></div>
 
     <div class="mobile-card" *ngFor="let p of history">
       <div class="mc-top">
@@ -200,8 +200,8 @@
         <span class="mc-amount">৳{{ p.amount | number:'1.0-2' }}</span>
       </div>
       <div class="mc-grid mc-grid-2">
-        <div class="mc-field"><span class="mc-lbl">Reference</span><span class="mc-val"><span class="ref-badge">{{ p.reference_no }}</span></span></div>
-        <div class="mc-field"><span class="mc-lbl">Note</span><span class="mc-val muted">{{ p.note || '—' }}</span></div>
+        <div class="mc-field"><span class="mc-lbl">{{ 'supplier_payment.reference' | translate }}</span><span class="mc-val"><span class="ref-badge">{{ p.reference_no }}</span></span></div>
+        <div class="mc-field"><span class="mc-lbl">{{ 'common.note' | translate }}</span><span class="mc-val muted">{{ p.note || '—' }}</span></div>
       </div>
     </div>
     <app-paginator [page]="histPage" [pages]="histPages" [total]="histTotal" [pageSize]="histPageSize" (pageChange)="onHistPage($event)"></app-paginator>

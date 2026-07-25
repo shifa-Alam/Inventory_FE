@@ -7,7 +7,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { ConfirmService } from '../../shared/services/confirm.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { localDateStr } from '../../shared/utils/date.utils';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
 
 @Component({
@@ -64,6 +64,7 @@ export class SalesListComponent implements OnInit {
     public auth: AuthService,
     private confirmSvc: ConfirmService,
     private toast: ToastService,
+    private translate: TranslateService,
   ) {}
 
   /** Owner/Manager may void a sale; cashiers may not. */
@@ -71,12 +72,12 @@ export class SalesListComponent implements OnInit {
 
   async cancelSale(s: any) {
     const ok = await this.confirmSvc.open(
-      `Void sale ${s.invoice_no}? This restocks the items, unwinds the customer's due and reverses any payment.`,
-      { confirmLabel: 'Void Sale', danger: true },
+      this.translate.instant('sales_list.msg_void_confirm', { inv: s.invoice_no }),
+      { confirmLabel: this.translate.instant('sales_list.void_sale_label'), danger: true },
     );
     if (!ok) return;
     this.api.post(`/sales/${s.id}/cancel`, {}).subscribe({
-      next: () => { this.toast.success(`Sale ${s.invoice_no} voided`); this.load(); },
+      next: () => { this.toast.success(this.translate.instant('sales_list.msg_void_success', { inv: s.invoice_no })); this.load(); },
       // error toast is handled globally by the error interceptor
       error: () => {},
     });
@@ -222,13 +223,13 @@ export class SalesListComponent implements OnInit {
     }).subscribe({
       next: (res: any) => {
         this.saving = false;
-        this.successMsg = 'Delivery date updated.';
+        this.successMsg = this.translate.instant('sales_list.msg_delivery_updated');
         const idx = this.sales.findIndex(s => s.id === this.selectedSale.id);
         if (idx > -1) this.sales[idx].delivery_date = res.delivery_date;
         this.selectedSale.delivery_date = res.delivery_date;
         setTimeout(() => { this.successMsg = ''; this.closePanel(); }, 2000);
       },
-      error: (err: any) => { this.errorMsg = err?.error?.detail || 'Update failed.'; this.saving = false; }
+      error: (err: any) => { this.errorMsg = err?.error?.detail || this.translate.instant('sales_list.msg_update_failed'); this.saving = false; }
     });
   }
 
@@ -254,9 +255,9 @@ export class SalesListComponent implements OnInit {
       next: (res: any) => {
         this.paying = false;
         const parts = [];
-        if (this.payAmount) parts.push(`৳${this.payAmount} payment`);
-        if (this.payDiscount) parts.push(`৳${this.payDiscount} discount`);
-        this.successMsg = `${parts.join(' + ')} recorded. Ref: ${res.reference_no}`;
+        if (this.payAmount) parts.push(this.translate.instant('sales_list.msg_payment_part', { n: this.payAmount }));
+        if (this.payDiscount) parts.push(this.translate.instant('sales_list.msg_discount_part', { n: this.payDiscount }));
+        this.successMsg = this.translate.instant('sales_list.msg_payment_recorded', { parts: parts.join(' + '), ref: res.reference_no });
         // update due in-place
         this.selectedSale.due_amount = res.sale_due_remaining;
         this.selectedSale.paid_amount = (this.selectedSale.paid_amount || 0) + (+(this.payAmount || 0));
@@ -269,7 +270,7 @@ export class SalesListComponent implements OnInit {
         }
         setTimeout(() => { this.successMsg = ''; this.closePanel(); }, 3500);
       },
-      error: (err: any) => { this.errorMsg = err?.error?.detail || 'Payment failed.'; this.paying = false; }
+      error: (err: any) => { this.errorMsg = err?.error?.detail || this.translate.instant('sales_list.msg_payment_failed'); this.paying = false; }
     });
   }
 

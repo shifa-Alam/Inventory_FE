@@ -12,7 +12,7 @@
     <p class="step-label">{{ 'sale_return.search_invoice_label' | translate }}</p>
     <div class="invoice-search-row">
       <input type="text" [(ngModel)]="invoiceQuery" (keydown.enter)="searchInvoice()"
-        placeholder="INV-20240101-00001" class="invoice-input" />
+        [placeholder]="'sale_return.search_invoice_ph' | translate" class="invoice-input" />
       <button class="btn btn-primary" (click)="searchInvoice()" [disabled]="loadingInvoice">
         {{ loadingInvoice ? ('common.loading' | translate) : ('sale_return.search_btn' | translate) }}
       </button>
@@ -91,7 +91,7 @@
                     (change)="clampQty(row)" class="return-qty-input" />
                   <button class="qty-btn" (click)="row.return_qty = row.return_qty + 1; clampQty(row)" [disabled]="row.return_qty >= row.max_qty">+</button>
                 </div>
-                <div class="qty-hint" *ngIf="row.already_returned > 0">{{ row.already_returned }} already returned</div>
+                <div class="qty-hint" *ngIf="row.already_returned > 0">{{ row.already_returned }} {{ 'sale_return.already_returned' | translate }}</div>
               </td>
               <td class="col-right col-highlight">
                 <span *ngIf="row.return_qty > 0" class="return-amt">৳{{ row.return_qty * row.rate | number:'1.0-0' }}</span>
@@ -112,17 +112,17 @@
           [placeholder]="'sale_return.reason_placeholder' | translate"
           class="reason-input"></textarea>
 
-        <label class="field-label refund-mode-label">Refund Method</label>
+        <label class="field-label refund-mode-label">{{ 'sale_return.refund_method_label' | translate }}</label>
         <div class="refund-mode-toggle">
           <label class="rm-option" [class.active]="refundMode === 'credit'">
             <input type="radio" name="refundMode" value="credit" [(ngModel)]="refundMode" />
-            <span class="rm-title">Store Credit</span>
-            <span class="rm-sub">Reduces customer's due balance</span>
+            <span class="rm-title">{{ 'sale_return.refund_store_credit' | translate }}</span>
+            <span class="rm-sub">{{ 'sale_return.refund_store_credit_sub' | translate }}</span>
           </label>
           <label class="rm-option" [class.active]="refundMode === 'cash'">
             <input type="radio" name="refundMode" value="cash" [(ngModel)]="refundMode" />
-            <span class="rm-title">Cash Refund</span>
-            <span class="rm-sub">Money handed back — due unchanged</span>
+            <span class="rm-title">{{ 'sale_return.refund_cash' | translate }}</span>
+            <span class="rm-sub">{{ 'sale_return.refund_cash_sub' | translate }}</span>
           </label>
         </div>
       </div>
@@ -158,26 +158,26 @@
     <div class="rh-filter-bar">
       <div class="rh-filter-row">
         <div class="rh-fg">
-          <label class="rh-lbl">From</label>
+          <label class="rh-lbl">{{ 'common.from' | translate }}</label>
           <input type="date" class="rh-inp" [(ngModel)]="filterDateFrom" (change)="onDateChange()" />
         </div>
         <div class="rh-fg">
-          <label class="rh-lbl">To</label>
+          <label class="rh-lbl">{{ 'common.to' | translate }}</label>
           <input type="date" class="rh-inp" [(ngModel)]="filterDateTo" (change)="onDateChange()" />
         </div>
         <div class="rh-fg rh-fg-grow">
-          <label class="rh-lbl">Return No</label>
-          <input class="rh-inp" placeholder="e.g. RET-001" [(ngModel)]="filterReturnNo" (ngModelChange)="applyFilter()" />
+          <label class="rh-lbl">{{ 'sale_return.return_no_label' | translate }}</label>
+          <input class="rh-inp" [placeholder]="'sale_return.return_no_ph' | translate" [(ngModel)]="filterReturnNo" (ngModelChange)="applyFilter()" />
         </div>
       </div>
       <div class="rh-quick-row">
         <span class="rh-count">{{ historyTotal }} {{ 'sale_return.history_title' | translate }}</span>
         <div class="rh-qbts">
-          <button class="rh-qb" [class.rh-qb-active]="activeQuick === 'today'" (click)="setToday()">Today</button>
-          <button class="rh-qb" [class.rh-qb-active]="activeQuick === 'week'"  (click)="setThisWeek()">This Week</button>
-          <button class="rh-qb" [class.rh-qb-active]="activeQuick === 'month'" (click)="setThisMonth()">This Month</button>
-          <button class="rh-qb" [class.rh-qb-active]="activeQuick === 'all'"   (click)="setAllTime()">All Time</button>
-          <button class="rh-qb rh-qb-clear" (click)="clearFilter()">Reset</button>
+          <button class="rh-qb" [class.rh-qb-active]="activeQuick === 'today'" (click)="setToday()">{{ 'common.today' | translate }}</button>
+          <button class="rh-qb" [class.rh-qb-active]="activeQuick === 'week'"  (click)="setThisWeek()">{{ 'common.this_week' | translate }}</button>
+          <button class="rh-qb" [class.rh-qb-active]="activeQuick === 'month'" (click)="setThisMonth()">{{ 'common.this_month' | translate }}</button>
+          <button class="rh-qb" [class.rh-qb-active]="activeQuick === 'all'"   (click)="setAllTime()">{{ 'common.all_time' | translate }}</button>
+          <button class="rh-qb rh-qb-clear" (click)="clearFilter()">{{ 'common.reset' | translate }}</button>
         </div>
       </div>
     </div>
@@ -215,7 +215,7 @@
 
     <!-- Mobile history cards -->
     <div class="show-mobile" style="padding:10px 12px">
-      <div class="mobile-loading" *ngIf="loadingReturns"><div class="loading-spinner"></div> Loading…</div>
+      <div class="mobile-loading" *ngIf="loadingReturns"><div class="loading-spinner"></div> {{ 'common.loading' | translate }}</div>
       <div class="mobile-empty" *ngIf="!loadingReturns && returns.length === 0">{{ 'sale_return.history_empty' | translate }}</div>
       <div class="mobile-card" *ngFor="let r of returns">
         <div class="mc-top">

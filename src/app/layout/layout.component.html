@@ -26,7 +26,7 @@
   <aside class="sidebar">
 
     <a class="sidebar-logo" [routerLink]="isSystemAdmin ? '/users' : '/dashboard'"
-       (click)="closeSidebar()" aria-label="Snova POS — home">
+       (click)="closeSidebar()" [attr.aria-label]="'nav.home_aria' | translate">
       <span class="logo-tile">
         <img src="logo-mark.png" width="44" height="44" alt="" decoding="async" draggable="false" />
       </span>
@@ -82,14 +82,14 @@
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
           </svg>
-          Import Products
+          {{ 'nav.import_products' | translate }}
         </a>
         <a *ngIf="canManage" routerLink="/units" routerLinkActive="active" (click)="closeSidebar()">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
             <polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" />
           </svg>
-          Units
+          {{ 'nav.units' | translate }}
         </a>
 
         <!-- People -->
@@ -137,7 +137,7 @@
             <polyline points="9 14 4 9 9 4" />
             <path d="M20 20v-7a4 4 0 0 0-4-4H4" />
           </svg>
-          Purchase Return
+          {{ 'nav.purchase_return' | translate }}
         </a>
         </ng-container>
 
@@ -236,7 +236,7 @@
             <path d="M9 11l3 3L22 4" />
             <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
           </svg>
-          Stock Count
+          {{ 'nav.stock_count' | translate }}
         </a>
         <a routerLink="/stock-ledger" routerLinkActive="active" (click)="closeSidebar()">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -259,7 +259,7 @@
           <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
         </svg>
-        Notifications
+        {{ 'nav.notifications' | translate }}
       </a>
 
       <!-- Admin -->
@@ -278,7 +278,7 @@
             <rect x="2" y="7" width="20" height="14" rx="2" />
             <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
           </svg>
-          Tenants
+          {{ 'nav.tenants' | translate }}
         </a>
       </ng-container>
 
@@ -296,7 +296,7 @@
         <button class="lang-toggle-btn" (click)="lang.toggle()" [title]="'lang.toggle' | translate">
           {{ 'lang.toggle' | translate }}
         </button>
-        <button class="theme-toggle-btn" (click)="toggleTheme()" [title]="isDark ? 'Light mode' : 'Dark mode'">
+        <button class="theme-toggle-btn" (click)="toggleTheme()" [title]="(isDark ? 'nav.light_mode' : 'nav.dark_mode') | translate">
           <svg *ngIf="!isDark" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"
             viewBox="0 0 24 24">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
@@ -337,7 +337,7 @@
       </div>
       <div class="topbar-right">
         <button class="lang-toggle-topbar" (click)="lang.toggle()">{{ 'lang.toggle' | translate }}</button>
-        <button class="theme-toggle-btn" (click)="toggleTheme()" [title]="isDark ? 'Light mode' : 'Dark mode'">
+        <button class="theme-toggle-btn" (click)="toggleTheme()" [title]="(isDark ? 'nav.light_mode' : 'nav.dark_mode') | translate">
           <svg *ngIf="!isDark" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
             viewBox="0 0 24 24">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
@@ -355,7 +355,7 @@
             <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
           </svg>
         </button>
-        <button class="hamburger" (click)="toggleSidebar()" aria-label="Toggle menu">
+        <button class="hamburger" (click)="toggleSidebar()" [attr.aria-label]="'nav.toggle_menu' | translate">
           <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <line x1="3" y1="6" x2="21" y2="6" />
             <line x1="3" y1="12" x2="21" y2="12" />
@@ -381,14 +381,14 @@
           <rect x="3" y="14" width="7" height="7" rx="1" />
           <rect x="14" y="14" width="7" height="7" rx="1" />
         </svg>
-        <span>Home</span>
+        <span>{{ 'nav.home' | translate }}</span>
       </a>
       <a routerLink="/billing" routerLinkActive="bn-active" (click)="closeSidebar()">
         <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <line x1="12" y1="1" x2="12" y2="23" />
           <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
         </svg>
-        <span>New Sale</span>
+        <span>{{ 'nav.new_sale' | translate }}</span>
       </a>
       <a routerLink="/sales" routerLinkActive="bn-active" (click)="closeSidebar()">
         <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -397,14 +397,14 @@
           <line x1="9" y1="11" x2="15" y2="11" />
           <line x1="9" y1="15" x2="13" y2="15" />
         </svg>
-        <span>Sales</span>
+        <span>{{ 'nav.sales' | translate }}</span>
       </a>
       <a routerLink="/products" routerLinkActive="bn-active" (click)="closeSidebar()">
         <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
           <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
         </svg>
-        <span>Products</span>
+        <span>{{ 'nav.products' | translate }}</span>
       </a>
     </ng-container>
 
@@ -416,14 +416,14 @@
           <circle cx="9" cy="7" r="4" />
           <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
         </svg>
-        <span>Users</span>
+        <span>{{ 'nav.users' | translate }}</span>
       </a>
       <a routerLink="/tenants" routerLinkActive="bn-active" (click)="closeSidebar()">
         <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <rect x="2" y="7" width="20" height="14" rx="2" />
           <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
         </svg>
-        <span>Tenants</span>
+        <span>{{ 'nav.tenants' | translate }}</span>
       </a>
     </ng-container>
 
@@ -433,7 +433,7 @@
         <circle cx="19" cy="12" r="1" />
         <circle cx="5" cy="12" r="1" />
       </svg>
-      <span>More</span>
+      <span>{{ 'nav.more' | translate }}</span>
     </button>
   </nav>
 

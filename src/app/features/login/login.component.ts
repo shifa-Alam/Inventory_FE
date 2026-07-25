@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { SubscriptionService } from '../../core/services/subscription.service';
 import { Router } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LanguageService } from '../../core/services/language.service';
 @Component({
   selector: 'app-login',
@@ -24,11 +24,11 @@ export class LoginComponent {
   passFocused = false;
   year = new Date().getFullYear();
 
-  constructor(private auth: AuthService, private router: Router, public lang: LanguageService, private subs: SubscriptionService) { }
+  constructor(private auth: AuthService, private router: Router, public lang: LanguageService, private subs: SubscriptionService, private translate: TranslateService) { }
 
   login() {
     if (!this.username.trim() || !this.password.trim()) {
-      this.errorMsg = 'Please enter username and password.';
+      this.errorMsg = this.translate.instant('login.error_enter_credentials');
       return;
     }
     this.loading = true;
@@ -45,7 +45,7 @@ export class LoginComponent {
       },
       error: (err) => {
         this.loading = false;
-        this.errorMsg = err?.error?.detail || 'Invalid username or password.';
+        this.errorMsg = err?.error?.detail || this.translate.instant('login.error_invalid_credentials');
       }
     });
   }

@@ -23,8 +23,8 @@
       </div> -->
 
       <div class="hero-text">
-        <h1>Run your business<br /><span class="gradient-text">smarter, faster.</span></h1>
-        <p>All-in-one inventory, sales, purchases and analytics — built for teams that move fast.</p>
+        <h1>{{ 'login.hero_line1' | translate }}<br /><span class="gradient-text">{{ 'login.hero_line2' | translate }}</span></h1>
+        <p>{{ 'login.hero_desc' | translate }}</p>
       </div>
 
       <div class="feature-list">
@@ -35,8 +35,8 @@
             </svg>
           </div>
           <div>
-            <div class="feature-title">Real-time Analytics</div>
-            <div class="feature-desc">Live sales and inventory insights</div>
+            <div class="feature-title">{{ 'login.feature_analytics_title' | translate }}</div>
+            <div class="feature-desc">{{ 'login.feature_analytics_desc' | translate }}</div>
           </div>
         </div>
         <div class="feature-item">
@@ -48,8 +48,8 @@
             </svg>
           </div>
           <div>
-            <div class="feature-title">Multi-device Access</div>
-            <div class="feature-desc">Works on desktop, tablet and mobile</div>
+            <div class="feature-title">{{ 'login.feature_multidevice_title' | translate }}</div>
+            <div class="feature-desc">{{ 'login.feature_multidevice_desc' | translate }}</div>
           </div>
         </div>
         <div class="feature-item">
@@ -60,8 +60,8 @@
             </svg>
           </div>
           <div>
-            <div class="feature-title">Secure & Reliable</div>
-            <div class="feature-desc">JWT-protected, role-based access</div>
+            <div class="feature-title">{{ 'login.feature_secure_title' | translate }}</div>
+            <div class="feature-desc">{{ 'login.feature_secure_desc' | translate }}</div>
           </div>
         </div>
       </div>
@@ -69,17 +69,17 @@
       <div class="stats-row">
         <div class="stat">
           <div class="stat-num">99.9%</div>
-          <div class="stat-lbl">Uptime</div>
+          <div class="stat-lbl">{{ 'login.stat_uptime' | translate }}</div>
         </div>
         <div class="stat-divider"></div>
         <div class="stat">
           <div class="stat-num">2.4k+</div>
-          <div class="stat-lbl">Products</div>
+          <div class="stat-lbl">{{ 'login.stat_products' | translate }}</div>
         </div>
         <div class="stat-divider"></div>
         <div class="stat">
           <div class="stat-num">Real‑time</div>
-          <div class="stat-lbl">Sync</div>
+          <div class="stat-lbl">{{ 'login.stat_sync' | translate }}</div>
         </div>
       </div>
     </div>
@@ -179,7 +179,7 @@
     </div>
 
     <div class="right-footer">
-      <span class="rf-powered">Powered by <strong>SNOVA Tech</strong></span>
+      <span class="rf-powered">{{ 'login.powered_by' | translate }} <strong>SNOVA Tech</strong></span>
       <!-- <span class="rf-copy">&copy; {{ year }} Snova POS. All rights reserved.</span> -->
     </div>
   </div>
@@ -205,7 +205,7 @@
         </svg>
     </div> -->
       <h1 class="m-app-name">Snova POS</h1>
-      <p class="m-tagline">Smart Business Management System</p>
+      <p class="m-tagline">{{ 'login.tagline' | translate }}</p>
 
     </div>
 
@@ -233,7 +233,7 @@
             [placeholder]="'login.password_placeholder' | translate" autocomplete="current-password"
             (focus)="passFocused=true" (blur)="passFocused=false" />
           <button type="button" class="m-eye" (click)="showPassword=!showPassword" tabindex="-1"
-            aria-label="Toggle password visibility">
+            [attr.aria-label]="'login.toggle_password' | translate">
             <svg *ngIf="!showPassword" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75"
               viewBox="0 0 24 24">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
@@ -275,7 +275,7 @@
 
     <!-- Footer branding -->
     <div class="m-footer">
-      <span class="m-powered">Powered by <strong>SNOVA Tech</strong></span>
+      <span class="m-powered">{{ 'login.powered_by' | translate }} <strong>SNOVA Tech</strong></span>
       <!-- <span class="m-copy">&copy; {{ year }} Snova POS · All rights reserved</span> -->
     </div>
 

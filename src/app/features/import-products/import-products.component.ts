@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-import-products',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './import-products.component.html',
   styleUrls: ['./import-products.component.css'],
 })
@@ -20,7 +21,7 @@ export class ImportProductsComponent {
   ];
   private readonly TEMPLATE_EXAMPLE = ['Egg', '8901234', 'Grocery', '8', '10', '12', '24', '100'];
 
-  constructor(private api: ApiService, private toast: ToastService) {}
+  constructor(private api: ApiService, private toast: ToastService, private translate: TranslateService) {}
 
   onFile(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -41,7 +42,7 @@ export class ImportProductsComponent {
   }
 
   import() {
-    if (!this.file) { this.toast.warning('Please choose a CSV or Excel file first'); return; }
+    if (!this.file) { this.toast.warning(this.translate.instant('import_products.choose_file_first')); return; }
     const form = new FormData();
     form.append('file', this.file);
     this.importing = true;
@@ -50,12 +51,12 @@ export class ImportProductsComponent {
       next: (res: any) => {
         this.importing = false;
         this.report = res;
-        if (res.created > 0) this.toast.success(`${res.created} product(s) imported`);
-        if (res.created === 0 && res.total > 0) this.toast.warning('No new products were created');
+        if (res.created > 0) this.toast.success(this.translate.instant('import_products.imported_count', { n: res.created }));
+        if (res.created === 0 && res.total > 0) this.toast.warning(this.translate.instant('import_products.no_new'));
       },
       error: (err: any) => {
         this.importing = false;
-        this.toast.error(err?.error?.detail || 'Import failed');
+        this.toast.error(err?.error?.detail || this.translate.instant('import_products.import_failed'));
       },
     });
   }

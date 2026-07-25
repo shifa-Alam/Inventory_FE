@@ -1,38 +1,38 @@
 <div class="page">
   <div class="page-header">
     <div>
-      <h2>Notifications</h2>
-      <p class="sub">SMS reminders &amp; alerts for your shop</p>
+      <h2>{{ 'notification_settings.title' | translate }}</h2>
+      <p class="sub">{{ 'notification_settings.subtitle' | translate }}</p>
     </div>
   </div>
 
   <!-- SMS credit balance -->
   <div class="card card-body credit-card">
     <div>
-      <span class="credit-label">SMS credits left</span>
+      <span class="credit-label">{{ 'notification_settings.credits_left' | translate }}</span>
       <span class="credit-value">{{ credits | number }}</span>
     </div>
-    <span class="credit-hint">Each reminder uses 1 SMS. Top-ups are billed to your plan.</span>
+    <span class="credit-hint">{{ 'notification_settings.credits_hint' | translate }}</span>
   </div>
 
   <!-- Settings (owner/admin only) -->
   <div class="card card-body" *ngIf="isAdmin">
-    <p class="card-title">SMS settings</p>
+    <p class="card-title">{{ 'notification_settings.sms_settings' | translate }}</p>
     <div class="form-grid">
       <div class="form-group">
-        <label>Send SMS reminders</label>
+        <label>{{ 'notification_settings.send_sms_reminders' | translate }}</label>
         <label class="switch-row">
           <input type="checkbox" [(ngModel)]="settings.sms_enabled" />
-          <span>{{ settings.sms_enabled ? 'On' : 'Off' }}</span>
+          <span>{{ (settings.sms_enabled ? 'notification_settings.on' : 'notification_settings.off') | translate }}</span>
         </label>
       </div>
       <div class="form-group">
-        <label>Sender / shop name <span class="hint">(shown in the SMS)</span></label>
-        <input type="text" maxlength="30" placeholder="e.g. Amira Traders"
+        <label>{{ 'notification_settings.sender_name_label' | translate }} <span class="hint">{{ 'notification_settings.sender_name_hint' | translate }}</span></label>
+        <input type="text" maxlength="30" [placeholder]="'notification_settings.sender_name_placeholder' | translate"
                [(ngModel)]="settings.sender_name" />
       </div>
       <div class="form-group">
-        <label>Message language</label>
+        <label>{{ 'notification_settings.message_language' | translate }}</label>
         <select [(ngModel)]="settings.language">
           <option value="bn">বাংলা</option>
           <option value="en">English</option>
@@ -41,7 +41,7 @@
     </div>
     <div class="form-actions">
       <button class="btn btn-primary" (click)="save()" [disabled]="saving">
-        {{ saving ? 'Saving…' : 'Save settings' }}
+        {{ (saving ? 'common.saving' : 'notification_settings.save_settings') | translate }}
       </button>
     </div>
   </div>
@@ -49,12 +49,12 @@
   <!-- Recent sends -->
   <div class="card">
     <div class="card-header-row">
-      <span class="card-title" style="margin-bottom:0">Recent reminders</span>
+      <span class="card-title" style="margin-bottom:0">{{ 'notification_settings.recent_reminders' | translate }}</span>
     </div>
     <div class="table-wrapper">
       <table>
         <thead>
-          <tr><th>When</th><th>Type</th><th>To</th><th>Status</th><th class="right">Cost</th></tr>
+          <tr><th>{{ 'notification_settings.col_when' | translate }}</th><th>{{ 'notification_settings.col_type' | translate }}</th><th>{{ 'notification_settings.col_to' | translate }}</th><th>{{ 'common.status' | translate }}</th><th class="right">{{ 'notification_settings.col_cost' | translate }}</th></tr>
         </thead>
         <tbody class="compact-rows">
           <tr *ngFor="let r of log">
@@ -67,7 +67,7 @@
             <td class="right muted">{{ r.cost_credits }}</td>
           </tr>
           <tr *ngIf="log.length === 0">
-            <td colspan="5" class="empty-row">No reminders sent yet.</td>
+            <td colspan="5" class="empty-row">{{ 'notification_settings.empty_log' | translate }}</td>
           </tr>
         </tbody>
       </table>

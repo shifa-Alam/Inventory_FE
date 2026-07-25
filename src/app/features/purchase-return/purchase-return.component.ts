@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
 
 @Component({
   selector: 'app-purchase-return',
   standalone: true,
-  imports: [CommonModule, FormsModule, PaginatorComponent],
+  imports: [CommonModule, FormsModule, TranslatePipe, PaginatorComponent],
   templateUrl: './purchase-return.component.html',
   styleUrls: ['./purchase-return.component.css']
 })
@@ -30,7 +31,7 @@ export class PurchaseReturnComponent implements OnInit {
   loadingHistory = false;
   histPage = 1; histPages = 1; histTotal = 0; histPageSize = 10;
 
-  constructor(private api: ApiService, private toast: ToastService) {}
+  constructor(private api: ApiService, private toast: ToastService, private translate: TranslateService) {}
 
   ngOnInit() {
     this.loadPurchases();
@@ -75,7 +76,7 @@ export class PurchaseReturnComponent implements OnInit {
         this.selected = detail;
         this.reason = '';
       },
-      error: () => this.toast.error('Failed to load purchase details.')
+      error: () => this.toast.error(this.translate.instant('purchase_return.load_detail_failed'))
     });
   }
 
@@ -106,7 +107,7 @@ export class PurchaseReturnComponent implements OnInit {
     this.api.post('/purchase-returns/', payload).subscribe({
       next: (res: any) => {
         this.saving = false;
-        this.toast.success(`${res.return_no} · returned ৳${res.total_returned} · due now ৳${res.purchase_due_remaining}`);
+        this.toast.success(this.translate.instant('purchase_return.save_success', { ref: res.return_no, total: res.total_returned, due: res.purchase_due_remaining }));
         this.clearSelection();
         this.loadPurchases();
         this.histPage = 1;
@@ -114,7 +115,7 @@ export class PurchaseReturnComponent implements OnInit {
       },
       error: (err) => {
         this.saving = false;
-        this.toast.error(err?.error?.detail || 'Failed to record purchase return.');
+        this.toast.error(err?.error?.detail || this.translate.instant('purchase_return.save_failed'));
       }
     });
   }

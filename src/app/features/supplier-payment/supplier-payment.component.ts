@@ -2,12 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
 
 @Component({
   selector: 'app-supplier-payment',
   standalone: true,
-  imports: [CommonModule, FormsModule, PaginatorComponent],
+  imports: [CommonModule, FormsModule, TranslatePipe, PaginatorComponent],
   templateUrl: './supplier-payment.component.html',
   styleUrls: ['./supplier-payment.component.css']
 })
@@ -50,7 +51,7 @@ export class SupplierPaymentComponent implements OnInit {
   histTotal = 0;
   histPageSize = 10;
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private translate: TranslateService) {}
 
   ngOnInit(): void {
     this.loadSummary();
@@ -117,7 +118,7 @@ export class SupplierPaymentComponent implements OnInit {
       note: this.payNote || null
     }).subscribe({
       next: (res: any) => {
-        this.successMsg = `৳${this.fmt(res.amount)} paid · Ref: ${res.reference_no}`;
+        this.successMsg = this.translate.instant('supplier_payment.payment_success', { amount: this.fmt(res.amount), ref: res.reference_no });
         this.paying = false;
         this.payAmount = null;
         this.payNote = '';
@@ -134,7 +135,7 @@ export class SupplierPaymentComponent implements OnInit {
         setTimeout(() => this.successMsg = '', 6000);
       },
       error: (err: any) => {
-        this.errorMsg = err?.error?.detail || 'Failed to record payment';
+        this.errorMsg = err?.error?.detail || this.translate.instant('supplier_payment.payment_failed');
         this.paying = false;
       }
     });

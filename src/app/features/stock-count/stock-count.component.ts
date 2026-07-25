@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { of, Subject } from 'rxjs';
 import { catchError, debounceTime, switchMap } from 'rxjs/operators';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
@@ -10,7 +11,7 @@ import { PaginatorComponent } from '../../shared/paginator/paginator.component';
 @Component({
   selector: 'app-stock-count',
   standalone: true,
-  imports: [CommonModule, FormsModule, PaginatorComponent],
+  imports: [CommonModule, FormsModule, PaginatorComponent, TranslatePipe],
   templateUrl: './stock-count.component.html',
   styleUrls: ['./stock-count.component.css']
 })
@@ -31,7 +32,7 @@ export class StockCountComponent implements OnInit {
   loadingHistory = false;
   page = 1; pages = 1; total = 0; pageSize = 15;
 
-  constructor(private api: ApiService, private toast: ToastService) {}
+  constructor(private api: ApiService, private toast: ToastService, private translate: TranslateService) {}
 
   ngOnInit() {
     this.search$.pipe(
@@ -86,15 +87,19 @@ export class StockCountComponent implements OnInit {
       next: (res: any) => {
         this.saving = false;
         const d = res.difference;
-        const msg = d === 0 ? 'No variance' : (d < 0 ? `Shrinkage ${d}` : `Found +${d}`);
-        this.toast.success(`${res.count_no} · ${msg} · stock now ${res.new_stock}`);
+        const msg = d === 0
+          ? this.translate.instant('stock_count.no_variance')
+          : (d < 0
+              ? this.translate.instant('stock_count.toast_shrinkage', { n: d })
+              : this.translate.instant('stock_count.toast_found', { n: d }));
+        this.toast.success(this.translate.instant('stock_count.toast_recorded', { ref: res.count_no, msg, stock: res.new_stock }));
         this.clearSelection();
         this.page = 1;
         this.loadHistory();
       },
       error: (err) => {
         this.saving = false;
-        this.toast.error(err?.error?.detail || 'Failed to record stock count.');
+        this.toast.error(err?.error?.detail || this.translate.instant('stock_count.error_record'));
       }
     });
   }

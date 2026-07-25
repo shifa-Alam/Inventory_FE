@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { ConfirmService } from '../../shared/services/confirm.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 
 interface InvoiceOptions {
   show_mrp: boolean;
@@ -20,7 +21,7 @@ const B2C_OPTIONS: InvoiceOptions = { show_mrp: false, show_signature: false, sh
 @Component({
   selector: 'app-tenants',
   standalone: true,
-  imports: [CommonModule, FormsModule, AutofocusDirective],
+  imports: [CommonModule, FormsModule, AutofocusDirective, TranslatePipe],
   templateUrl: './tenants.component.html',
   styleUrls: ['./tenants.component.css']
 })
@@ -51,7 +52,7 @@ export class TenantsComponent implements OnInit {
   customizeOptions = false;      // false = Auto options by business type
   options: InvoiceOptions = { ...B2C_OPTIONS };
 
-  constructor(private api: ApiService, private confirmSvc: ConfirmService, private toast: ToastService) {}
+  constructor(private api: ApiService, private confirmSvc: ConfirmService, private toast: ToastService, private translate: TranslateService) {}
 
   /* subscription renewal modal */
   renewTenant: any = null;
@@ -81,8 +82,8 @@ export class TenantsComponent implements OnInit {
     if (!this.renewTenant) return;
     this.renewSaving = true;
     this.api.post(`/tenants/${this.renewTenant.id}/subscription/renew`, { months: this.renewMonths }).subscribe({
-      next: (res: any) => this.afterSubscriptionChange(res, `Subscription extended by ${this.renewMonths} month(s)`),
-      error: (err) => { this.renewSaving = false; this.toast.error(err?.error?.detail || 'Renewal failed'); }
+      next: (res: any) => this.afterSubscriptionChange(res, this.translate.instant('tenants.toast_extended', { n: this.renewMonths })),
+      error: (err) => { this.renewSaving = false; this.toast.error(err?.error?.detail || this.translate.instant('tenants.err_renewal_failed')); }
     });
   }
 
@@ -90,8 +91,8 @@ export class TenantsComponent implements OnInit {
     if (!this.renewTenant || !this.renewEndDate) return;
     this.renewSaving = true;
     this.api.put(`/tenants/${this.renewTenant.id}/subscription`, { subscription_end: this.renewEndDate }).subscribe({
-      next: (res: any) => this.afterSubscriptionChange(res, 'Expiry date updated'),
-      error: (err) => { this.renewSaving = false; this.toast.error(err?.error?.detail || 'Update failed'); }
+      next: (res: any) => this.afterSubscriptionChange(res, this.translate.instant('tenants.toast_expiry_updated')),
+      error: (err) => { this.renewSaving = false; this.toast.error(err?.error?.detail || this.translate.instant('tenants.err_update_failed')); }
     });
   }
 
@@ -99,8 +100,8 @@ export class TenantsComponent implements OnInit {
     if (!this.renewTenant) return;
     this.renewSaving = true;
     this.api.put(`/tenants/${this.renewTenant.id}/subscription`, { subscription_end: null }).subscribe({
-      next: (res: any) => this.afterSubscriptionChange(res, 'Subscription set to unlimited'),
-      error: (err) => { this.renewSaving = false; this.toast.error(err?.error?.detail || 'Update failed'); }
+      next: (res: any) => this.afterSubscriptionChange(res, this.translate.instant('tenants.toast_set_unlimited')),
+      error: (err) => { this.renewSaving = false; this.toast.error(err?.error?.detail || this.translate.instant('tenants.err_update_failed')); }
     });
   }
 
@@ -175,7 +176,7 @@ export class TenantsComponent implements OnInit {
 
     req.subscribe({
       next: () => {
-        this.successMsg = `Tenant "${payload.name}" ${this.isEditing ? 'updated' : 'created'}.`;
+        this.successMsg = this.translate.instant(this.isEditing ? 'tenants.toast_updated' : 'tenants.toast_created', { name: payload.name });
         this.showForm = false;
         this.editingId = null;
         this.load();
@@ -183,16 +184,16 @@ export class TenantsComponent implements OnInit {
       },
       error: (err: any) => {
         this.loading = false;
-        this.errorMsg = err?.error?.detail ?? 'Failed to save tenant.';
+        this.errorMsg = err?.error?.detail ?? this.translate.instant('tenants.err_save');
       }
     });
   }
 
   async deactivate(t: any) {
-    if (!await this.confirmSvc.open(`Deactivate tenant "${t.name}"?`, { confirmLabel: 'Deactivate' })) return;
+    if (!await this.confirmSvc.open(this.translate.instant('tenants.confirm_deactivate', { name: t.name }), { confirmLabel: this.translate.instant('tenants.deactivate') })) return;
     this.api.delete(`/tenants/${t.id}/deactivate`).subscribe({
       next: () => this.load(),
-      error: (err: any) => this.toast.error(err?.error?.detail ?? 'Failed to deactivate.')
+      error: (err: any) => this.toast.error(err?.error?.detail ?? this.translate.instant('tenants.err_deactivate'))
     });
   }
 

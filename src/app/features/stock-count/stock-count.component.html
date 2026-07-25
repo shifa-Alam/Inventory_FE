@@ -1,23 +1,23 @@
 <div class="page">
   <div class="page-header">
     <div>
-      <h2>Stock Count</h2>
-      <p class="sub">Reconcile physical count with system stock (shrinkage / found)</p>
+      <h2>{{ 'stock_count.title' | translate }}</h2>
+      <p class="sub">{{ 'stock_count.subtitle' | translate }}</p>
     </div>
   </div>
 
   <!-- Count form -->
   <div class="card card-body count-card">
-    <p class="card-title">New Count</p>
+    <p class="card-title">{{ 'stock_count.new_count' | translate }}</p>
 
     <!-- product picker -->
     <div class="sc-search" *ngIf="!selected">
       <input type="text" [(ngModel)]="search" (ngModelChange)="onSearch($event)"
-             placeholder="Search product by name or Barcode (min 2 chars)…" autocomplete="off" />
+             [placeholder]="'stock_count.search_placeholder' | translate" autocomplete="off" />
       <div class="sc-dropdown" *ngIf="results.length">
         <div class="sc-item" *ngFor="let p of results" (click)="pick(p)">
           <span class="sc-name">{{ p.name }}</span>
-          <span class="sc-stock">stock: {{ p.current_stock }}</span>
+          <span class="sc-stock">{{ 'stock_count.stock_label' | translate }} {{ p.current_stock }}</span>
         </div>
       </div>
     </div>
@@ -29,43 +29,43 @@
           <div class="sc-picked-name">{{ selected.name }}</div>
           <div class="sc-picked-sku muted">{{ selected.barcode }}</div>
         </div>
-        <button class="btn btn-ghost btn-sm" (click)="clearSelection()">Change</button>
+        <button class="btn btn-ghost btn-sm" (click)="clearSelection()">{{ 'stock_count.change' | translate }}</button>
       </div>
 
       <div class="sc-grid">
         <div class="sc-field">
-          <label>System Stock</label>
+          <label>{{ 'stock_count.system_stock' | translate }}</label>
           <div class="sc-readonly">{{ selected.current_stock }}</div>
         </div>
         <div class="sc-field">
-          <label>Counted (physical) <span class="req">*</span></label>
+          <label>{{ 'stock_count.counted_physical' | translate }} <span class="req">*</span></label>
           <input type="number" [(ngModel)]="countedQty" min="0" placeholder="0" />
         </div>
         <div class="sc-field">
-          <label>Variance</label>
+          <label>{{ 'stock_count.variance' | translate }}</label>
           <div class="sc-variance"
                [class.neg]="difference! < 0" [class.pos]="difference! > 0"
                *ngIf="difference !== null">
             {{ difference! > 0 ? '+' : '' }}{{ difference }}
-            <span class="sc-var-tag" *ngIf="difference! < 0">Shrinkage</span>
-            <span class="sc-var-tag" *ngIf="difference! > 0">Found</span>
-            <span class="sc-var-tag" *ngIf="difference === 0">No variance</span>
+            <span class="sc-var-tag" *ngIf="difference! < 0">{{ 'stock_count.shrinkage' | translate }}</span>
+            <span class="sc-var-tag" *ngIf="difference! > 0">{{ 'stock_count.found' | translate }}</span>
+            <span class="sc-var-tag" *ngIf="difference === 0">{{ 'stock_count.no_variance' | translate }}</span>
           </div>
           <div class="sc-readonly muted" *ngIf="difference === null">—</div>
         </div>
       </div>
 
       <div class="sc-field">
-        <label>Reason / Note</label>
-        <input type="text" [(ngModel)]="reason" placeholder="e.g. monthly stock take, breakage found…" />
+        <label>{{ 'stock_count.reason_note' | translate }}</label>
+        <input type="text" [(ngModel)]="reason" [placeholder]="'stock_count.reason_placeholder' | translate" />
       </div>
 
       <div class="form-footer">
         <button class="btn btn-primary" (click)="save()" [disabled]="!isValid || saving">
           <span *ngIf="saving" class="spinner"></span>
-          {{ saving ? 'Saving…' : 'Record Count' }}
+          {{ saving ? ('stock_count.saving' | translate) : ('stock_count.record_count' | translate) }}
         </button>
-        <button class="btn btn-ghost" (click)="clearSelection()">Cancel</button>
+        <button class="btn btn-ghost" (click)="clearSelection()">{{ 'common.cancel' | translate }}</button>
       </div>
     </div>
   </div>
@@ -73,25 +73,25 @@
   <!-- History -->
   <div class="card desktop-table">
     <div class="card-header-row">
-      <span class="card-title" style="margin-bottom:0">Count History</span>
-      <span class="count-badge">{{ total }} records</span>
+      <span class="card-title" style="margin-bottom:0">{{ 'stock_count.count_history' | translate }}</span>
+      <span class="count-badge">{{ total }} {{ 'stock_count.records' | translate }}</span>
     </div>
     <div class="table-wrapper">
       <table>
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Ref</th>
-            <th>Product</th>
-            <th class="right">System</th>
-            <th class="right">Counted</th>
-            <th class="right">Variance</th>
-            <th class="right">Value Impact</th>
+            <th>{{ 'stock_count.col_date' | translate }}</th>
+            <th>{{ 'stock_count.col_ref' | translate }}</th>
+            <th>{{ 'stock_count.col_product' | translate }}</th>
+            <th class="right">{{ 'stock_count.col_system' | translate }}</th>
+            <th class="right">{{ 'stock_count.col_counted' | translate }}</th>
+            <th class="right">{{ 'stock_count.col_variance' | translate }}</th>
+            <th class="right">{{ 'stock_count.col_value_impact' | translate }}</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngIf="loadingHistory" class="loading-row">
-            <td colspan="7"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+            <td colspan="7"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
           </tr>
           <tr *ngFor="let c of history">
             <td class="muted">{{ c.created_at | date:'dd MMM yyyy, hh:mm a' }}</td>
@@ -107,7 +107,7 @@
             <td class="right" [class.neg-text]="c.value_impact < 0">৳{{ c.value_impact | number:'1.0-2' }}</td>
           </tr>
           <tr *ngIf="!loadingHistory && history.length === 0">
-            <td colspan="7" class="empty-row">No stock counts recorded yet.</td>
+            <td colspan="7" class="empty-row">{{ 'stock_count.empty' | translate }}</td>
           </tr>
         </tbody>
       </table>
@@ -118,11 +118,11 @@
   <!-- Count history — mobile cards -->
   <div class="mobile-list">
     <div class="mobile-meta">
-      <span class="mobile-title">Count History</span>
-      <span class="count-badge">{{ total }} records</span>
+      <span class="mobile-title">{{ 'stock_count.count_history' | translate }}</span>
+      <span class="count-badge">{{ total }} {{ 'stock_count.records' | translate }}</span>
     </div>
-    <div class="mobile-loading" *ngIf="loadingHistory"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
-    <div class="mobile-empty" *ngIf="!loadingHistory && history.length === 0"><p>No stock counts recorded yet.</p></div>
+    <div class="mobile-loading" *ngIf="loadingHistory"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
+    <div class="mobile-empty" *ngIf="!loadingHistory && history.length === 0"><p>{{ 'stock_count.empty' | translate }}</p></div>
 
     <div class="mobile-card" *ngFor="let c of history">
       <div class="mc-top">
@@ -135,9 +135,9 @@
         </span>
       </div>
       <div class="mc-grid">
-        <div class="mc-field"><span class="mc-lbl">System</span><span class="mc-val">{{ c.system_qty }}</span></div>
-        <div class="mc-field"><span class="mc-lbl">Counted</span><span class="mc-val">{{ c.counted_qty }}</span></div>
-        <div class="mc-field"><span class="mc-lbl">Value Impact</span><span class="mc-val" [class.danger]="c.value_impact < 0">৳{{ c.value_impact | number:'1.0-2' }}</span></div>
+        <div class="mc-field"><span class="mc-lbl">{{ 'stock_count.col_system' | translate }}</span><span class="mc-val">{{ c.system_qty }}</span></div>
+        <div class="mc-field"><span class="mc-lbl">{{ 'stock_count.col_counted' | translate }}</span><span class="mc-val">{{ c.counted_qty }}</span></div>
+        <div class="mc-field"><span class="mc-lbl">{{ 'stock_count.col_value_impact' | translate }}</span><span class="mc-val" [class.danger]="c.value_impact < 0">৳{{ c.value_impact | number:'1.0-2' }}</span></div>
       </div>
     </div>
     <app-paginator [page]="page" [pages]="pages" [total]="total" [pageSize]="pageSize" (pageChange)="onPage($event)"></app-paginator>

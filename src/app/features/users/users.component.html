@@ -49,12 +49,12 @@
         </select>
       </div>
       <div class="form-group" *ngIf="isSystemAdmin">
-        <label>Tenant</label>
+        <label>{{ 'users.tenant_label' | translate }}</label>
         <select [(ngModel)]="selectedTenantId" [disabled]="isEditing">
-          <option [ngValue]="null">— Select Tenant —</option>
+          <option [ngValue]="null">{{ 'users.select_tenant' | translate }}</option>
           <option *ngFor="let t of tenants" [ngValue]="t.id">{{ t.name }}</option>
         </select>
-        <small class="field-hint" *ngIf="isEditing">🔒 A user's tenant can't be changed after creation.</small>
+        <small class="field-hint" *ngIf="isEditing">🔒 {{ 'users.tenant_locked_hint' | translate }}</small>
       </div>
       <div class="form-footer">
         <button class="btn btn-primary" (click)="save()" [disabled]="!isValid || loading">
@@ -92,9 +92,9 @@
             <td class="muted">{{ (page - 1) * pageSize + i + 1 }}</td>
             <td class="bold">{{ u.username }}</td>
             <td><span class="badge badge-success">{{ u.role }}</span></td>
-            <td *ngIf="isSystemAdmin">{{ u.tenant_name || 'N/A' }}</td>
-            <td *ngIf="isSystemAdmin" class="muted">{{ u.created_at ? (u.created_at | date:'dd MMM yyyy HH:mm') : 'N/A' }}</td>
-            <td *ngIf="isSystemAdmin">{{ u.created_by_name || 'System' }}</td>
+            <td *ngIf="isSystemAdmin">{{ u.tenant_name || ('users.na' | translate) }}</td>
+            <td *ngIf="isSystemAdmin" class="muted">{{ u.created_at ? (u.created_at | date:'dd MMM yyyy HH:mm') : ('users.na' | translate) }}</td>
+            <td *ngIf="isSystemAdmin">{{ u.created_by_name || ('users.system' | translate) }}</td>
             <td>
               <div class="row-actions">
                 <button class="btn btn-secondary btn-sm" (click)="edit(u)">{{ 'users.edit' | translate }}</button>
@@ -133,9 +133,9 @@
         <span class="badge badge-success">{{ u.role }}</span>
       </div>
       <div class="mc-meta-rows" *ngIf="isSystemAdmin">
-        <div class="mc-meta-row"><span class="mc-meta-lbl">{{ 'users.col_tenant' | translate }}</span><span>{{ u.tenant_name || 'N/A' }}</span></div>
-        <div class="mc-meta-row"><span class="mc-meta-lbl">{{ 'users.col_created_at' | translate }}</span><span>{{ u.created_at ? (u.created_at | date:'dd MMM yyyy HH:mm') : 'N/A' }}</span></div>
-        <div class="mc-meta-row"><span class="mc-meta-lbl">{{ 'users.col_created_by' | translate }}</span><span>{{ u.created_by_name || 'System' }}</span></div>
+        <div class="mc-meta-row"><span class="mc-meta-lbl">{{ 'users.col_tenant' | translate }}</span><span>{{ u.tenant_name || ('users.na' | translate) }}</span></div>
+        <div class="mc-meta-row"><span class="mc-meta-lbl">{{ 'users.col_created_at' | translate }}</span><span>{{ u.created_at ? (u.created_at | date:'dd MMM yyyy HH:mm') : ('users.na' | translate) }}</span></div>
+        <div class="mc-meta-row"><span class="mc-meta-lbl">{{ 'users.col_created_by' | translate }}</span><span>{{ u.created_by_name || ('users.system' | translate) }}</span></div>
       </div>
       <div class="mc-actions">
         <button class="btn btn-secondary btn-sm" (click)="edit(u)">{{ 'users.edit' | translate }}</button>

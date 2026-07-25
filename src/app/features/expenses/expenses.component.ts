@@ -6,7 +6,7 @@ import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ConfirmService } from '../../shared/services/confirm.service';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-expenses',
@@ -49,7 +49,8 @@ export class ExpensesComponent implements OnInit {
   constructor(
     private api: ApiService,
     private toast: ToastService,
-    private confirmSvc: ConfirmService
+    private confirmSvc: ConfirmService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit() { this.loadCategories(); this.load(); this.loadSummary(); }
@@ -135,23 +136,23 @@ export class ExpensesComponent implements OnInit {
 
   addCategory() {
     const name = this.newCategoryName.trim();
-    if (!name) { this.toast.warning('Please enter a category name.'); return; }
+    if (!name) { this.toast.warning(this.translate.instant('expenses.msg_enter_category_name')); return; }
     this.api.post('/expense-categories/', { name }).subscribe({
       next: (res: any) => {
-        this.toast.success('Category added.');
+        this.toast.success(this.translate.instant('expenses.msg_category_added'));
         this.showNewCategory = false;
         this.newCategoryName = '';
         this.loadCategories();
         this.form.category_id = res.id;
       },
-      error: (err: any) => this.toast.error(err?.error?.detail || 'Failed to add category.')
+      error: (err: any) => this.toast.error(err?.error?.detail || this.translate.instant('expenses.msg_add_category_failed'))
     });
   }
 
   save() {
-    if (!+this.form.category_id)          { this.toast.warning('Please select an expense type.'); return; }
-    if (!this.form.amount || this.form.amount <= 0) { this.toast.warning('Please enter a valid amount.'); return; }
-    if (!this.form.date)                  { this.toast.warning('Please select a date.'); return; }
+    if (!+this.form.category_id)          { this.toast.warning(this.translate.instant('expenses.msg_select_type')); return; }
+    if (!this.form.amount || this.form.amount <= 0) { this.toast.warning(this.translate.instant('expenses.msg_enter_valid_amount')); return; }
+    if (!this.form.date)                  { this.toast.warning(this.translate.instant('expenses.msg_select_date')); return; }
 
     const payload = {
       category_id: +this.form.category_id,
@@ -168,23 +169,23 @@ export class ExpensesComponent implements OnInit {
     req.subscribe({
       next: () => {
         this.toast.stopSaving();
-        this.toast.success(this.form.id > 0 ? 'Expense updated.' : 'Expense recorded.');
+        this.toast.success(this.form.id > 0 ? this.translate.instant('expenses.msg_expense_updated') : this.translate.instant('expenses.msg_expense_recorded'));
         this.cancelForm();
         this.load();
         this.loadSummary();
       },
       error: (err: any) => {
         this.toast.stopSaving();
-        this.toast.error(err?.error?.detail || 'Failed to save expense.');
+        this.toast.error(err?.error?.detail || this.translate.instant('expenses.msg_save_failed'));
       }
     });
   }
 
   async delete(id: number) {
-    if (!await this.confirmSvc.open('Deactivate this expense? It will be removed from lists and summaries.', { danger: true })) return;
+    if (!await this.confirmSvc.open(this.translate.instant('expenses.msg_delete_confirm'), { danger: true })) return;
     this.api.delete(`/expenses/${id}`).subscribe({
-      next: () => { this.toast.success('Expense deleted.'); this.load(); this.loadSummary(); },
-      error: () => this.toast.error('Failed to delete expense.')
+      next: () => { this.toast.success(this.translate.instant('expenses.msg_expense_deleted')); this.load(); this.loadSummary(); },
+      error: () => this.toast.error(this.translate.instant('expenses.msg_delete_failed'))
     });
   }
 

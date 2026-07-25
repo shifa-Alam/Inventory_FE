@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../shared/services/toast.service';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
 
 @Component({
@@ -43,7 +43,7 @@ export class SaleReturnComponent implements OnInit, OnDestroy {
   private filterTimer: any;
   private today() { return new Date().toISOString().slice(0, 10); }
 
-  constructor(private api: ApiService, private toast: ToastService) {}
+  constructor(private api: ApiService, private toast: ToastService, private translate: TranslateService) {}
 
   ngOnInit() {
     this.filterDateFrom = this.today();
@@ -65,7 +65,7 @@ export class SaleReturnComponent implements OnInit, OnDestroy {
         this.invoiceResults = res.data ?? res;
         this.loadingInvoice = false;
       },
-      error: () => { this.toast.error('Invoice not found'); this.loadingInvoice = false; }
+      error: () => { this.toast.error(this.translate.instant('sale_return.invoice_not_found')); this.loadingInvoice = false; }
     });
   }
 
@@ -92,7 +92,7 @@ export class SaleReturnComponent implements OnInit, OnDestroy {
         this.invoiceResults = [];
         this.invoiceQuery = '';
       },
-      error: () => this.toast.error('Failed to load invoice')
+      error: () => this.toast.error(this.translate.instant('sale_return.load_invoice_failed'))
     });
   }
 
@@ -135,9 +135,9 @@ export class SaleReturnComponent implements OnInit, OnDestroy {
 
   // ── Submit ────────────────────────────────────────────────────
   submit() {
-    if (!this.sale) { this.toast.warning('Please select an invoice first.'); return; }
-    if (!this.hasAnyReturn()) { this.toast.warning('Please enter return quantity for at least one item.'); return; }
-    if (!this.reason.trim()) { this.toast.warning('Please enter a reason for the return.'); return; }
+    if (!this.sale) { this.toast.warning(this.translate.instant('sale_return.select_invoice_first')); return; }
+    if (!this.hasAnyReturn()) { this.toast.warning(this.translate.instant('sale_return.enter_return_qty')); return; }
+    if (!this.reason.trim()) { this.toast.warning(this.translate.instant('sale_return.enter_reason')); return; }
 
     const payload = {
       sale_id: this.sale.id,
@@ -153,11 +153,11 @@ export class SaleReturnComponent implements OnInit, OnDestroy {
     this.api.post('/sale-returns/', payload).subscribe({
       next: (res: any) => {
         this.toast.stopSaving();
-        this.toast.success(`Return recorded: ${res.return_no} — Refund ৳${res.refund_amount?.toFixed(2)}`);
+        this.toast.success(this.translate.instant('sale_return.return_recorded', { return_no: res.return_no, amount: res.refund_amount?.toFixed(2) }));
         this.clearSale();
         this.loadReturns();
       },
-      error: (err) => { this.toast.stopSaving(); this.toast.error(err?.error?.detail || 'Failed to save return'); }
+      error: (err) => { this.toast.stopSaving(); this.toast.error(err?.error?.detail || this.translate.instant('sale_return.save_return_failed')); }
     });
   }
 

@@ -1,32 +1,32 @@
 <div class="page">
   <div class="page-header">
     <div>
-      <h2>Units of Measure</h2>
-      <p class="sub">Piece, Box, Carton, Kg… — used for buy/sell conversion on products</p>
+      <h2>{{ 'units.title' | translate }}</h2>
+      <p class="sub">{{ 'units.subtitle' | translate }}</p>
     </div>
     <button class="btn btn-primary" (click)="openAdd()">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      New Unit
+      {{ 'units.new_unit' | translate }}
     </button>
   </div>
 
   <!-- Form modal -->
   <div class="modal-backdrop" *ngIf="showForm" (click)="cancelForm()">
     <div class="modal-card" (click)="$event.stopPropagation()">
-      <h3>{{ newUnit.id ? 'Edit Unit' : 'New Unit' }}</h3>
+      <h3>{{ newUnit.id ? ('units.edit_unit' | translate) : ('units.new_unit' | translate) }}</h3>
       <div class="u-form">
         <div class="form-group">
-          <label>Name <span class="req">*</span></label>
-          <input autofocus [(ngModel)]="newUnit.name" placeholder="e.g. Carton" maxlength="50" />
+          <label>{{ 'common.name' | translate }} <span class="req">*</span></label>
+          <input autofocus [(ngModel)]="newUnit.name" [placeholder]="'units.name_placeholder' | translate" maxlength="50" />
         </div>
         <div class="form-group">
-          <label>Symbol</label>
-          <input [(ngModel)]="newUnit.symbol" placeholder="e.g. ctn" maxlength="20" />
+          <label>{{ 'units.symbol' | translate }}</label>
+          <input [(ngModel)]="newUnit.symbol" [placeholder]="'units.symbol_placeholder' | translate" maxlength="20" />
         </div>
       </div>
       <div class="u-actions">
-        <button class="btn btn-ghost" (click)="cancelForm()">Cancel</button>
-        <button class="btn btn-primary" (click)="save()">{{ newUnit.id ? 'Update' : 'Save' }}</button>
+        <button class="btn btn-ghost" (click)="cancelForm()">{{ 'common.cancel' | translate }}</button>
+        <button class="btn btn-primary" (click)="save()">{{ newUnit.id ? ('common.update' | translate) : ('common.save' | translate) }}</button>
       </div>
     </div>
   </div>
@@ -34,13 +34,13 @@
   <!-- DESKTOP TABLE -->
   <div class="card desktop-table">
     <div class="card-header-row">
-      <span class="card-title" style="margin-bottom:0">All Units</span>
+      <span class="card-title" style="margin-bottom:0">{{ 'units.all_units' | translate }}</span>
       <span class="count-badge">{{ units.length }}</span>
     </div>
     <div class="table-wrapper">
       <table>
         <thead>
-          <tr><th>#</th><th>Name</th><th>Symbol</th><th>Actions</th></tr>
+          <tr><th>#</th><th>{{ 'common.name' | translate }}</th><th>{{ 'units.symbol' | translate }}</th><th>{{ 'common.actions' | translate }}</th></tr>
         </thead>
         <tbody class="compact-rows">
           <tr *ngFor="let u of units; let i = index">
@@ -49,13 +49,13 @@
             <td>{{ u.symbol || '—' }}</td>
             <td>
               <div class="row-actions">
-                <button class="btn btn-secondary btn-sm" (click)="edit(u)">Edit</button>
-                <button class="btn btn-danger btn-sm" (click)="delete(u)">Deactivate</button>
+                <button class="btn btn-secondary btn-sm" (click)="edit(u)">{{ 'common.edit' | translate }}</button>
+                <button class="btn btn-danger btn-sm" (click)="delete(u)">{{ 'units.deactivate' | translate }}</button>
               </div>
             </td>
           </tr>
-          <tr *ngIf="loading" class="loading-row"><td colspan="4"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td></tr>
-          <tr *ngIf="!loading && units.length === 0"><td colspan="4" class="empty-row">No units yet. Add Piece, Box, Carton…</td></tr>
+          <tr *ngIf="loading" class="loading-row"><td colspan="4"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td></tr>
+          <tr *ngIf="!loading && units.length === 0"><td colspan="4" class="empty-row">{{ 'units.empty' | translate }}</td></tr>
         </tbody>
       </table>
     </div>
@@ -63,16 +63,16 @@
 
   <!-- MOBILE LIST -->
   <div class="mobile-list">
-    <div class="mobile-meta"><span class="mobile-title">All Units</span><span class="count-badge">{{ units.length }}</span></div>
-    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
-    <div class="mobile-empty" *ngIf="!loading && units.length === 0"><p>No units yet. Add Piece, Box, Carton…</p></div>
+    <div class="mobile-meta"><span class="mobile-title">{{ 'units.all_units' | translate }}</span><span class="count-badge">{{ units.length }}</span></div>
+    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
+    <div class="mobile-empty" *ngIf="!loading && units.length === 0"><p>{{ 'units.empty' | translate }}</p></div>
     <div class="mobile-card" *ngFor="let u of units">
       <div class="mc-top">
         <div><div class="mc-title">{{ u.name }}</div><div class="mc-sub">{{ u.symbol || '—' }}</div></div>
       </div>
       <div class="mc-actions">
-        <button class="btn btn-secondary btn-sm" (click)="edit(u)">Edit</button>
-        <button class="btn btn-danger btn-sm" (click)="delete(u)">Deactivate</button>
+        <button class="btn btn-secondary btn-sm" (click)="edit(u)">{{ 'common.edit' | translate }}</button>
+        <button class="btn btn-danger btn-sm" (click)="delete(u)">{{ 'units.deactivate' | translate }}</button>
       </div>
     </div>
   </div>

@@ -3,7 +3,7 @@ import { AutofocusDirective } from '../../shared/directives/autofocus.directive'
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
 import { ToastService } from '../../shared/services/toast.service';
 import { ConfirmService } from '../../shared/services/confirm.service';
@@ -50,7 +50,7 @@ export class ProductsComponent implements OnInit {
   variantRows: any[] = [];
   savingVariants = false;
 
-  constructor(private api: ApiService, private toast: ToastService, private confirmSvc: ConfirmService) {}
+  constructor(private api: ApiService, private toast: ToastService, private confirmSvc: ConfirmService, private translate: TranslateService) {}
 
   ngOnInit() {
     this.load();
@@ -124,7 +124,7 @@ export class ProductsComponent implements OnInit {
   /** Client-side guard so an incomplete unit row surfaces nicely. */
   unitsValid(): boolean {
     for (const r of (this.newProduct.units || [])) {
-      if (!r.unit_id || !(+r.factor > 0)) { this.toast.error('Each unit needs a unit and a factor'); return false; }
+      if (!r.unit_id || !(+r.factor > 0)) { this.toast.error(this.translate.instant('products.err_unit_incomplete')); return false; }
     }
     return true;
   }
@@ -155,8 +155,8 @@ export class ProductsComponent implements OnInit {
   onPageChange(p: number) { this.page = p; this.load(); }
 
   save() {
-    if (!this.newProduct.name?.trim()) { this.toast.error('Product name is required'); return; }
-    if (!+this.newProduct.category_id) { this.toast.error('Please select a category'); return; }
+    if (!this.newProduct.name?.trim()) { this.toast.error(this.translate.instant('products.err_name_required')); return; }
+    if (!+this.newProduct.category_id) { this.toast.error(this.translate.instant('products.err_select_category')); return; }
     if (!this.unitsValid()) return;
     this.newProduct.id ? this.update() : this.create();
   }
@@ -167,19 +167,19 @@ export class ProductsComponent implements OnInit {
                       has_variants: this.newProduct.has_variants };
     this.api.post('/products/', payload).subscribe({
       next: (created: any) => {
-        this.toast.stopSaving(); this.toast.success('Product Added'); this.load(); this.reset();
+        this.toast.stopSaving(); this.toast.success(this.translate.instant('products.toast_added')); this.load(); this.reset();
         // A new template goes straight into the variant builder.
         if (created?.has_variants) this.openVariants(created);
       },
-      error: (err: any) => { this.toast.stopSaving(); this.toast.error(err?.error?.detail || 'Failed to create product'); }
+      error: (err: any) => { this.toast.stopSaving(); this.toast.error(err?.error?.detail || this.translate.instant('products.err_create')); }
     });
   }
 
   update() {
     this.toast.startSaving();
     this.api.put(`/products/${this.newProduct.id}`, this.buildPayload()).subscribe({
-      next: () => { this.toast.stopSaving(); this.toast.success('Product Updated'); this.load(); this.reset(); },
-      error: (err: any) => { this.toast.stopSaving(); this.toast.error(err?.error?.detail || 'Failed to update product'); }
+      next: () => { this.toast.stopSaving(); this.toast.success(this.translate.instant('products.toast_updated')); this.load(); this.reset(); },
+      error: (err: any) => { this.toast.stopSaving(); this.toast.error(err?.error?.detail || this.translate.instant('products.err_update')); }
     });
   }
 
@@ -194,15 +194,15 @@ export class ProductsComponent implements OnInit {
   toggleActive(p: any) {
     this.api.patch(`/products/${p.id}/toggle-active`, {}).subscribe({
       next: (res: any) => { p.is_active = res.is_active; },
-      error: () => this.toast.error('Failed to update product status')
+      error: () => this.toast.error(this.translate.instant('products.err_status'))
     });
   }
 
   async delete(id: number) {
-    if (!await this.confirmSvc.open('Deactivate this product? It will be hidden and cannot be sold, but its history is kept.')) return;
+    if (!await this.confirmSvc.open(this.translate.instant('products.confirm_deactivate'))) return;
     this.api.delete(`/products/${id}`).subscribe({
       next: () => this.load(),
-      error: () => this.toast.error('Failed to delete product.')
+      error: () => this.toast.error(this.translate.instant('products.err_delete'))
     });
   }
 
@@ -248,7 +248,7 @@ export class ProductsComponent implements OnInit {
   /** Cartesian product of every axis's options → one editable grid row each. */
   generateRows() {
     const axes = this.vbAxes.filter(a => a.name.trim() && a.options.length);
-    if (!axes.length) { this.toast.error('Add at least one variant type with options'); return; }
+    if (!axes.length) { this.toast.error(this.translate.instant('products.err_variant_type_required')); return; }
     let combos: string[][] = [[]];
     for (const a of axes) combos = combos.flatMap(c => a.options.map(o => [...c, o]));
     const existing = new Set(this.existingVariants.map(v => v.variant_name));
@@ -260,7 +260,7 @@ export class ProductsComponent implements OnInit {
         average_cost: 0, sale_price: 0, wholesale_price: 0, mrp: 0,
         current_stock: 0, minimum_stock: 0, _axes: axes.map((a, i) => ({ type: a.name, value: name.split(' ')[i] }))
       }));
-    if (!this.variantRows.length) this.toast.error('All combinations already exist');
+    if (!this.variantRows.length) this.toast.error(this.translate.instant('products.err_all_combos_exist'));
   }
 
   removeRow(i: number) { this.variantRows.splice(i, 1); }
@@ -304,13 +304,13 @@ export class ProductsComponent implements OnInit {
           }))
         };
         const created: any = await this.api.post(`/products/${this.variantFor.id}/variants`, payload).toPromise();
-        this.toast.success(`${created.length} variant(s) created`);
+        this.toast.success(this.translate.instant('products.variants_created', { n: created.length }));
         this.existingVariants = [...this.existingVariants, ...created];
         this.variantRows = [];
         this.variantFor.has_variants = true;
         this.load();
       } catch (err: any) {
-        this.toast.error(err?.error?.detail || 'Failed to save variants');
+        this.toast.error(err?.error?.detail || this.translate.instant('products.err_save_variants'));
       } finally {
         this.savingVariants = false;
       }

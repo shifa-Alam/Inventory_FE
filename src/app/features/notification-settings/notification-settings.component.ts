@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { AuthService } from '../../core/services/auth.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-notification-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './notification-settings.component.html',
   styleUrls: ['./notification-settings.component.css'],
 })
@@ -19,7 +20,7 @@ export class NotificationSettingsComponent implements OnInit {
   saving = false;
   isAdmin = false;
 
-  constructor(private api: ApiService, private toast: ToastService, private auth: AuthService) {}
+  constructor(private api: ApiService, private toast: ToastService, private auth: AuthService, private translate: TranslateService) {}
 
   ngOnInit() {
     // Credits + log are readable by managers too; the settings form is
@@ -61,11 +62,11 @@ export class NotificationSettingsComponent implements OnInit {
       next: (res: any) => {
         this.settings = res;
         this.saving = false;
-        this.toast.success('Notification settings saved');
+        this.toast.success(this.translate.instant('notification_settings.saved_success'));
       },
       error: (err: any) => {
         this.saving = false;
-        this.toast.error(err?.error?.detail || 'Failed to save settings');
+        this.toast.error(err?.error?.detail || this.translate.instant('notification_settings.save_failed'));
       },
     });
   }

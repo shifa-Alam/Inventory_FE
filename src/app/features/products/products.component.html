@@ -24,21 +24,21 @@
         <input autofocus [placeholder]="'products.name_placeholder' | translate" [(ngModel)]="newProduct.name" />
       </div>
       <div class="form-group">
-        <label>Category <span class="req">*</span></label>
+        <label>{{ 'products.category_label' | translate }} <span class="req">*</span></label>
         <select [(ngModel)]="newProduct.category_id">
           <option value="0">{{ 'products.select_category' | translate }}</option>
           <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
         </select>
       </div>
       <div class="form-group" *ngIf="!newProduct.has_variants">
-        <label>Barcode</label>
-        <input placeholder="Scan or type barcode" [(ngModel)]="newProduct.barcode" />
+        <label>{{ 'products.barcode_label' | translate }}</label>
+        <input [placeholder]="'products.barcode_placeholder' | translate" [(ngModel)]="newProduct.barcode" />
       </div>
       <div class="form-group" *ngIf="!newProduct.id">
         <label>&nbsp;</label>
         <label class="hv-check">
           <input type="checkbox" [(ngModel)]="newProduct.has_variants" />
-          <span>Has Variants <small>(e.g. Sprite → 250ml / 500ml / 1L)</small></span>
+          <span>{{ 'products.has_variants_label' | translate }} <small>{{ 'products.has_variants_hint' | translate }}</small></span>
         </label>
       </div>
       <ng-container *ngIf="!newProduct.has_variants">
@@ -51,8 +51,8 @@
         <input type="number" [placeholder]="'products.sale_price_placeholder' | translate" [(ngModel)]="newProduct.sale_price" />
       </div>
       <div class="form-group">
-        <label>Wholesale Price</label>
-        <input type="number" placeholder="Wholesale Price" [(ngModel)]="newProduct.wholesale_price" />
+        <label>{{ 'products.wholesale_price_placeholder' | translate }}</label>
+        <input type="number" [placeholder]="'products.wholesale_price_placeholder' | translate" [(ngModel)]="newProduct.wholesale_price" />
       </div>
       <div class="form-group">
         <label>{{ 'products.mrp_placeholder' | translate }}</label>
@@ -67,55 +67,55 @@
         <input type="number" [placeholder]="'products.stock_placeholder' | translate"
                [(ngModel)]="newProduct.current_stock" [disabled]="!!newProduct.id" />
         <small class="field-hint" *ngIf="newProduct.id">
-          🔒 Stock changes through purchase, sale &amp; stock-count — not editable here.
+          {{ 'products.stock_edit_hint' | translate }}
         </small>
       </div>
 
       <!-- ── Units of measure (optional) ── -->
       <div class="form-group unit-full">
-        <label class="unit-section">Units of measure <span class="unit-hint">— prices, cost &amp; stock are in the base unit; leave blank for single-unit products</span></label>
+        <label class="unit-section">{{ 'products.units_section_label' | translate }} <span class="unit-hint">{{ 'products.units_section_hint' | translate }}</span></label>
       </div>
       <div class="form-group">
-        <label>Base unit <span class="unit-sub">(stock kept in this)</span></label>
+        <label>{{ 'products.base_unit_label' | translate }} <span class="unit-sub">{{ 'products.base_unit_sub' | translate }}</span></label>
         <select [(ngModel)]="newProduct.base_unit_id" [disabled]="!!newProduct.id">
-          <option [ngValue]="null">— None —</option>
+          <option [ngValue]="null">{{ 'products.unit_none' | translate }}</option>
           <option *ngFor="let u of units" [ngValue]="u.id">{{ u.name }}{{ u.symbol ? ' (' + u.symbol + ')' : '' }}</option>
         </select>
         <small class="field-hint" *ngIf="newProduct.id">
-          🔒 Base unit can't be changed after creation — stock &amp; cost history depend on it.
+          {{ 'products.base_unit_hint' | translate }}
         </small>
       </div>
 
       <!-- Extra transacting units: the product can be bought/sold in any of
            these (e.g. Dozen = 12 base). The operator picks per line. -->
       <div class="form-group unit-full" *ngIf="newProduct.base_unit_id">
-        <label>Other units <span class="unit-sub">(e.g. buy by Dozen = 12, sell by Piece)</span></label>
+        <label>{{ 'products.other_units_label' | translate }} <span class="unit-sub">{{ 'products.other_units_sub' | translate }}</span></label>
         <div class="unit-row" *ngFor="let row of newProduct.units; let i = index">
           <select [(ngModel)]="row.unit_id" [ngModelOptions]="{ standalone: true }">
-            <option [ngValue]="null">— Select unit —</option>
+            <option [ngValue]="null">{{ 'products.select_unit' | translate }}</option>
             <option *ngFor="let u of units" [ngValue]="u.id"
                     [disabled]="u.id === newProduct.base_unit_id">{{ u.name }}{{ u.symbol ? ' (' + u.symbol + ')' : '' }}</option>
           </select>
           <span class="unit-eq">=</span>
           <input type="number" min="0.000001" step="any" [(ngModel)]="row.factor"
-                 [ngModelOptions]="{ standalone: true }" placeholder="qty in base" />
+                 [ngModelOptions]="{ standalone: true }" [placeholder]="'products.qty_in_base_placeholder' | translate" />
           <span class="unit-eq">{{ unitName(newProduct.base_unit_id) || 'base' }}</span>
-          <button type="button" class="unit-del" (click)="removeUnitRow(i)" title="Remove">✕</button>
+          <button type="button" class="unit-del" (click)="removeUnitRow(i)" [title]="'products.remove' | translate">✕</button>
         </div>
-        <button type="button" class="unit-add" (click)="addUnitRow()">+ Add unit</button>
+        <button type="button" class="unit-add" (click)="addUnitRow()">{{ 'products.add_unit' | translate }}</button>
       </div>
 
       <!-- Default unit pre-selected on a new purchase / sale line -->
       <div class="form-group unit-pair" *ngIf="newProduct.base_unit_id">
         <div>
-          <label>Default purchase unit</label>
+          <label>{{ 'products.default_purchase_unit' | translate }}</label>
           <select [(ngModel)]="newProduct.purchase_unit_id">
             <option [ngValue]="null">— Base ({{ unitName(newProduct.base_unit_id) }}) —</option>
             <option *ngFor="let u of defaultUnitOptions()" [ngValue]="u.id">{{ u.name }}</option>
           </select>
         </div>
         <div>
-          <label>Default sale unit</label>
+          <label>{{ 'products.default_sale_unit' | translate }}</label>
           <select [(ngModel)]="newProduct.sale_unit_id">
             <option [ngValue]="null">— Base ({{ unitName(newProduct.base_unit_id) }}) —</option>
             <option *ngFor="let u of defaultUnitOptions()" [ngValue]="u.id">{{ u.name }}</option>
@@ -125,7 +125,7 @@
       </ng-container>
     </div>
     <p class="hv-hint" *ngIf="newProduct.has_variants">
-      Prices, barcode &amp; stock are set per variant — you'll add them in the next step after saving.
+      {{ 'products.variants_prices_hint' | translate }}
     </p>
     <div class="form-actions">
       <button class="btn btn-primary" (click)="save()">
@@ -138,13 +138,13 @@
   <!-- VARIANT BUILDER -->
   <div class="card card-body form-card variant-card" *ngIf="variantFor">
     <div class="form-card-header">
-      <p class="card-title">Variants of <strong>{{ variantFor.name }}</strong></p>
+      <p class="card-title">{{ 'products.variants_of' | translate }} <strong>{{ variantFor.name }}</strong></p>
       <button class="close-btn" (click)="closeVariants()">✕</button>
     </div>
 
     <!-- Existing variants -->
     <div class="ev-section" *ngIf="existingVariants.length">
-      <p class="ev-title">Existing variants ({{ existingVariants.length }})</p>
+      <p class="ev-title">{{ 'products.existing_variants' | translate:{ n: existingVariants.length } }}</p>
       <div class="ev-chips">
         <span class="ev-chip" *ngFor="let v of existingVariants">
           {{ v.variant_name }} <small>· {{ v.barcode || '—' }} · ৳{{ v.sale_price | number }} · stock {{ v.current_stock }}</small>
@@ -153,9 +153,9 @@
     </div>
 
     <!-- Step 1: attribute axes -->
-    <p class="vb-step">1. Variant Type &amp; Options <small>— e.g. Volume → 250ml, 500ml, 1L (comma or Enter to add)</small></p>
+    <p class="vb-step">{{ 'products.vb_step1' | translate }} <small>{{ 'products.vb_step1_hint' | translate }}</small></p>
     <div class="vb-axis" *ngFor="let axis of vbAxes; let ai = index">
-      <input class="vb-type" list="variantTypeList" placeholder="Type (Size / Volume / Color…)" [(ngModel)]="axis.name" />
+      <input class="vb-type" list="variantTypeList" [placeholder]="'products.variant_type_placeholder' | translate" [(ngModel)]="axis.name" />
       <datalist id="variantTypeList">
         <option *ngFor="let t of variantTypes" [value]="t.name"></option>
       </datalist>
@@ -163,31 +163,31 @@
         <span class="ev-chip opt-chip" *ngFor="let o of axis.options">
           {{ o }} <button class="chip-x" (click)="removeOption(axis, o)">✕</button>
         </span>
-        <input class="vb-opt-input" placeholder="Add option…" [(ngModel)]="axis.optionInput"
+        <input class="vb-opt-input" [placeholder]="'products.add_option_placeholder' | translate" [(ngModel)]="axis.optionInput"
                (keyup.enter)="addOption(axis)" (blur)="addOption(axis)" />
       </div>
       <button class="btn btn-ghost btn-sm" *ngIf="vbAxes.length > 1" (click)="removeAxis(ai)">✕</button>
     </div>
     <div class="vb-axis-actions">
-      <button class="btn btn-ghost btn-sm" (click)="addAxis()">+ Another Type (e.g. Color)</button>
-      <button class="btn btn-primary btn-sm" (click)="generateRows()">Generate Variants ⚡</button>
+      <button class="btn btn-ghost btn-sm" (click)="addAxis()">{{ 'products.another_type' | translate }}</button>
+      <button class="btn btn-primary btn-sm" (click)="generateRows()">{{ 'products.generate_variants' | translate }}</button>
     </div>
 
     <!-- Step 2: editable grid -->
     <ng-container *ngIf="variantRows.length">
-      <p class="vb-step">2. Set Barcode / Prices / Stock per variant</p>
+      <p class="vb-step">{{ 'products.vb_step2' | translate }}</p>
       <div class="table-wrapper">
         <table class="vb-table">
           <thead>
             <tr>
-              <th>Variant</th><th>Barcode</th><th>Cost</th><th>Retail</th>
-              <th>Wholesale</th><th>MRP</th><th>Opening Stock</th><th>Min Stock</th><th></th>
+              <th>{{ 'products.col_variant' | translate }}</th><th>{{ 'products.barcode_label' | translate }}</th><th>{{ 'products.col_cost' | translate }}</th><th>{{ 'products.col_retail' | translate }}</th>
+              <th>{{ 'products.col_wholesale' | translate }}</th><th>{{ 'products.col_mrp' | translate }}</th><th>{{ 'products.stock_placeholder' | translate }}</th><th>{{ 'products.col_min_stock' | translate }}</th><th></th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let r of variantRows; let ri = index">
               <td class="bold">{{ variantFor.name }} <span class="vb-vname">{{ r.variant_name }}</span></td>
-              <td><input [(ngModel)]="r.barcode" placeholder="Barcode" /></td>
+              <td><input [(ngModel)]="r.barcode" [placeholder]="'products.barcode_label' | translate" /></td>
               <td><input type="number" [(ngModel)]="r.average_cost" /></td>
               <td><input type="number" [(ngModel)]="r.sale_price" /></td>
               <td><input type="number" [(ngModel)]="r.wholesale_price" /></td>
@@ -201,7 +201,7 @@
       </div>
       <div class="form-actions">
         <button class="btn btn-primary" [disabled]="savingVariants" (click)="saveVariants()">
-          {{ savingVariants ? 'Saving…' : 'Save ' + variantRows.length + ' Variant(s)' }}
+          {{ savingVariants ? ('common.saving' | translate) : ('products.save_variants' | translate:{ n: variantRows.length }) }}
         </button>
         <button class="btn btn-ghost" (click)="closeVariants()">{{ 'products.cancel' | translate }}</button>
       </div>
@@ -213,10 +213,10 @@
     <div class="card-header-row">
       <div class="chr-left">
         <span class="card-title" style="margin-bottom:0">{{ 'products.title' | translate }}</span>
-        <span class="count-badge">{{ total }} total</span>
+        <span class="count-badge">{{ 'products.total_count' | translate:{ n: total } }}</span>
       </div>
       <div class="chr-toolbar">
-        <input placeholder="Name or Barcode" [(ngModel)]="filterName" (ngModelChange)="onSearchInput()" />
+        <input [placeholder]="'products.name_or_barcode_placeholder' | translate" [(ngModel)]="filterName" (ngModelChange)="onSearchInput()" />
         <select [(ngModel)]="filterCategoryId" (ngModelChange)="applyFilter()">
           <option value="0">{{ 'products.filter_all_categories' | translate }}</option>
           <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
@@ -254,8 +254,8 @@
               <div class="prod-cell">
                 <span class="prod-name">
                   {{ p.name }}
-                  <span class="variant-tag template" *ngIf="p.has_variants">Template</span>
-                  <span class="variant-tag" *ngIf="p.parent_product_id">Variant</span>
+                  <span class="variant-tag template" *ngIf="p.has_variants">{{ 'products.tag_template' | translate }}</span>
+                  <span class="variant-tag" *ngIf="p.parent_product_id">{{ 'products.tag_variant' | translate }}</span>
                   <span class="inactive-tag" *ngIf="!p.is_active">{{ 'products.inactive' | translate }}</span>
                 </span>
                 <span class="prod-barcode" *ngIf="p.barcode">▮ {{ p.barcode }}</span>
@@ -271,8 +271,8 @@
             </td>
             <td>
               <div class="row-actions right-actions">
-                <button class="chip-btn chip-variants" *ngIf="p.has_variants" (click)="openVariants(p)">Variants</button>
-                <button class="icon-btn" title="Edit" (click)="edit(p)">
+                <button class="chip-btn chip-variants" *ngIf="p.has_variants" (click)="openVariants(p)">{{ 'products.variants_btn' | translate }}</button>
+                <button class="icon-btn" [title]="'products.edit' | translate" (click)="edit(p)">
                   <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
                 </button>
                 <button class="icon-btn" [class.ib-success]="!p.is_active"
@@ -280,14 +280,14 @@
                   (click)="toggleActive(p)">
                   <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
                 </button>
-                <button class="icon-btn ib-danger" title="Delete" (click)="delete(p.id)">
+                <button class="icon-btn ib-danger" [title]="'products.delete' | translate" (click)="delete(p.id)">
                   <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 </button>
               </div>
             </td>
           </tr>
           <tr *ngIf="loading" class="loading-row">
-            <td colspan="7"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+            <td colspan="7"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
           </tr>
           <tr *ngIf="!loading && products.length === 0">
             <td colspan="7" class="empty-row">{{ 'products.empty' | translate }}</td>
@@ -301,7 +301,7 @@
   <!-- MOBILE LIST -->
   <div class="mobile-list">
     <div class="mobile-filter">
-      <input placeholder="Name or Barcode" [(ngModel)]="filterName" (ngModelChange)="onSearchInput()" />
+      <input [placeholder]="'products.name_or_barcode_placeholder' | translate" [(ngModel)]="filterName" (ngModelChange)="onSearchInput()" />
       <select [(ngModel)]="filterCategoryId" (ngModelChange)="applyFilter()">
         <option value="0">{{ 'products.filter_all_categories' | translate }}</option>
         <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
@@ -317,7 +317,7 @@
       <span class="mobile-title">{{ 'products.title' | translate }}</span>
       <span class="count-badge">{{ total }}</span>
     </div>
-    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
+    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
     <div class="mobile-empty" *ngIf="!loading && products.length === 0"><p>{{ 'products.empty' | translate }}</p></div>
     <div class="mobile-card" *ngFor="let p of products; let i = index" [class.row-inactive]="!p.is_active">
       <div class="mc-top">
@@ -352,7 +352,7 @@
         </div>
       </div>
       <div class="mc-actions">
-        <button class="btn btn-primary btn-sm" *ngIf="p.has_variants" (click)="openVariants(p)">Variants</button>
+        <button class="btn btn-primary btn-sm" *ngIf="p.has_variants" (click)="openVariants(p)">{{ 'products.variants_btn' | translate }}</button>
         <button class="btn btn-warning btn-sm" (click)="edit(p)">{{ 'products.edit' | translate }}</button>
         <button class="btn btn-sm" [ngClass]="p.is_active ? 'btn-ghost' : 'btn-success'"
           (click)="toggleActive(p)">

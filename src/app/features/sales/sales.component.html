@@ -31,7 +31,7 @@
               <circle cx="12" cy="7" r="4" />
             </svg>
             <span class="cust-dd-val" [class.placeholder]="!selectedCustomer">
-              {{ selectedCustomer ? selectedCustomer.name : 'Customer *' }}
+              {{ selectedCustomer ? selectedCustomer.name : ('sales.customer_placeholder' | translate) }}
             </span>
             <svg class="dd-caret" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"
               viewBox="0 0 24 24">
@@ -40,13 +40,13 @@
           </div>
           <div class="cust-dd-panel" *ngIf="ddOpen">
             <input #ddSearch type="text" class="cust-dd-search" [(ngModel)]="ddQuery"
-              (ngModelChange)="onDdSearch($event)" placeholder="Search name…" autocomplete="off" />
+              (ngModelChange)="onDdSearch($event)" [placeholder]="'sales.search_name_ph' | translate" autocomplete="off" />
             <div class="cust-dd-list">
               <div class="cust-dd-item" *ngFor="let c of ddResults" (click)="pickCustomer(c)">
                 <span class="cdi-name">{{ c.name }}</span>
                 <span class="cdi-phone">{{ c.phone }}</span>
               </div>
-              <div class="cust-dd-empty" *ngIf="ddResults.length === 0">No customers found</div>
+              <div class="cust-dd-empty" *ngIf="ddResults.length === 0">{{ 'sales.no_customers' | translate }}</div>
             </div>
           </div>
         </div>
@@ -67,10 +67,10 @@
           </div>
         </div>
         <div *ngIf="phoneNotFound" class="phone-not-found">
-          <span class="not-found-label">Not found</span>
-          <input type="text" [(ngModel)]="newCustomerName" placeholder="Enter name" class="cust-name-input" />
+          <span class="not-found-label">{{ 'sales.not_found' | translate }}</span>
+          <input type="text" [(ngModel)]="newCustomerName" [placeholder]="'sales.enter_name_ph' | translate" class="cust-name-input" />
           <button class="btn-save-customer" [disabled]="!newCustomerName.trim()"
-            (click)="savePhoneCustomer()">Save</button>
+            (click)="savePhoneCustomer()">{{ 'common.save' | translate }}</button>
         </div>
       </div>
 
@@ -162,7 +162,7 @@
                     min="1" [max]="maxUnitQty(item)" (change)="clampQuantity(item)" /></td>
                 <td class="cell-input"><input class="input-rate" type="number" [(ngModel)]="item.rate" min="0" /></td>
                 <td class="col-right cell-total">{{ item.quantity * item.rate | number }}</td>
-                <td class="col-center"><button class="row-remove" (click)="removeRow(i)" title="Remove">✕</button></td>
+                <td class="col-center"><button class="row-remove" (click)="removeRow(i)" [title]="'sales.remove' | translate">✕</button></td>
               </tr>
               <tr *ngIf="items.length === 0">
                 <td colspan="8" class="empty-row">{{ 'sales.empty' | translate }}</td>
@@ -238,7 +238,7 @@
         </div>
 
         <div class="summary-line">
-          <span class="s-label">Delivery Date</span>
+          <span class="s-label">{{ 'sales.delivery_date' | translate }}</span>
           <input class="s-input s-input-date" type="date" [(ngModel)]="delivery_date" />
         </div>
 
@@ -253,12 +253,12 @@
 
         <!-- Cash tender → change calculator -->
         <div class="summary-line">
-          <span class="s-label">Cash Received</span>
+          <span class="s-label">{{ 'sales.cash_received' | translate }}</span>
           <input class="s-input" type="number" [(ngModel)]="cashReceived" (ngModelChange)="onCashReceivedChange()"
             placeholder="0" min="0" />
         </div>
         <div class="tender-chips" *ngIf="payable > 0">
-          <button type="button" class="tender-chip exact" (click)="setFullPaid()" title="F8">Exact ৳{{ payable | number
+          <button type="button" class="tender-chip exact" (click)="setFullPaid()" title="F8">{{ 'sales.exact' | translate }} ৳{{ payable | number
             }}</button>
           <button type="button" class="tender-chip" *ngFor="let n of tenderChips" (click)="setCashReceived(n)">৳{{ n |
             number }}</button>
@@ -271,7 +271,7 @@
 
         <!-- ফেরত — change to hand back -->
         <div class="summary-line change-row" *ngIf="changeDue > 0">
-          <span class="s-label change-lbl">Change to Return</span>
+          <span class="s-label change-lbl">{{ 'sales.change_to_return' | translate }}</span>
           <span class="s-value change-val">৳{{ changeDue | number }}</span>
         </div>
       </div>
@@ -285,16 +285,16 @@
         <button class="btn btn-primary btn-lg" (click)="submit()"
           [disabled]="items.length === 0 || !customer_id || saving">
           <span *ngIf="saving" class="spinner"></span>
-          {{ saving ? 'Saving…' : ('sales.complete' | translate) }}
+          {{ saving ? ('common.saving' | translate) : ('sales.complete' | translate) }}
         </button>
       </div>
 
       <!-- Keyboard shortcut hints (desktop cashiers) -->
       <div class="shortcut-strip hide-mobile">
-        <span class="sc-hint"><kbd>F4</kbd> Customer</span>
-        <span class="sc-hint"><kbd>F8</kbd> Full Paid</span>
-        <span class="sc-hint"><kbd>F9</kbd> Complete Sale</span>
-        <span class="sc-hint"><kbd>↵</kbd> Add Product</span>
+        <span class="sc-hint"><kbd>F4</kbd> {{ 'sales.customer_label' | translate }}</span>
+        <span class="sc-hint"><kbd>F8</kbd> {{ 'sales.sc_full_paid' | translate }}</span>
+        <span class="sc-hint"><kbd>F9</kbd> {{ 'sales.sc_complete_sale' | translate }}</span>
+        <span class="sc-hint"><kbd>↵</kbd> {{ 'sales.sc_add_product' | translate }}</span>
       </div>
 
     </div>
@@ -325,7 +325,7 @@
     </div>
 
     <div class="sheet-line">
-      <span class="sl-label">Delivery Date</span>
+      <span class="sl-label">{{ 'sales.delivery_date' | translate }}</span>
       <input class="sl-input sl-input-date" type="date" [(ngModel)]="delivery_date" />
     </div>
 
@@ -337,12 +337,12 @@
 
     <!-- Cash tender + quick chips -->
     <div class="sheet-line">
-      <span class="sl-label">Cash Received</span>
+      <span class="sl-label">{{ 'sales.cash_received' | translate }}</span>
       <input class="sl-input" type="number" [(ngModel)]="cashReceived" (ngModelChange)="onCashReceivedChange()"
         placeholder="0" min="0" />
     </div>
     <div class="tender-chips" *ngIf="payable > 0">
-      <button type="button" class="tender-chip exact" (click)="setFullPaid()">Exact ৳{{ payable | number }}</button>
+      <button type="button" class="tender-chip exact" (click)="setFullPaid()">{{ 'sales.exact' | translate }} ৳{{ payable | number }}</button>
       <button type="button" class="tender-chip" *ngFor="let n of tenderChips" (click)="setCashReceived(n)">৳{{ n |
         number }}</button>
     </div>
@@ -353,7 +353,7 @@
     </div>
 
     <div class="sheet-line change-row" *ngIf="changeDue > 0">
-      <span class="sl-label change-lbl">Change to Return</span>
+      <span class="sl-label change-lbl">{{ 'sales.change_to_return' | translate }}</span>
       <span class="sl-value change-val">৳{{ changeDue | number }}</span>
     </div>
 
@@ -363,7 +363,7 @@
     </div>
 
     <button class="charge-btn" (click)="submit()" [disabled]="items.length === 0 || !customer_id || saving">
-      {{ saving ? 'Saving…' : (('sales.complete' | translate) + ' · ৳' + (payable | number)) }}
+      {{ saving ? ('common.saving' | translate) : (('sales.complete' | translate) + ' · ৳' + (payable | number)) }}
     </button>
   </div>
 

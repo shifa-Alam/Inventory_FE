@@ -1,11 +1,11 @@
 <div class="import-page">
   <div class="import-head">
     <div>
-      <h2>Import Products</h2>
-      <p class="sub">Bulk-add products from a CSV or Excel file. In Google Sheets use
-        <strong>File → Download → CSV</strong>, then upload it here.</p>
+      <h2>{{ 'import_products.title' | translate }}</h2>
+      <p class="sub">{{ 'import_products.subtitle_intro' | translate }}
+        <strong>{{ 'import_products.subtitle_menu' | translate }}</strong>{{ 'import_products.subtitle_outro' | translate }}</p>
     </div>
-    <button class="btn-ghost" (click)="downloadTemplate()">⬇ Download template</button>
+    <button class="btn-ghost" (click)="downloadTemplate()">⬇ {{ 'import_products.download_template' | translate }}</button>
   </div>
 
   <!-- Upload card -->
@@ -13,36 +13,36 @@
     <label class="file-drop" [class.has-file]="file">
       <input type="file" accept=".csv,.xlsx,.xls" (change)="onFile($event)" hidden />
       <span class="fd-icon">📄</span>
-      <span class="fd-text">{{ file ? file.name : 'Choose a .csv or .xlsx file' }}</span>
-      <span class="fd-hint" *ngIf="!file">Columns: name, barcode, category, cost, sale_price, mrp, minimum_stock, opening_stock</span>
+      <span class="fd-text">{{ file ? file.name : ('import_products.choose_file' | translate) }}</span>
+      <span class="fd-hint" *ngIf="!file">{{ 'import_products.columns_hint' | translate }}</span>
     </label>
 
     <div class="actions">
       <button class="btn-primary" [disabled]="!file || importing" (click)="import()">
-        {{ importing ? 'Importing…' : 'Import products' }}
+        {{ importing ? ('import_products.importing' | translate) : ('import_products.import_btn' | translate) }}
       </button>
-      <button class="btn-ghost" *ngIf="file || report" [disabled]="importing" (click)="reset()">Clear</button>
+      <button class="btn-ghost" *ngIf="file || report" [disabled]="importing" (click)="reset()">{{ 'common.clear' | translate }}</button>
     </div>
   </div>
 
   <!-- Result report -->
   <div class="card report" *ngIf="report">
     <div class="summary">
-      <div class="stat ok"><span class="num">{{ report.created }}</span><span>Created</span></div>
-      <div class="stat warn"><span class="num">{{ report.skipped }}</span><span>Skipped</span></div>
-      <div class="stat bad"><span class="num">{{ report.failed }}</span><span>Failed</span></div>
-      <div class="stat"><span class="num">{{ report.total }}</span><span>Rows</span></div>
+      <div class="stat ok"><span class="num">{{ report.created }}</span><span>{{ 'import_products.created' | translate }}</span></div>
+      <div class="stat warn"><span class="num">{{ report.skipped }}</span><span>{{ 'import_products.skipped' | translate }}</span></div>
+      <div class="stat bad"><span class="num">{{ report.failed }}</span><span>{{ 'import_products.failed' | translate }}</span></div>
+      <div class="stat"><span class="num">{{ report.total }}</span><span>{{ 'import_products.rows' | translate }}</span></div>
     </div>
 
     <p class="all-good" *ngIf="problemRows.length === 0 && report.created > 0">
-      ✅ All rows imported cleanly.
+      ✅ {{ 'import_products.all_good' | translate }}
     </p>
 
     <div class="table-wrap" *ngIf="problemRows.length">
-      <p class="problem-title">Rows that need attention</p>
+      <p class="problem-title">{{ 'import_products.problem_title' | translate }}</p>
       <table>
         <thead>
-          <tr><th>Row</th><th>Name</th><th>Status</th><th>Reason</th></tr>
+          <tr><th>{{ 'import_products.col_row' | translate }}</th><th>{{ 'common.name' | translate }}</th><th>{{ 'common.status' | translate }}</th><th>{{ 'import_products.col_reason' | translate }}</th></tr>
         </thead>
         <tbody>
           <tr *ngFor="let r of problemRows">
@@ -53,7 +53,7 @@
           </tr>
         </tbody>
       </table>
-      <p class="fix-hint">Fix these rows in your sheet and upload again — already-created products are skipped, not duplicated.</p>
+      <p class="fix-hint">{{ 'import_products.fix_hint' | translate }}</p>
     </div>
   </div>
 </div>

@@ -1,12 +1,12 @@
 <div class="page">
   <div class="page-header">
     <div>
-      <h2>Tenants</h2>
-      <p class="sub">Manage SaaS tenants (System Admin only)</p>
+      <h2>{{ 'tenants.title' | translate }}</h2>
+      <p class="sub">{{ 'tenants.subtitle' | translate }}</p>
     </div>
     <button class="btn btn-primary" (click)="openAdd()">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      New Tenant
+      {{ 'tenants.new_tenant' | translate }}
     </button>
   </div>
 
@@ -18,7 +18,7 @@
   <div class="modal-backdrop" *ngIf="showForm" (click)="cancelForm()">
     <div class="modal-card form-modal" (click)="$event.stopPropagation()">
       <div class="form-card-header">
-        <p class="card-title">{{ isEditing ? 'Edit Tenant' : 'Create New Tenant' }}</p>
+        <p class="card-title">{{ (isEditing ? 'tenants.edit_title' : 'tenants.create_title') | translate }}</p>
         <button class="close-btn" (click)="cancelForm()">✕</button>
       </div>
 
@@ -27,86 +27,86 @@
       </div>
 
       <!-- Basic info -->
-      <p class="section-label">Business</p>
+      <p class="section-label">{{ 'tenants.section_business' | translate }}</p>
       <div class="form-grid">
         <div class="form-group fg-wide">
-          <label>Tenant Name <span class="req">*</span></label>
-          <input autofocus type="text" [(ngModel)]="name" placeholder="e.g. Acme Corp" maxlength="150" />
+          <label>{{ 'tenants.name_label' | translate }} <span class="req">*</span></label>
+          <input autofocus type="text" [(ngModel)]="name" [placeholder]="'tenants.name_ph' | translate" maxlength="150" />
         </div>
         <div class="form-group">
-          <label>Tenant Code</label>
-          <input type="text" [(ngModel)]="code" placeholder="e.g. at_01" maxlength="20"
+          <label>{{ 'tenants.code_label' | translate }}</label>
+          <input type="text" [(ngModel)]="code" [placeholder]="'tenants.code_ph' | translate" maxlength="20"
                  pattern="[a-zA-Z0-9_-]+" />
         </div>
         <div class="form-group">
-          <label>Business Type <span class="req">*</span></label>
+          <label>{{ 'tenants.business_type_label' | translate }} <span class="req">*</span></label>
           <select [(ngModel)]="businessType" (ngModelChange)="onBusinessTypeChange()">
-            <option value="B2C">B2C — Retail</option>
-            <option value="B2B">B2B — Wholesale</option>
+            <option value="B2C">{{ 'tenants.type_b2c' | translate }}</option>
+            <option value="B2B">{{ 'tenants.type_b2b' | translate }}</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Phone</label>
-          <input type="text" [(ngModel)]="phone" placeholder="e.g. 01700-000000" maxlength="20" />
+          <label>{{ 'common.phone' | translate }}</label>
+          <input type="text" [(ngModel)]="phone" [placeholder]="'tenants.phone_ph' | translate" maxlength="20" />
         </div>
         <div class="form-group">
-          <label>Email</label>
-          <input type="email" [(ngModel)]="email" placeholder="e.g. shop@mail.com" maxlength="150" />
+          <label>{{ 'tenants.email_label' | translate }}</label>
+          <input type="email" [(ngModel)]="email" [placeholder]="'tenants.email_ph' | translate" maxlength="150" />
         </div>
         <div class="form-group fg-wide">
-          <label>Address</label>
-          <input type="text" [(ngModel)]="address" placeholder="e.g. Dhaka, Bangladesh" maxlength="300" />
+          <label>{{ 'common.address' | translate }}</label>
+          <input type="text" [(ngModel)]="address" [placeholder]="'tenants.address_ph' | translate" maxlength="300" />
         </div>
         <div class="form-group fg-wide">
-          <label>Logo URL</label>
+          <label>{{ 'tenants.logo_label' | translate }}</label>
           <input type="text" [(ngModel)]="logo" placeholder="https://…/logo.png" maxlength="300" />
         </div>
       </div>
 
       <!-- Invoice configuration -->
-      <p class="section-label">Invoice</p>
+      <p class="section-label">{{ 'tenants.section_invoice' | translate }}</p>
       <div class="form-grid">
         <div class="form-group">
-          <label>Template</label>
+          <label>{{ 'tenants.template_label' | translate }}</label>
           <select [(ngModel)]="invoiceTemplate">
-            <option value="">Auto ({{ derivedTemplate }})</option>
-            <option value="classic">Classic — full A4</option>
-            <option value="compact">Compact — half page</option>
-            <option value="thermal">Thermal — 80mm</option>
+            <option value="">{{ 'tenants.template_auto' | translate }} ({{ derivedTemplate }})</option>
+            <option value="classic">{{ 'tenants.template_classic' | translate }}</option>
+            <option value="compact">{{ 'tenants.template_compact' | translate }}</option>
+            <option value="thermal">{{ 'tenants.template_thermal' | translate }}</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Accent Color</label>
+          <label>{{ 'tenants.accent_color_label' | translate }}</label>
           <input type="color" class="color-input" [(ngModel)]="accentColor" />
         </div>
         <div class="form-group fg-wide">
-          <label>Tagline</label>
-          <input type="text" [(ngModel)]="tagline" placeholder="Shown under the shop name" maxlength="150" />
+          <label>{{ 'tenants.tagline_label' | translate }}</label>
+          <input type="text" [(ngModel)]="tagline" [placeholder]="'tenants.tagline_ph' | translate" maxlength="150" />
         </div>
         <div class="form-group fg-wide">
-          <label>Footer Note</label>
-          <input type="text" [(ngModel)]="footerNote" placeholder="e.g. Thank you for your business!" maxlength="300" />
+          <label>{{ 'tenants.footer_note_label' | translate }}</label>
+          <input type="text" [(ngModel)]="footerNote" [placeholder]="'tenants.footer_note_ph' | translate" maxlength="300" />
         </div>
       </div>
 
       <!-- Invoice options -->
       <label class="chk-row customize-row">
         <input type="checkbox" [(ngModel)]="customizeOptions" (ngModelChange)="onBusinessTypeChange()" />
-        <span>Customize invoice options <span class="muted-hint">(unchecked = auto by business type)</span></span>
+        <span>{{ 'tenants.customize_options' | translate }} <span class="muted-hint">{{ 'tenants.customize_hint' | translate }}</span></span>
       </label>
       <div class="options-grid" *ngIf="customizeOptions">
-        <label class="chk-row"><input type="checkbox" [(ngModel)]="options.show_mrp" /><span>MRP column</span></label>
-        <label class="chk-row"><input type="checkbox" [(ngModel)]="options.show_paid_due" /><span>Paid / Due</span></label>
-        <label class="chk-row"><input type="checkbox" [(ngModel)]="options.show_status" /><span>Payment status</span></label>
-        <label class="chk-row"><input type="checkbox" [(ngModel)]="options.show_signature" /><span>Signature lines</span></label>
-        <label class="chk-row"><input type="checkbox" [(ngModel)]="options.show_footer_contact" /><span>Footer contact</span></label>
+        <label class="chk-row"><input type="checkbox" [(ngModel)]="options.show_mrp" /><span>{{ 'tenants.opt_mrp' | translate }}</span></label>
+        <label class="chk-row"><input type="checkbox" [(ngModel)]="options.show_paid_due" /><span>{{ 'tenants.opt_paid_due' | translate }}</span></label>
+        <label class="chk-row"><input type="checkbox" [(ngModel)]="options.show_status" /><span>{{ 'tenants.opt_status' | translate }}</span></label>
+        <label class="chk-row"><input type="checkbox" [(ngModel)]="options.show_signature" /><span>{{ 'tenants.opt_signature' | translate }}</span></label>
+        <label class="chk-row"><input type="checkbox" [(ngModel)]="options.show_footer_contact" /><span>{{ 'tenants.opt_footer_contact' | translate }}</span></label>
       </div>
 
       <div class="form-footer">
-        <button class="btn btn-ghost" (click)="cancelForm()">Cancel</button>
+        <button class="btn btn-ghost" (click)="cancelForm()">{{ 'common.cancel' | translate }}</button>
         <button class="btn btn-primary" (click)="save()" [disabled]="!name.trim() || loading">
           <span *ngIf="loading" class="spinner"></span>
-          {{ loading ? 'Saving…' : (isEditing ? 'Update Tenant' : 'Create Tenant') }}
+          {{ loading ? ('common.saving' | translate) : ((isEditing ? 'tenants.update_tenant' : 'tenants.create_tenant') | translate) }}
         </button>
       </div>
     </div>
@@ -116,7 +116,7 @@
   <div class="card desktop-table">
     <div class="card-header-row">
       <div class="chr-left">
-        <span class="card-title" style="margin-bottom:0">All Tenants</span>
+        <span class="card-title" style="margin-bottom:0">{{ 'tenants.all_tenants' | translate }}</span>
         <span class="count-badge">{{ tenants.length }}</span>
       </div>
     </div>
@@ -125,12 +125,12 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Tenant</th>
-            <th>Type</th>
-            <th>Status</th>
-            <th>Subscription</th>
-            <th>Created</th>
-            <th>Actions</th>
+            <th>{{ 'tenants.col_tenant' | translate }}</th>
+            <th>{{ 'tenants.col_type' | translate }}</th>
+            <th>{{ 'common.status' | translate }}</th>
+            <th>{{ 'tenants.col_subscription' | translate }}</th>
+            <th>{{ 'tenants.col_created' | translate }}</th>
+            <th>{{ 'common.actions' | translate }}</th>
           </tr>
         </thead>
         <tbody class="compact-rows">
@@ -151,7 +151,7 @@
             </td>
             <td>
               <span class="badge" [class.badge-success]="t.is_active" [class.badge-danger]="!t.is_active">
-                {{ t.is_active ? 'Active' : 'Inactive' }}
+                {{ (t.is_active ? 'tenants.active' : 'tenants.inactive') | translate }}
               </span>
             </td>
             <td>
@@ -160,30 +160,30 @@
                       [class.badge-success]="sub.status === 'ACTIVE' && !sub.warning"
                       [class.badge-warning]="sub.status === 'ACTIVE' && sub.warning || sub.status === 'GRACE'"
                       [class.badge-danger]="sub.status === 'READ_ONLY'">
-                  {{ sub.status === 'GRACE' ? 'GRACE' : (sub.status === 'READ_ONLY' ? 'READ-ONLY' : 'ACTIVE') }}
+                  {{ (sub.status === 'GRACE' ? 'tenants.sub_grace' : (sub.status === 'READ_ONLY' ? 'tenants.sub_readonly' : 'tenants.sub_active')) | translate }}
                 </span>
                 <div class="muted small" *ngIf="sub.expires_on">
                   {{ t.subscription_end | date:'dd MMM yyyy' }}
-                  <ng-container *ngIf="sub.status === 'ACTIVE'"> - {{ sub.days_remaining }}d left</ng-container>
-                  <ng-container *ngIf="sub.status === 'GRACE'"> - grace: {{ sub.grace_days_remaining }}d</ng-container>
+                  <ng-container *ngIf="sub.status === 'ACTIVE'"> - {{ 'tenants.days_left' | translate:{ n: sub.days_remaining } }}</ng-container>
+                  <ng-container *ngIf="sub.status === 'GRACE'"> - {{ 'tenants.grace_days' | translate:{ n: sub.grace_days_remaining } }}</ng-container>
                 </div>
-                <div class="muted small" *ngIf="!sub.expires_on">Unlimited</div>
+                <div class="muted small" *ngIf="!sub.expires_on">{{ 'tenants.unlimited' | translate }}</div>
               </div>
             </td>
             <td class="muted">{{ t.created_at | date:'dd MMM yyyy' }}</td>
             <td>
               <div class="row-actions">
-                <button class="btn btn-primary btn-sm" (click)="openRenew(t)">Renew</button>
-                <button class="btn btn-secondary btn-sm" (click)="edit(t)">Edit</button>
-                <button class="btn btn-danger btn-sm" *ngIf="t.is_active" (click)="deactivate(t)">Deactivate</button>
+                <button class="btn btn-primary btn-sm" (click)="openRenew(t)">{{ 'tenants.renew' | translate }}</button>
+                <button class="btn btn-secondary btn-sm" (click)="edit(t)">{{ 'common.edit' | translate }}</button>
+                <button class="btn btn-danger btn-sm" *ngIf="t.is_active" (click)="deactivate(t)">{{ 'tenants.deactivate' | translate }}</button>
               </div>
             </td>
           </tr>
           <tr *ngIf="loading" class="loading-row">
-            <td colspan="7"><div class="loading-spinner"></div><span class="loading-text">Loading...</span></td>
+            <td colspan="7"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
           </tr>
           <tr *ngIf="!loading && tenants.length === 0">
-            <td colspan="7" class="empty-row">No tenants found.</td>
+            <td colspan="7" class="empty-row">{{ 'tenants.empty' | translate }}</td>
           </tr>
         </tbody>
       </table>
@@ -193,11 +193,11 @@
   <!-- MOBILE LIST -->
   <div class="mobile-list">
     <div class="mobile-meta">
-      <span class="mobile-title">All Tenants</span>
+      <span class="mobile-title">{{ 'tenants.all_tenants' | translate }}</span>
       <span class="count-badge">{{ tenants.length }}</span>
     </div>
-    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
-    <div class="mobile-empty" *ngIf="!loading && tenants.length === 0"><p>No tenants found.</p></div>
+    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
+    <div class="mobile-empty" *ngIf="!loading && tenants.length === 0"><p>{{ 'tenants.empty' | translate }}</p></div>
 
     <div class="mobile-card" *ngFor="let t of tenants">
       <div class="mc-top">
@@ -209,37 +209,37 @@
           </div>
         </div>
         <span class="badge" [class.badge-success]="t.is_active" [class.badge-danger]="!t.is_active">
-          {{ t.is_active ? 'Active' : 'Inactive' }}
+          {{ (t.is_active ? 'tenants.active' : 'tenants.inactive') | translate }}
         </span>
       </div>
       <div class="mc-grid" *ngIf="t.subscription as sub">
         <div class="mc-field">
-          <span class="mc-lbl">Subscription</span>
+          <span class="mc-lbl">{{ 'tenants.col_subscription' | translate }}</span>
           <span class="mc-val">
             <span class="badge"
                   [class.badge-success]="sub.status === 'ACTIVE' && !sub.warning"
                   [class.badge-warning]="sub.status === 'ACTIVE' && sub.warning || sub.status === 'GRACE'"
                   [class.badge-danger]="sub.status === 'READ_ONLY'">
-              {{ sub.status === 'GRACE' ? 'GRACE' : (sub.status === 'READ_ONLY' ? 'READ-ONLY' : 'ACTIVE') }}
+              {{ (sub.status === 'GRACE' ? 'tenants.sub_grace' : (sub.status === 'READ_ONLY' ? 'tenants.sub_readonly' : 'tenants.sub_active')) | translate }}
             </span>
           </span>
         </div>
         <div class="mc-field">
-          <span class="mc-lbl">Expires</span>
+          <span class="mc-lbl">{{ 'tenants.expires' | translate }}</span>
           <span class="mc-val" *ngIf="sub.expires_on">{{ t.subscription_end | date:'dd MMM yy' }}</span>
-          <span class="mc-val muted" *ngIf="!sub.expires_on">Unlimited</span>
+          <span class="mc-val muted" *ngIf="!sub.expires_on">{{ 'tenants.unlimited' | translate }}</span>
         </div>
         <div class="mc-field">
-          <span class="mc-lbl">Remaining</span>
+          <span class="mc-lbl">{{ 'tenants.remaining' | translate }}</span>
           <span class="mc-val" *ngIf="sub.status === 'ACTIVE' && sub.expires_on">{{ sub.days_remaining }}d</span>
-          <span class="mc-val" *ngIf="sub.status === 'GRACE'">grace {{ sub.grace_days_remaining }}d</span>
+          <span class="mc-val" *ngIf="sub.status === 'GRACE'">{{ 'tenants.grace_days_short' | translate:{ n: sub.grace_days_remaining } }}</span>
           <span class="mc-val muted" *ngIf="sub.status === 'READ_ONLY' || !sub.expires_on">—</span>
         </div>
       </div>
       <div class="mc-actions">
-        <button class="btn btn-primary btn-sm" (click)="openRenew(t)">Renew</button>
-        <button class="btn btn-secondary btn-sm" (click)="edit(t)">Edit</button>
-        <button class="btn btn-danger btn-sm" *ngIf="t.is_active" (click)="deactivate(t)">Deactivate</button>
+        <button class="btn btn-primary btn-sm" (click)="openRenew(t)">{{ 'tenants.renew' | translate }}</button>
+        <button class="btn btn-secondary btn-sm" (click)="edit(t)">{{ 'common.edit' | translate }}</button>
+        <button class="btn btn-danger btn-sm" *ngIf="t.is_active" (click)="deactivate(t)">{{ 'tenants.deactivate' | translate }}</button>
       </div>
     </div>
   </div>
@@ -247,34 +247,34 @@
   <!-- RENEW / SET SUBSCRIPTION MODAL -->
   <div class="modal-backdrop" *ngIf="renewTenant" (click)="closeRenew()">
     <div class="modal-card" (click)="$event.stopPropagation()">
-      <h3>Subscription - {{ renewTenant.name }}</h3>
+      <h3>{{ 'tenants.subscription_title' | translate }} - {{ renewTenant.name }}</h3>
       <p class="muted small" *ngIf="renewTenant.subscription?.expires_on">
-        Current expiry: {{ renewTenant.subscription_end | date:'dd MMM yyyy' }}
+        {{ 'tenants.current_expiry' | translate }} {{ renewTenant.subscription_end | date:'dd MMM yyyy' }}
         ({{ renewTenant.subscription.status }})
       </p>
-      <p class="muted small" *ngIf="!renewTenant.subscription?.expires_on">Currently unlimited (no expiry set).</p>
+      <p class="muted small" *ngIf="!renewTenant.subscription?.expires_on">{{ 'tenants.currently_unlimited' | translate }}</p>
 
       <div class="renew-row">
-        <label>Extend by</label>
+        <label>{{ 'tenants.extend_by' | translate }}</label>
         <select [(ngModel)]="renewMonths">
-          <option [ngValue]="1">1 month</option>
-          <option [ngValue]="3">3 months</option>
-          <option [ngValue]="6">6 months</option>
-          <option [ngValue]="12">12 months</option>
+          <option [ngValue]="1">{{ 'tenants.month_1' | translate }}</option>
+          <option [ngValue]="3">{{ 'tenants.months_3' | translate }}</option>
+          <option [ngValue]="6">{{ 'tenants.months_6' | translate }}</option>
+          <option [ngValue]="12">{{ 'tenants.months_12' | translate }}</option>
         </select>
-        <button class="btn btn-primary" (click)="renew()" [disabled]="renewSaving">Renew</button>
+        <button class="btn btn-primary" (click)="renew()" [disabled]="renewSaving">{{ 'tenants.renew' | translate }}</button>
       </div>
 
-      <div class="renew-divider">or set the expiry date directly</div>
+      <div class="renew-divider">{{ 'tenants.set_expiry_directly' | translate }}</div>
 
       <div class="renew-row">
         <input type="date" [(ngModel)]="renewEndDate" />
-        <button class="btn btn-secondary" (click)="setEndDate()" [disabled]="renewSaving || !renewEndDate">Set date</button>
-        <button class="btn btn-ghost" (click)="setUnlimited()" [disabled]="renewSaving">Make unlimited</button>
+        <button class="btn btn-secondary" (click)="setEndDate()" [disabled]="renewSaving || !renewEndDate">{{ 'tenants.set_date' | translate }}</button>
+        <button class="btn btn-ghost" (click)="setUnlimited()" [disabled]="renewSaving">{{ 'tenants.make_unlimited' | translate }}</button>
       </div>
 
       <div class="renew-actions">
-        <button class="btn btn-ghost" (click)="closeRenew()">Close</button>
+        <button class="btn btn-ghost" (click)="closeRenew()">{{ 'tenants.close' | translate }}</button>
       </div>
     </div>
   </div>

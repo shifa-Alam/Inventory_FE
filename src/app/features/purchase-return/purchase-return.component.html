@@ -1,8 +1,8 @@
 <div class="page">
   <div class="page-header">
     <div>
-      <h2>Purchase Returns</h2>
-      <p class="sub">Return goods to a supplier — reduces stock and payable</p>
+      <h2>{{ 'purchase_return.title' | translate }}</h2>
+      <p class="sub">{{ 'purchase_return.subtitle' | translate }}</p>
     </div>
   </div>
 
@@ -13,12 +13,12 @@
         <table class="pr-items">
           <thead>
             <tr>
-              <th>Product</th>
-              <th class="right">Purchased</th>
-              <th class="right">Returned</th>
-              <th class="right">Returnable</th>
-              <th class="right">Cost</th>
-              <th class="right">Return Qty</th>
+              <th>{{ 'purchase_return.col_product' | translate }}</th>
+              <th class="right">{{ 'purchase_return.col_purchased' | translate }}</th>
+              <th class="right">{{ 'purchase_return.col_returned' | translate }}</th>
+              <th class="right">{{ 'purchase_return.col_returnable' | translate }}</th>
+              <th class="right">{{ 'purchase_return.col_cost' | translate }}</th>
+              <th class="right">{{ 'purchase_return.col_return_qty' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -39,13 +39,13 @@
       </div>
 
       <div class="pr-foot">
-        <input class="pr-reason" type="text" [(ngModel)]="reason" placeholder="Reason (optional)…" />
-        <div class="pr-total">Return total: <b>৳{{ returnTotal | number:'1.0-2' }}</b></div>
+        <input class="pr-reason" type="text" [(ngModel)]="reason" [placeholder]="'purchase_return.reason_placeholder' | translate" />
+        <div class="pr-total">{{ 'purchase_return.return_total_label' | translate }}: <b>৳{{ returnTotal | number:'1.0-2' }}</b></div>
         <button class="btn btn-primary" [disabled]="!isValid || saving" (click)="save()">
           <span *ngIf="saving" class="spinner"></span>
-          {{ saving ? 'Saving…' : 'Record Return' }}
+          {{ saving ? ('common.saving' | translate) : ('purchase_return.record_return' | translate) }}
         </button>
-        <button class="btn btn-ghost" (click)="clearSelection()">Cancel</button>
+        <button class="btn btn-ghost" (click)="clearSelection()">{{ 'common.cancel' | translate }}</button>
       </div>
     </div>
   </ng-template>
@@ -53,19 +53,19 @@
   <!-- ══════════ Purchases to return from ══════════ -->
   <div class="card desktop-table">
     <div class="card-header-row">
-      <span class="card-title" style="margin-bottom:0">Select Purchase</span>
+      <span class="card-title" style="margin-bottom:0">{{ 'purchase_return.select_purchase' | translate }}</span>
       <input class="pr-search" type="text" [(ngModel)]="searchInvoice" (ngModelChange)="onSearch()"
-             placeholder="Filter by invoice…" />
+             [placeholder]="'purchase_return.filter_invoice_ph' | translate" />
     </div>
     <div class="table-wrapper">
       <table>
         <thead>
           <tr>
-            <th>Invoice</th>
-            <th>Supplier</th>
-            <th class="right">Total</th>
-            <th class="right">Due</th>
-            <th>Date</th>
+            <th>{{ 'purchase_return.col_invoice' | translate }}</th>
+            <th>{{ 'purchase_return.col_supplier' | translate }}</th>
+            <th class="right">{{ 'common.total' | translate }}</th>
+            <th class="right">{{ 'common.due' | translate }}</th>
+            <th>{{ 'common.date' | translate }}</th>
             <th></th>
           </tr>
         </thead>
@@ -79,7 +79,7 @@
               <td class="muted">{{ p.created_at | date:'dd MMM yyyy' }}</td>
               <td class="right">
                 <button class="btn btn-primary btn-sm" (click)="selectPurchase(p)">
-                  {{ selected?.id === p.id ? 'Close' : 'Return' }}
+                  {{ selected?.id === p.id ? ('purchase_return.close' | translate) : ('purchase_return.return_btn' | translate) }}
                 </button>
               </td>
             </tr>
@@ -91,10 +91,10 @@
           </ng-container>
 
           <tr *ngIf="loadingPurchases" class="loading-row">
-            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
           </tr>
           <tr *ngIf="!loadingPurchases && purchases.length === 0">
-            <td colspan="6" class="empty-row">No purchases found.</td>
+            <td colspan="6" class="empty-row">{{ 'purchase_return.no_purchases' | translate }}</td>
           </tr>
         </tbody>
       </table>
@@ -105,11 +105,11 @@
   <!-- Select purchase — mobile cards -->
   <div class="mobile-list">
     <div class="mobile-meta">
-      <span class="mobile-title">Select Purchase</span>
-      <input class="pr-search" type="text" [(ngModel)]="searchInvoice" (ngModelChange)="onSearch()" placeholder="Filter by invoice…" />
+      <span class="mobile-title">{{ 'purchase_return.select_purchase' | translate }}</span>
+      <input class="pr-search" type="text" [(ngModel)]="searchInvoice" (ngModelChange)="onSearch()" [placeholder]="'purchase_return.filter_invoice_ph' | translate" />
     </div>
-    <div class="mobile-loading" *ngIf="loadingPurchases"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
-    <div class="mobile-empty" *ngIf="!loadingPurchases && purchases.length === 0"><p>No purchases found.</p></div>
+    <div class="mobile-loading" *ngIf="loadingPurchases"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
+    <div class="mobile-empty" *ngIf="!loadingPurchases && purchases.length === 0"><p>{{ 'purchase_return.no_purchases' | translate }}</p></div>
 
     <div class="mobile-card" *ngFor="let p of purchases" [class.mc-selected]="selected?.id === p.id">
       <div class="mc-top">
@@ -120,11 +120,11 @@
         <span class="due-chip" *ngIf="p.due_amount > 0">৳{{ p.due_amount | number:'1.0-2' }}</span>
       </div>
       <div class="mc-grid mc-grid-2">
-        <div class="mc-field"><span class="mc-lbl">Total</span><span class="mc-val">৳{{ p.total_amount | number:'1.0-2' }}</span></div>
-        <div class="mc-field"><span class="mc-lbl">Due</span><span class="mc-val danger" *ngIf="p.due_amount > 0">৳{{ p.due_amount | number:'1.0-2' }}</span><span class="mc-val muted" *ngIf="p.due_amount <= 0">—</span></div>
+        <div class="mc-field"><span class="mc-lbl">{{ 'common.total' | translate }}</span><span class="mc-val">৳{{ p.total_amount | number:'1.0-2' }}</span></div>
+        <div class="mc-field"><span class="mc-lbl">{{ 'common.due' | translate }}</span><span class="mc-val danger" *ngIf="p.due_amount > 0">৳{{ p.due_amount | number:'1.0-2' }}</span><span class="mc-val muted" *ngIf="p.due_amount <= 0">—</span></div>
       </div>
       <div class="mc-actions">
-        <button class="btn btn-primary btn-sm" (click)="selectPurchase(p)">{{ selected?.id === p.id ? 'Close' : 'Return' }}</button>
+        <button class="btn btn-primary btn-sm" (click)="selectPurchase(p)">{{ selected?.id === p.id ? ('purchase_return.close' | translate) : ('purchase_return.return_btn' | translate) }}</button>
       </div>
       <ng-container *ngIf="selected?.id === p.id" [ngTemplateOutlet]="returnPanel" [ngTemplateOutletContext]="{ $implicit: selected }"></ng-container>
     </div>
@@ -134,24 +134,24 @@
   <!-- ══════════ History ══════════ -->
   <div class="card desktop-table">
     <div class="card-header-row">
-      <span class="card-title" style="margin-bottom:0">Return History</span>
-      <span class="count-badge">{{ histTotal }} records</span>
+      <span class="card-title" style="margin-bottom:0">{{ 'purchase_return.history_title' | translate }}</span>
+      <span class="count-badge">{{ histTotal }} {{ 'common.records' | translate }}</span>
     </div>
     <div class="table-wrapper">
       <table>
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Ref</th>
-            <th>Invoice</th>
-            <th>Supplier</th>
-            <th class="right">Amount</th>
-            <th>Reason</th>
+            <th>{{ 'common.date' | translate }}</th>
+            <th>{{ 'purchase_return.col_ref' | translate }}</th>
+            <th>{{ 'purchase_return.col_invoice' | translate }}</th>
+            <th>{{ 'purchase_return.col_supplier' | translate }}</th>
+            <th class="right">{{ 'common.amount' | translate }}</th>
+            <th>{{ 'purchase_return.col_reason' | translate }}</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngIf="loadingHistory" class="loading-row">
-            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></td>
+            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
           </tr>
           <tr *ngFor="let r of history">
             <td class="muted">{{ r.created_at | date:'dd MMM yyyy, hh:mm a' }}</td>
@@ -162,7 +162,7 @@
             <td class="muted">{{ r.reason || '—' }}</td>
           </tr>
           <tr *ngIf="!loadingHistory && history.length === 0">
-            <td colspan="6" class="empty-row">No purchase returns recorded yet.</td>
+            <td colspan="6" class="empty-row">{{ 'purchase_return.no_history' | translate }}</td>
           </tr>
         </tbody>
       </table>
@@ -173,11 +173,11 @@
   <!-- Return history — mobile cards -->
   <div class="mobile-list">
     <div class="mobile-meta">
-      <span class="mobile-title">Return History</span>
-      <span class="count-badge">{{ histTotal }} records</span>
+      <span class="mobile-title">{{ 'purchase_return.history_title' | translate }}</span>
+      <span class="count-badge">{{ histTotal }} {{ 'common.records' | translate }}</span>
     </div>
-    <div class="mobile-loading" *ngIf="loadingHistory"><div class="loading-spinner"></div><span class="loading-text">Loading…</span></div>
-    <div class="mobile-empty" *ngIf="!loadingHistory && history.length === 0"><p>No purchase returns recorded yet.</p></div>
+    <div class="mobile-loading" *ngIf="loadingHistory"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
+    <div class="mobile-empty" *ngIf="!loadingHistory && history.length === 0"><p>{{ 'purchase_return.no_history' | translate }}</p></div>
 
     <div class="mobile-card" *ngFor="let r of history">
       <div class="mc-top">
@@ -188,8 +188,8 @@
         <span class="mc-amount">৳{{ r.total_amount | number:'1.0-2' }}</span>
       </div>
       <div class="mc-grid mc-grid-2">
-        <div class="mc-field"><span class="mc-lbl">Ref</span><span class="mc-val"><span class="ref-badge">{{ r.return_no }}</span></span></div>
-        <div class="mc-field"><span class="mc-lbl">Reason</span><span class="mc-val muted">{{ r.reason || '—' }}</span></div>
+        <div class="mc-field"><span class="mc-lbl">{{ 'purchase_return.col_ref' | translate }}</span><span class="mc-val"><span class="ref-badge">{{ r.return_no }}</span></span></div>
+        <div class="mc-field"><span class="mc-lbl">{{ 'purchase_return.col_reason' | translate }}</span><span class="mc-val muted">{{ r.reason || '—' }}</span></div>
       </div>
     </div>
     <app-paginator [page]="histPage" [pages]="histPages" [total]="histTotal" [pageSize]="histPageSize" (pageChange)="onHistPage($event)"></app-paginator>

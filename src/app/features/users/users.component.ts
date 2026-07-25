@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
 import { ConfirmService } from '../../shared/services/confirm.service';
 
@@ -40,7 +40,7 @@ export class UsersComponent implements OnInit {
   tenants: any[] = [];
   selectedTenantId: number | null = null;
 
-  constructor(private api: ApiService, public authSvc: AuthService, private confirmSvc: ConfirmService) {}
+  constructor(private api: ApiService, public authSvc: AuthService, private confirmSvc: ConfirmService, private translate: TranslateService) {}
 
   get isSystemAdmin(): boolean { return this.authSvc.isSystemAdmin(); }
 
@@ -134,20 +134,20 @@ export class UsersComponent implements OnInit {
       next: () => {
         this.loading = false;
         this.successMsg = this.isEditing
-          ? `User "${this.username.trim()}" updated successfully.`
-          : `User "${this.username.trim()}" created successfully.`;
+          ? this.translate.instant('users.user_updated', { n: this.username.trim() })
+          : this.translate.instant('users.user_created', { n: this.username.trim() });
         this.reset();
         this.load();
       },
       error: (err) => {
         this.loading = false;
-        this.errorMsg = err?.error?.detail ?? (this.isEditing ? 'Failed to update user.' : 'Failed to create user. Username may already exist.');
+        this.errorMsg = err?.error?.detail ?? (this.isEditing ? this.translate.instant('users.update_failed') : this.translate.instant('users.create_failed'));
       }
     });
   }
 
   async delete(id: number) {
-    if (!await this.confirmSvc.open('Deactivate this user? They will no longer be able to log in.')) return;
+    if (!await this.confirmSvc.open(this.translate.instant('users.confirm_delete'))) return;
     this.api.delete(`/auth/users/${id}`).subscribe({
       next: () => this.load(),
       error: () => {}
