@@ -1,10 +1,11 @@
-import { Component, OnInit, ElementRef, ViewChild, Type } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, Type } from '@angular/core';
 import { CommonModule, Location, NgComponentOutlet } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import html2pdf from 'html2pdf.js';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ApiService } from '../../core/services/api.service';
 import { TenantSettingsService, TenantInvoiceSettings, DEFAULT_INVOICE_SETTINGS } from '../../core/services/tenant-settings.service';
+import { PrintLanguageService } from '../../core/services/print-language.service';
 import { InvoiceClassicComponent } from './templates/invoice-classic.component';
 import { InvoiceCompactComponent } from './templates/invoice-compact.component';
 import { InvoiceThermalComponent } from './templates/invoice-thermal.component';
@@ -17,7 +18,7 @@ import { TENANT_TEMPLATES } from './templates/tenant-templates';
   templateUrl: './invoice-print.component.html',
   styleUrls: ['./invoice-print.component.css']
 })
-export class InvoicePrintComponent implements OnInit {
+export class InvoicePrintComponent implements OnInit, OnDestroy {
 
   invoice: any = null;
   settings: TenantInvoiceSettings | null = null;
@@ -28,12 +29,15 @@ export class InvoicePrintComponent implements OnInit {
 
   private autoPrint = false;
   private autoPrinted = false;
+  /** App UI language before this print view overrode it; restored on leave. */
+  private prevLang: string | null = null;
 
   constructor(
     private location: Location,
     private route: ActivatedRoute,
     private api: ApiService,
-    private tenantSettings: TenantSettingsService
+    private tenantSettings: TenantSettingsService,
+    private printLang: PrintLanguageService
   ) {}
 
   ngOnInit() {
@@ -45,9 +49,10 @@ export class InvoicePrintComponent implements OnInit {
         this.settings = s;
         // Resolve a bespoke template from the tenant's code (e.g. 'at_01').
         this.customTemplate = (s.code && TENANT_TEMPLATES[s.code]) || null;
+        this.applyDocLanguage(s);
         this.maybeAutoPrint();
       },
-      error: () => { this.settings = DEFAULT_INVOICE_SETTINGS; this.maybeAutoPrint(); }
+      error: () => { this.settings = DEFAULT_INVOICE_SETTINGS; this.applyDocLanguage(DEFAULT_INVOICE_SETTINGS); this.maybeAutoPrint(); }
     });
 
     if (id) {
@@ -64,6 +69,18 @@ export class InvoicePrintComponent implements OnInit {
       this.loading = false;
       this.maybeAutoPrint();
     }
+  }
+
+  /** Print documents in the tenant's configured language (en/bn/bilingual),
+   *  independent of the app UI language; the UI language is restored on leave. */
+  private applyDocLanguage(s: TenantInvoiceSettings) {
+    this.printLang.applyForView(s.options.print_language).then((prev) => {
+      if (this.prevLang === null) this.prevLang = prev;
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.prevLang) this.printLang.restore(this.prevLang);
   }
 
   /** Auto-print only once, after BOTH the invoice and tenant settings are ready. */

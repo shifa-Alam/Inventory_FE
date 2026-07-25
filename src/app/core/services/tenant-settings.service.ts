@@ -4,6 +4,10 @@ import { catchError, map, shareReplay } from 'rxjs/operators';
 import { ApiService } from './api.service';
 
 export type InvoiceTemplate = 'classic' | 'compact' | 'thermal';
+/** Document print language — independent of the app UI language. */
+export type PrintLanguage = 'en' | 'bn' | 'bilingual';
+/** Physical print medium; null = derive from invoice_template. */
+export type PaperSize = 'a4' | '80mm' | '58mm' | 'dotmatrix' | null;
 
 export interface InvoiceOptions {
     show_mrp: boolean;
@@ -11,6 +15,10 @@ export interface InvoiceOptions {
     show_status: boolean;
     show_paid_due: boolean;
     show_footer_contact: boolean;
+    /** বাংলা / bilingual printing (see PrintLanguageService). */
+    print_language: PrintLanguage;
+    bangla_digits: boolean;
+    paper_size: PaperSize;
 }
 
 export interface TenantInvoiceSettings {
@@ -46,6 +54,9 @@ export const DEFAULT_INVOICE_SETTINGS: TenantInvoiceSettings = {
         show_status: true,
         show_paid_due: true,
         show_footer_contact: true,
+        print_language: 'en',
+        bangla_digits: false,
+        paper_size: null,
     },
 };
 
