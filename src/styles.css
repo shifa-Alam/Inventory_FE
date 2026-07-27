@@ -35,6 +35,21 @@
   --primary-subtle:     rgba(99,102,241,0.08);
   --primary-ring:       rgba(99,102,241,0.18);
 
+  /* Vendor wordmark — "SNOVA" blue + "TECH" green, sampled from the logo art
+     (public/snovaPOS_2.png). Distinct from --primary, which is the product UI
+     accent; these two are the Snova Tech identity and nothing else.
+       --brand-blue        #0252b3  as in the logo's SNOVA TECH lockup
+       --brand-green       #91ca47  the logo green, EXACT
+       --brand-green-text  #57792b  the logo green darkened along the same hue
+     Why two greens: the exact logo green only reaches 1.87:1 on a light
+     surface — WCAG AA wants 4.5:1 for text this small — so it is safe for
+     fills and marks but NOT for small text. Use -text on light backgrounds
+     (4.81:1); the exact green is the one that works on our dark surfaces
+     (8.2:1 on the sidebar), where --brand-blue fails at 2.18:1. */
+  --brand-blue:         #0252b3;
+  --brand-green:        #91ca47;
+  --brand-green-text:   #57792b;
+
   /* Semantic */
   --success:            #16a34a;
   --success-light:      #f0fdf4;
@@ -970,6 +985,91 @@ td input[type="number"] {
   .main, .content { display: block !important; overflow: visible !important; }
   .page { padding: 0 !important; background: white !important; }
   @page { size: A4; margin: 12mm; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOW-INK / FADED-PRINTER LEGIBILITY  (all invoice templates)
+
+   Shop printers are often nearly out of toner, or run a worn thermal
+   head. What fails first, in order:
+     1. grey text            — mid-greys fade to nothing long before black
+     2. tinted panel fills   — print blotchy, and the patchiness cuts the
+                               contrast of the text sitting on them
+     3. hairline borders     — sub-1px rules drop out entirely
+     4. light/thin glyphs    — thin strokes break up on a fading head
+   So for print we force pure black text on plain white, solid black
+   rules, and heavier strokes. Weight is increased rather than font-size
+   because size changes would reflow the document and break pagination.
+
+   Kept global (not per-component) so all four templates — classic,
+   compact, thermal and the bespoke at-01 — stay consistent, and any
+   future template inherits it for free.
+═══════════════════════════════════════════════════════════════ */
+@media print {
+  .invoice-doc, .invoice-doc *,
+  .cpt-doc,     .cpt-doc *,
+  .th-doc,      .th-doc * {
+    /* Pure black survives a fading head; greys do not. */
+    color: #000 !important;
+    /* Semi-transparent text prints pale — flatten it. */
+    opacity: 1 !important;
+    text-shadow: none !important;
+    filter: none !important;
+    /* Drop tinted panels: on low ink they render as uneven grey and
+       actively reduce the contrast of the text on top of them. */
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Small print (SKU lines, terms, footnotes) is the first thing to
+     disappear — thicken the strokes so it stays readable. */
+  .invoice-doc .td-sku, .cpt-doc .cpt-sku, .th-doc .th-item-sku,
+  .invoice-doc .inv-terms-text, .invoice-doc .inv-terms-label,
+  .cpt-doc .cpt-terms, .th-doc .th-terms,
+  .invoice-doc small, .cpt-doc small, .th-doc small {
+    font-weight: 600 !important;
+    letter-spacing: .2px !important;   /* stops thin glyphs merging */
+  }
+
+  /* Body text: nudge light weights up so strokes have some body. */
+  .invoice-doc, .cpt-doc, .th-doc { font-weight: 500 !important; }
+
+  /* Structure has to survive even when fills don't — solid black rules. */
+  .invoice-doc table, .invoice-doc th, .invoice-doc td,
+  .cpt-doc table, .cpt-doc th, .cpt-doc td,
+  .th-doc table, .th-doc th, .th-doc td {
+    border-color: #000 !important;
+  }
+  /* Hairlines round down to 0 on many drivers — enforce a real minimum. */
+  .invoice-doc [class*="divider"], .invoice-doc [class*="line"],
+  .cpt-doc [class*="divider"], .cpt-doc [class*="line"],
+  .th-doc [class*="divider"], .th-doc [class*="line"] {
+    border-color: #000 !important;
+    min-height: 1px;
+  }
+
+  /* Column headers read as headers via a rule, not a grey fill. */
+  .invoice-doc thead th, .cpt-doc thead th, .th-doc thead th {
+    font-weight: 700 !important;
+    border-bottom: 1.5px solid #000 !important;
+  }
+
+  /* Status/badge chips lose their fill, so outline them instead —
+     otherwise they collapse into surrounding text. */
+  .invoice-doc [class*="status"], .invoice-doc [class*="badge"],
+  .cpt-doc [class*="status"], .cpt-doc [class*="badge"] {
+    border: 1px solid #000 !important;
+    font-weight: 700 !important;
+  }
+
+  /* Deliberate solid-black accent rules must still ink up — they are a
+     few px tall, so the cost is negligible and they anchor the layout. */
+  .gold-bar, .company-info::after {
+    background-color: #000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════

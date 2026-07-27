@@ -5,7 +5,27 @@
   <title>Snova POS</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description"
+        content="Snova POS — inventory, sales, purchases and analytics for shops and distributors. Built by SNOVA TECH.">
+  <!-- Matches the sidebar so the mobile browser chrome and the installed app
+       share one colour instead of a white band above the dark shell. -->
+  <meta name="theme-color" content="#1e1b4b">
+
+  <!-- Link previews: without these, sharing the app URL on WhatsApp/Facebook
+       renders a bare grey card with just the hostname. Image path is relative —
+       scrapers resolve it against the page — so no deploy domain is hardcoded,
+       and og:url is omitted for the same reason (scrapers fall back to the
+       fetched URL). -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Snova POS">
+  <meta property="og:title" content="Snova POS — run your business smarter, faster">
+  <meta property="og:description"
+        content="All-in-one inventory, sales, purchases and analytics. Built by SNOVA TECH.">
+  <meta property="og:image" content="snova_POS_3.png">
+  <meta name="twitter:card" content="summary">
+
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="manifest" href="manifest.webmanifest">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>

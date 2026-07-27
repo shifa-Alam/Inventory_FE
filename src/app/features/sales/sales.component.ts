@@ -22,6 +22,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
   @ViewChildren('qtyInput') qtyInputs!: QueryList<ElementRef<HTMLInputElement>>;
+  @ViewChild('ddSearch') ddSearchRef?: ElementRef<HTMLInputElement>;
 
   customer_id: number = 0;
   paid_amount: number = 0;
@@ -48,12 +49,17 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   ddOpen = false;
   ddQuery = '';
   ddResults: any[] = [];
+  /** Keyboard-highlighted row in the customer dropdown; -1 = nothing chosen.
+   *  Same convention as selectedIndex for the product list. */
+  ddIndex = -1;
 
   // Phone search
   customerPhone = '';
   phoneResults: any[] = [];
   phoneNotFound = false;
   newCustomerName = '';
+  /** Keyboard-highlighted row in the phone-lookup results. */
+  phoneIndex = -1;
 
   productSearch = '';
   filteredProducts: any[] = [];
@@ -150,6 +156,12 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   //   F4 → open customer picker · F8 → mark fully paid · F9 → complete sale
   @HostListener('document:keydown', ['$event'])
   onGlobalKey(event: KeyboardEvent) {
+    // A modified key is never ours. It belongs to the browser (Ctrl+P), the OS
+    // (Alt+F4 — which would otherwise ALSO fire our F4 handler on its way out),
+    // or to a local handler such as Alt+↑/↓ row movement in the qty column.
+    // Without this the single-char router at the bottom swallowed Ctrl+P, Alt+D
+    // and friends too, and typed them into the search box.
+    if (event.ctrlKey || event.altKey || event.metaKey) return;
     if (event.key === 'F9') { event.preventDefault(); this.submit(); return; }
     if (event.key === 'F8') { event.preventDefault(); this.setFullPaid(); return; }
     if (event.key === 'F4') { event.preventDefault(); this.openDropdown(); return; }
@@ -165,10 +177,48 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     return Math.max(0, this.getTotal() - (this.discount || 0));
   }
 
+  /**
+   * Park focus back on the product search box.
+   *
+   * This is the single rule that keeps a barcode scanner safe. A scanner is just
+   * a very fast keyboard that ends with Enter, so whenever an interaction
+   * finishes — customer picked, F8 pressed, dropdown dismissed — focus has to
+   * come back here. Otherwise the next scan types a barcode into the discount or
+   * cash-received field, which is the classic POS data-corruption bug.
+   */
+  private focusSearch() {
+    setTimeout(() => this.searchInputRef?.nativeElement.focus(), 0);
+  }
+
+  /**
+   * The qty inputs that are actually on screen.
+   *
+   * The line list is rendered TWICE — the desktop table and the mobile item
+   * cards — and both mark their input `#qtyInput`, so the ViewChildren query
+   * returns two refs per line. Anything that moves focus has to filter to the
+   * live layout first, or focus lands in the `display:none` copy and vanishes.
+   */
+  private visibleQtyInputs(): HTMLInputElement[] {
+    return this.qtyInputs
+      .toArray()
+      .map(r => r.nativeElement)
+      .filter(el => el.offsetParent !== null);
+  }
+
+  /** Focus the first on-screen qty box — used right after a line is added. */
+  private focusFirstQty(delay = 0) {
+    setTimeout(() => {
+      const el = this.visibleQtyInputs()[0];
+      el?.focus();
+      el?.select();
+    }, delay);
+  }
+
   /** One tap / F8: customer pays the exact bill. */
   setFullPaid() {
     this.paid_amount = this.payable;
     this.cashReceived = this.payable;
+    this.focusSearch();
   }
 
   /** Cash tender chips: note handed over (e.g. ৳500/৳1000). */
@@ -203,7 +253,12 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
       ? `/customers/?name=${encodeURIComponent(q.trim())}&page=1&page_size=10`
       : `/customers/?page=1&page_size=10`;
     this.api.get(url).subscribe({
-      next: (res: any) => { this.ddResults = res.data ?? res; },
+      next: (res: any) => {
+        this.ddResults = res.data ?? res;
+        // Only auto-highlight an unambiguous single hit, so Enter can never pick
+        // the wrong customer off a list. Same rule as the product search.
+        this.ddIndex = this.ddResults.length === 1 ? 0 : -1;
+      },
       error: () => {}
     });
   }
@@ -211,7 +266,96 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   openDropdown() {
     this.ddOpen = true;
     this.ddQuery = '';
+    this.ddIndex = -1;
     this.loadDdCustomers('');
+    // Focus the panel's own search box: without this the list opens but is
+    // unreachable without a mouse, and a customer is mandatory to submit.
+    setTimeout(() => this.ddSearchRef?.nativeElement.focus(), 0);
+  }
+
+  closeDropdown() {
+    this.ddOpen = false;
+    this.ddIndex = -1;
+    this.focusSearch();
+  }
+
+  /** Arrow/Enter/Escape inside the customer dropdown — deliberately the same
+   *  shape as onKeyDown()'s product-list handling so both lists feel identical. */
+  onDdKeyDown(event: KeyboardEvent) {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      if (this.ddResults.length) {
+        this.ddIndex = this.ddIndex < this.ddResults.length - 1 ? this.ddIndex + 1 : 0;
+      }
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (this.ddResults.length) {
+        this.ddIndex = this.ddIndex > 0 ? this.ddIndex - 1 : this.ddResults.length - 1;
+      }
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      if (this.ddIndex >= 0 && this.ddResults[this.ddIndex]) {
+        this.pickCustomer(this.ddResults[this.ddIndex]);
+      }
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      this.closeDropdown();
+    }
+  }
+
+  /** Same navigation for the phone-lookup result list. */
+  onPhoneKeyDown(event: KeyboardEvent) {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      if (this.phoneResults.length) {
+        this.phoneIndex = this.phoneIndex < this.phoneResults.length - 1 ? this.phoneIndex + 1 : 0;
+      }
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (this.phoneResults.length) {
+        this.phoneIndex = this.phoneIndex > 0 ? this.phoneIndex - 1 : this.phoneResults.length - 1;
+      }
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      if (this.phoneIndex >= 0 && this.phoneResults[this.phoneIndex]) {
+        const picked = this.phoneResults[this.phoneIndex];
+        this.clearPhone();
+        this.pickCustomer(picked);
+      }
+    }
+  }
+
+  /**
+   * Qty column keys.
+   *
+   * Plain ↑/↓ are left alone on purpose: on a number input they step the
+   * quantity, which a cashier uses constantly. Row-to-row movement is therefore
+   * Alt+↑/↓. Enter goes back to the search box, which is the real cashier loop —
+   * scan → qty → scan → qty — so the till never needs a mouse between items.
+   */
+  onQtyKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.focusSearch();
+      return;
+    }
+    if (event.altKey && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+      event.preventDefault();
+      // Position is derived from the event target, not from the template's
+      // *ngFor index: that index counts rows in one layout while the query
+      // holds inputs from both, so the two disagree on the last row.
+      const rows = this.visibleQtyInputs();
+      const from = rows.indexOf(event.target as HTMLInputElement);
+      if (from === -1) return;
+      const next = event.key === 'ArrowDown' ? from + 1 : from - 1;
+      if (next >= 0 && next < rows.length) {
+        // focus() first, select() only as a bonus: on <input type="number"> the
+        // selection APIs do not apply, so select() alone is a no-op in some
+        // browsers and focus would never have moved — the whole point here.
+        rows[next].focus();
+        rows[next].select();
+      }
+    }
   }
 
   onDdFocusOut(event: FocusEvent) {
@@ -228,6 +372,9 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.customer_id = c ? c.id : 0;
     this.ddOpen = false;
     this.ddQuery = '';
+    this.ddIndex = -1;
+    this.phoneIndex = -1;
+    this.focusSearch();
   }
 
   // ── Phone search ──────────────────────────────────────────
@@ -235,11 +382,13 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.phoneResults = [];
     this.phoneNotFound = false;
     this.newCustomerName = '';
+    this.phoneIndex = -1;
     if (phone.trim().length < 3) return;
     this.api.get(`/customers/?phone=${encodeURIComponent(phone.trim())}&page=1&page_size=10`).subscribe({
       next: (res: any) => {
         const list = res.data ?? res;
         this.phoneResults = list;
+        this.phoneIndex = list.length === 1 ? 0 : -1;
         if (!list.length) this.phoneNotFound = true;
       },
       error: () => {}
@@ -251,6 +400,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.phoneResults = [];
     this.phoneNotFound = false;
     this.newCustomerName = '';
+    this.phoneIndex = -1;
   }
 
   savePhoneCustomer() {
@@ -361,7 +511,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.applyLineUnits(line, product);
       this.items.unshift(line);
       this.showToast(this.translate.instant('sales.added_named', { name: product.name }), 'success');
-      setTimeout(() => this.qtyInputs.first?.nativeElement.focus(), 0);
+      this.focusFirstQty();
     }
   }
 
@@ -407,7 +557,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filteredProducts = [];
     this.productSearch = '';
     this.selectedIndex = -1;
-    setTimeout(() => this.qtyInputs.first?.nativeElement.focus(), 50);
+    this.focusFirstQty(50);
   }
 
   removeRow(i: number) { this.items.splice(i, 1); }

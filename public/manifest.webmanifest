@@ -1,0 +1,23 @@
+{
+  "name": "Snova POS",
+  "short_name": "Snova POS",
+  "description": "Inventory, sales, purchases and analytics for shops and distributors. Built by SNOVA TECH.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1e1b4b",
+  "theme_color": "#1e1b4b",
+  "icons": [
+    {
+      "src": "logo-mark.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "snova_POS_3.png",
+      "sizes": "500x500",
+      "type": "image/png"
+    }
+  ]
+}

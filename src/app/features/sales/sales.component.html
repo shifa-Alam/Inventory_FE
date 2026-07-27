@@ -22,8 +22,14 @@
         <label class="field-label hide-mobile">
           {{ 'sales.customer_label' | translate }} <span class="req-star">*</span>
         </label>
-        <div class="cust-dd-wrap" (keydown.escape)="ddOpen=false" (focusout)="onDdFocusOut($event)">
-          <div class="cust-dd-box" (click)="openDropdown()" [class.dd-required]="!selectedCustomer && items.length > 0"
+        <div class="cust-dd-wrap" (focusout)="onDdFocusOut($event)">
+          <!-- A real <button>, not a div: Enter and Space then open the picker for
+               free, and it lands in the natural Tab order. ArrowDown opens too,
+               which is what a keyboard user reaches for on a combobox. -->
+          <button type="button" class="cust-dd-box" (click)="openDropdown()"
+            (keydown.arrowdown)="openDropdown()"
+            aria-haspopup="listbox" [attr.aria-expanded]="ddOpen"
+            [class.dd-required]="!selectedCustomer && items.length > 0"
             [class.dd-selected]="!!selectedCustomer">
             <svg class="dd-user-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
               viewBox="0 0 24 24">
@@ -37,12 +43,21 @@
               viewBox="0 0 24 24">
               <polyline points="6 9 12 15 18 9" />
             </svg>
-          </div>
+          </button>
           <div class="cust-dd-panel" *ngIf="ddOpen">
+            <!-- The input is the combobox and owns the arrow keys; the list below
+                 is its listbox. aria-activedescendant is what lets a screen
+                 reader follow the highlight without focus ever leaving the input,
+                 which is also exactly how the sighted keyboard flow works. -->
             <input #ddSearch type="text" class="cust-dd-search" [(ngModel)]="ddQuery"
-              (ngModelChange)="onDdSearch($event)" [placeholder]="'sales.search_name_ph' | translate" autocomplete="off" />
-            <div class="cust-dd-list">
-              <div class="cust-dd-item" *ngFor="let c of ddResults" (click)="pickCustomer(c)">
+              (ngModelChange)="onDdSearch($event)" (keydown)="onDdKeyDown($event)"
+              role="combobox" aria-controls="custDdList" aria-expanded="true" aria-autocomplete="list"
+              [attr.aria-activedescendant]="ddIndex >= 0 ? 'dd-opt-' + ddIndex : null"
+              [placeholder]="'sales.search_name_ph' | translate" autocomplete="off" />
+            <div class="cust-dd-list" id="custDdList" role="listbox">
+              <div class="cust-dd-item" *ngFor="let c of ddResults; let i = index"
+                [id]="'dd-opt-' + i" role="option" [attr.aria-selected]="i === ddIndex"
+                [class.active]="i === ddIndex" (click)="pickCustomer(c)">
                 <span class="cdi-name">{{ c.name }}</span>
                 <span class="cdi-phone">{{ c.phone }}</span>
               </div>
@@ -57,11 +72,17 @@
         <label class="field-label hide-mobile">{{ 'sales.phone_search_label' | translate }}</label>
         <div class="cust-phone-wrap">
           <input type="tel" class="cust-phone-input" [(ngModel)]="customerPhone" (ngModelChange)="onPhoneChange($event)"
+            (keydown)="onPhoneKeyDown($event)"
+            role="combobox" aria-controls="custPhoneList" [attr.aria-expanded]="phoneResults.length > 0"
+            aria-autocomplete="list"
+            [attr.aria-activedescendant]="phoneIndex >= 0 ? 'ph-opt-' + phoneIndex : null"
             [placeholder]="'sales.phone_search_ph' | translate" autocomplete="off" />
           <button *ngIf="customerPhone" class="btn-cancel-customer" (click)="clearPhone()">✕</button>
         </div>
-        <div class="cust-phone-results" *ngIf="phoneResults.length > 0">
-          <div class="cust-drop-item" *ngFor="let c of phoneResults" (click)="pickCustomer(c); clearPhone()">
+        <div class="cust-phone-results" id="custPhoneList" role="listbox" *ngIf="phoneResults.length > 0">
+          <div class="cust-drop-item" *ngFor="let c of phoneResults; let i = index"
+            [id]="'ph-opt-' + i" role="option" [attr.aria-selected]="i === phoneIndex"
+            [class.active]="i === phoneIndex" (click)="clearPhone(); pickCustomer(c)">
             <span class="cdi-name">{{ c.name }}</span>
             <span class="cdi-phone">{{ c.phone }}</span>
           </div>
@@ -159,7 +180,8 @@
                 <td class="col-center"><span class="stock-chip">{{ item.stock }}</span></td>
                 <td class="col-right mrp-ref">{{ item.mrp ? (item.mrp | number) : '—' }}</td>
                 <td class="cell-input"><input #qtyInput class="input-qty" type="number" [(ngModel)]="item.quantity"
-                    min="1" [max]="maxUnitQty(item)" (change)="clampQuantity(item)" /></td>
+                    min="1" [max]="maxUnitQty(item)" (change)="clampQuantity(item)"
+                    (keydown)="onQtyKeyDown($event)" /></td>
                 <td class="cell-input"><input class="input-rate" type="number" [(ngModel)]="item.rate" min="0" /></td>
                 <td class="col-right cell-total">{{ item.quantity * item.rate | number }}</td>
                 <td class="col-center"><button class="row-remove" (click)="removeRow(i)" [title]="'sales.remove' | translate">✕</button></td>
@@ -196,7 +218,7 @@
                 <button class="qty-btn" type="button" (click)="item.quantity = item.quantity - 1; clampQuantity(item)"
                   [disabled]="item.quantity <= 1">−</button>
                 <input #qtyInput type="number" [(ngModel)]="item.quantity" min="1" [max]="maxUnitQty(item)"
-                  (change)="clampQuantity(item)" class="qty-input" />
+                  (change)="clampQuantity(item)" (keydown)="onQtyKeyDown($event)" class="qty-input" />
                 <button class="qty-btn" type="button" (click)="item.quantity = item.quantity + 1; clampQuantity(item)"
                   [disabled]="item.quantity >= maxUnitQty(item)">+</button>
               </div>

@@ -32,10 +32,22 @@
       </span>
       <span class="logo-text">
         <span class="logo-title">Snova POS</span>
-        <span class="logo-sub">by Snova Tech</span>
+        <!-- Wordmark is all caps everywhere. Stays monochrome here, unlike the
+             login footer: the brand blue only reaches 2.18:1 on the sidebar's
+             #1e1b4b (2.77:1 on the dark theme's #05050e), so the two-tone
+             treatment belongs on light surfaces only. -->
+        <span class="logo-sub">by SNOVA TECH</span>
       </span>
     </a>
 
+    <!-- Which tenant this session is signed in to. Text only, on purpose: a
+         second avatar directly beneath the product mark read as two competing
+         brand lockups, and tenants without an uploaded logo would get a
+         different-shaped chip from those with one. -->
+    <div class="tenant-chip" *ngIf="tenantName">
+      <span class="tenant-label">{{ 'nav.tenant_label' | translate }}</span>
+      <span class="tenant-name" [attr.title]="tenantName">{{ tenantName }}</span>
+    </div>
 
     <nav class="sidebar-nav">
 
@@ -341,7 +353,16 @@
     <header class="topbar">
       <div class="topbar-logo">
         <img class="topbar-logo-img" src="logo-mark.png" width="26" height="26" alt="" decoding="async" draggable="false" />
-        <span class="topbar-title">Snova POS</span>
+        <!-- The sidebar (and its tenant chip) is off-screen on mobile, so the
+             tenant name is repeated here — otherwise phone users get no account
+             context at all. Tenant leads and the product name drops to a micro
+             line beneath it: in a 54px bar only one line can be primary, and on
+             the shop floor "which business am I billing for" is the one that
+             matters. The logo mark alongside still carries the product. -->
+        <span class="topbar-text">
+          <span class="topbar-tenant" *ngIf="tenantName">{{ tenantName }}</span>
+          <span class="topbar-title">Snova POS</span>
+        </span>
       </div>
       <div class="topbar-right">
         <button class="lang-toggle-topbar" (click)="lang.toggle()">{{ 'lang.toggle' | translate }}</button>

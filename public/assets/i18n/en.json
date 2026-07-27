@@ -102,7 +102,8 @@
     "dark_mode": "Dark mode",
     "toggle_menu": "Toggle menu",
     "home": "Home",
-    "more": "More"
+    "more": "More",
+    "tenant_label": "Business"
   },
   "login": {
     "title": "Manage your business with confidence.",

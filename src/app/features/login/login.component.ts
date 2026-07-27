@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LanguageService } from '../../core/services/language.service';
 import { TenantSettingsService } from '../../core/services/tenant-settings.service';
+import { BRAND } from '../../core/brand';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -24,6 +25,8 @@ export class LoginComponent {
   userFocused = false;
   passFocused = false;
   year = new Date().getFullYear();
+  /** Login is the one screen where vendor branding belongs — see brand.ts. */
+  brand = BRAND;
 
   constructor(private auth: AuthService, private router: Router, public lang: LanguageService, private subs: SubscriptionService, private translate: TranslateService, private tenantSettings: TenantSettingsService) { }
 
@@ -34,7 +37,7 @@ export class LoginComponent {
     }
     this.loading = true;
     this.errorMsg = '';
-    this.auth.login({ username: this.username, password: this.password }).subscribe({
+    this.auth.login({ username: this.username.trim(), password: this.password.trim() }).subscribe({
       next: (res: any) => {
         // Backend sets httpOnly cookies — nothing to store client-side.
         // The login response carries the subscription warning/grace message
@@ -47,11 +50,11 @@ export class LoginComponent {
           this.tenantSettings.clearCache();   // drop any previous user's cache
           this.tenantSettings.getSettings().subscribe({
             next: (s) => this.lang.applyTenantDefault(s.settings.default_language),
-            error: () => {},
+            error: () => { },
           });
         }
-        // system_admin has no tenant modules; land it on Users.
-        this.router.navigate([this.auth.isSystemAdmin() ? '/users' : '/dashboard']);
+        // system_admin has no tenant modules; land it on tenants.
+        this.router.navigate([this.auth.isSystemAdmin() ? '/tenants' : '/dashboard']);
       },
       error: (err) => {
         this.loading = false;

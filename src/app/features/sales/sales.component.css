@@ -57,6 +57,8 @@
   cursor: pointer; font-size: 13.5px; background: var(--surface);
   user-select: none; transition: border-color 0.15s, background 0.15s;
   box-sizing: border-box;
+  /* Now a <button>, so undo the UA defaults the old <div> never had. */
+  font-family: inherit; color: inherit; text-align: left;
 }
 .cust-dd-box:hover { border-color: var(--primary); }
 .cust-dd-box.dd-selected { border-color: var(--primary); background: var(--primary-light); }
@@ -87,7 +89,11 @@
   display: flex; justify-content: space-between; align-items: center;
   padding: 10px 12px; font-size: 13px; cursor: pointer; gap: 10px;
 }
+/* .active is the keyboard highlight. It reuses --primary-light rather than the
+   hover grey so the arrow-key position is unmistakable even while the mouse
+   happens to be resting over a different row. Matches .dropdown-item.active. */
 .cust-dd-item:hover, .cust-dd-item:active { background: var(--surface-hover); }
+.cust-dd-item.active { background: var(--primary-light); }
 .cust-dd-empty { padding: 12px; font-size: 12px; color: var(--text-muted); text-align: center; }
 
 /* Phone search */
@@ -125,6 +131,7 @@
 }
 .cust-drop-item:last-child { border-bottom: none; }
 .cust-drop-item:hover, .cust-drop-item:active { background: var(--surface-hover); }
+.cust-drop-item.active { background: var(--primary-light); }
 .cdi-name  { font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cdi-phone { font-size: 11.5px; color: var(--text-muted); flex-shrink: 0; }
 
@@ -654,3 +661,34 @@ button:disabled {
 
 .line-unit { margin-left: 6px; padding: 2px 6px; font-size: 12px; border: 1px solid var(--border, #d1d5db); border-radius: 6px; background: var(--surface, #fff); max-width: 130px; }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   KEYBOARD-ONLY OPERATION — focus visibility
+
+   The till is meant to be run without a mouse, which makes "where is
+   focus right now" the single most important thing on screen. This file
+   had no :focus-visible rule at all, so a keyboard cashier was working
+   blind. One ring, one colour, every interactive element.
+
+   :focus-visible (not :focus) so a mouse click does not leave a ring
+   behind — the browser only matches it for keyboard/AT interaction.
+
+   Written as a catch-all rather than a list of class names on purpose: a
+   hand-maintained list silently goes dead when a class is renamed (the first
+   draft of this rule targeted .sales-page and .pm-btn, neither of which
+   exists), and a till that quietly loses its focus ring is worse than one that
+   never had it. Component style encapsulation keeps this scoped to the billing
+   template, so it cannot leak into other screens.
+═══════════════════════════════════════════════════════════════ */
+.page :focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Table cells clip an offset ring, so the qty/rate inputs get the ring drawn
+   inside their own box instead. */
+.input-qty:focus-visible,
+.input-rate:focus-visible {
+  outline-offset: 0;
+}

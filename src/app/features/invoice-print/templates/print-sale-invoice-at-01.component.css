@@ -1,3 +1,11 @@
+/* This template renders NO `.invoice-doc` wrapper — its HTML starts straight at
+   .gold-bar — so the host element IS the document box. Page whitespace is owned
+   by :host below, not by `.invoice-doc` (whose rules further down are inert for
+   this template; they survive only as reference for the shared markup). */
+:host {
+  display: block;
+}
+
 .inv-loading {
   padding: 40px;
   text-align: center;
@@ -500,9 +508,30 @@
 
 /* ─── Print ──────────────────────────────────────────────────── */
 @media print {
+  /* ── Page whitespace: split between @page and :host on purpose ──
+     The print dialog lets the operator pick the margin (Default / None /
+     Minimum / Custom) and that choice overrides `@page margin`. So the
+     invoice must not depend on it:
+
+       • :host padding is part of the element box, which the dialog cannot
+         touch. It guarantees breathing room even at "None" / Custom 0", and
+         keeps content clear of the ~4mm non-printable edge most printers
+         have, so nothing is clipped.
+       • @page margin still carries a share, because element padding is only
+         laid out once — before the first and after the last page — so on a
+         multi-page invoice the page breaks would otherwise run text to the
+         very top and bottom edge of the sheet.
+
+     Deliberately modest values so the two never add up to an absurd margin:
+       Default margins → 8mm + padding  (a normal-looking A4 document)
+       None / 0" custom → padding only  (tight but clean, nothing clipped) */
   @page {
     size: A4;
-    margin: 8mm 10mm;
+    margin: 8mm;
+  }
+
+  :host {
+    padding: 8mm 10mm 10mm !important;
   }
 
   * {
@@ -516,13 +545,17 @@
     display: none !important;
   }
 
+  /* Inert for this template (no wrapper element) — kept so the shared markup
+     still flattens correctly if the wrapper is ever reintroduced. No padding
+     or min-height here: the whitespace lives on :host, and a fixed page-height
+     box would spill onto a blank second page whenever the dialog margin is
+     non-zero. */
   .invoice-doc {
     box-shadow: none !important;
     border-radius: 0 !important;
     border: none !important;
     max-width: 100% !important;
     width: 100% !important;
-    min-height: calc(297mm - 16mm) !important;
   }
 
   /* Top bar */
@@ -531,9 +564,12 @@
     background: #000 !important;
   }
 
-  /* Header */
+  /* Header.
+     Horizontal padding is 7px here, on .bill-block and on .sig-row so every
+     section's text lines up with the table cells (which are also 7px in) —
+     the page whitespace is :host's job now, not each section's. */
   .inv-head {
-    padding: 10px 20px 8px !important;
+    padding: 10px 7px 8px !important;
     border-bottom: 1px solid #000 !important;
   }
 
@@ -583,7 +619,7 @@
   }
 
   .bill-block {
-    padding: 6px 20px !important;
+    padding: 6px 7px !important;
   }
 
   .bill-block-right {
@@ -729,7 +765,7 @@
 
   /* Signature */
   .sig-row {
-    padding: 0 20px !important;
+    padding: 0 7px !important;
   }
 
   .sig-block {

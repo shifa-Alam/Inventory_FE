@@ -530,6 +530,39 @@
   color: #cbd5e1;
 }
 
+/* Vendor link in both footers (desktop .rf-powered and mobile .m-powered, so
+   this stays outside the mobile media query). Styled to look identical to the
+   plain text it replaces — the affordance shows only on hover/focus, so the
+   footer stays as quiet as it was before it became clickable. */
+.brand-link {
+  text-decoration: none;
+  border-radius: 3px;
+}
+
+/* Two-tone vendor wordmark, matching the logo art: SNOVA blue, TECH green.
+   Colour only — weight and tracking stay with the existing .rf-powered strong /
+   .m-powered strong rules, which set them per footer. These per-word colours
+   win over those rules, which is why hover below only underlines; recolouring
+   the brand on hover would be wrong. */
+.bw-snova {
+  color: var(--brand-blue);
+}
+
+.bw-tech {
+  color: var(--brand-green-text);
+}
+
+.brand-link:hover strong,
+.brand-link:focus-visible strong {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.brand-link:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 /* ══════════════════════════════════════════════════════════════════
    RESPONSIVE — tablet keeps the (stacked) desktop layout
 ══════════════════════════════════════════════════════════════════ */
@@ -583,33 +616,22 @@
     min-height: 100dvh;
     position: relative;
     overflow: hidden;
-    background: #ffffff;
+    /* Sampled from the logo artwork's own background (public/snovaPOS_2.png —
+       #fefefe over the whole outer frame, fully opaque, no alpha channel), so
+       the page and the logo are literally the same colour.
+
+       The two ambient glow blobs that used to live here were removed, not just
+       recoloured. They were the actual reason the logo looked pasted on: the
+       blurred indigo/violet tint landed on the page but could not land on the
+       logo's opaque white rectangle, so its edges showed as a hard seam right
+       under the brand. A tinted page and an untintable logo cannot both exist
+       here — the uniform background wins, since the blobs were barely visible
+       (0.10 / 0.08 alpha behind a 90px blur) and cost the brand its clean
+       entrance. Desktop is untouched: its .glow g1/g2/g3 set sits on the dark
+       hero panel, where nothing overlays it with an opaque white image. */
+    background: #fefefe;
     font-family: 'Inter', 'SolaimanLipi', 'Segoe UI', system-ui, sans-serif;
     padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
-  }
-
-  /* Ambient glow blobs */
-  .m-bg-blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(90px);
-    pointer-events: none;
-  }
-
-  .m-blob-1 {
-    width: 340px;
-    height: 340px;
-    background: rgba(99, 102, 241, 0.10);
-    top: -130px;
-    right: -100px;
-  }
-
-  .m-blob-2 {
-    width: 280px;
-    height: 280px;
-    background: rgba(139, 92, 246, 0.08);
-    bottom: -100px;
-    left: -110px;
   }
 
   /* ── Content wrapper ── */

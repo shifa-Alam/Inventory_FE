@@ -5,6 +5,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { LanguageService } from '../core/services/language.service';
 import { AuthService } from '../core/services/auth.service';
 import { SubscriptionService } from '../core/services/subscription.service';
+import { TenantSettingsService } from '../core/services/tenant-settings.service';
 import { ToastComponent } from '../shared/components/toast/toast.component';
 import { ConfirmModalComponent } from '../shared/components/confirm-modal/confirm-modal.component';
 
@@ -21,11 +22,17 @@ export class LayoutComponent {
   /** One-time popup after login (expiry warning / grace / read-only). */
   subPopup: string | null = null;
   currentUser: { username: string; role: string; tenant_id: number | null } | null = null;
+  /** The tenant this session belongs to — account context for the sidebar/topbar
+   *  chip, separate from the "Snova POS" product branding. Stays null for
+   *  system_admin (platform role, owns no tenant) and for a tenant that has no
+   *  name set, so the chip simply does not render. */
+  tenantName: string | null = null;
 
   constructor(
     public lang: LanguageService,
     public auth: AuthService,
     public subs: SubscriptionService,
+    private tenantSettings: TenantSettingsService,
     private router: Router
   ) {
     this.currentUser = this.auth.getCurrentUser();
@@ -34,6 +41,12 @@ export class LayoutComponent {
     if (!this.isSystemAdmin) {
       this.subPopup = this.subs.consumePopup();   // set only right after login
       this.subs.refresh();                        // reload-safe banner state
+      // Session-cached in the service (shareReplay), so this costs one request
+      // per login, not one per navigation. It also swallows its own errors and
+      // falls back to defaults — hence no error branch, just an empty name.
+      this.tenantSettings.getSettings().subscribe((s) => {
+        this.tenantName = s.shop_name || null;
+      });
     }
   }
 

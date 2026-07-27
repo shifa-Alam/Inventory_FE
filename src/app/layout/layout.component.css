@@ -95,6 +95,50 @@
   text-overflow: ellipsis;
 }
 
+/* Tenant (account context) band — its own quiet strip between the product
+   lockup and the nav, fenced by this hairline above and .sidebar-nav's below.
+
+   No fill, no avatar, no radius: the sidebar already carries two surfaces (the
+   logo tile and the hover pill), and a third would compete with both. What
+   separates this from the branding above it is position and type scale, not
+   extra chrome.
+
+   Full-bleed padding of 16px puts the text on the sidebar's shared left rail —
+   the logo tile, every .nav-group-label and every nav icon start at 16px too —
+   and keeps the hairline flush with the nav's, which is not inset either. */
+.tenant-chip {
+  padding: 9px 16px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Same treatment as .nav-group-label rather than a new one — it is doing the
+   same job (naming what follows it) and the sidebar should only have one
+   micro-label style. */
+.tenant-label {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(148, 163, 184, 0.45);
+}
+
+/* Sits just below .logo-title in the scale: clearly the second-most prominent
+   thing up here, without out-shouting the product name directly above it. */
+.tenant-name {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: -0.2px;
+  line-height: 1.3;
+  /* Long shop names must not widen the sidebar or wrap to a third line. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* divider lives on the nav, not the link, so the hover pill floats cleanly */
 .sidebar-nav {
   border-top: 1px solid rgba(255, 255, 255, 0.06);
@@ -337,21 +381,56 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  /* Lets the tenant name inside truncate instead of shoving .topbar-right out. */
+  min-width: 0;
 }
 
 .topbar-logo-img {
   width: 26px;
   height: 26px;
+  flex-shrink: 0;
   /* border-radius: 5px;
   background-color: floralwhite; */
   object-fit: contain;
 }
 
-.topbar-title {
-  font-size: 15px;
+/* Two-line lockup: tenant name leads, product name is the micro second line.
+   min-width:0 lets the tenant name ellipsis rather than push .topbar-right's
+   buttons off the edge of a narrow phone. */
+.topbar-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.topbar-tenant {
+  font-size: 13.5px;
   font-weight: 700;
   color: #f1f5f9;
   letter-spacing: -0.2px;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar-title {
+  font-size: 9.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: rgba(148, 163, 184, 0.65);
+  line-height: 1.25;
+}
+
+/* system_admin has no tenant, so the product name is the only line — restore it
+   to a proper title instead of leaving a lone micro-label in a 54px bar. */
+.topbar-text:not(:has(.topbar-tenant)) .topbar-title {
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: -0.2px;
+  color: #f1f5f9;
 }
 
 .topbar-right {
@@ -581,6 +660,14 @@
 
   .user-role {
     font-size: 11.5px;
+  }
+
+  .tenant-name {
+    font-size: 14px;
+  }
+
+  .tenant-label {
+    font-size: 9.5px;
   }
 }
 

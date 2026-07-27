@@ -179,8 +179,21 @@
     </div>
 
     <div class="right-footer">
-      <span class="rf-powered">{{ 'login.powered_by' | translate }} <strong>SNOVA Tech</strong></span>
-      <!-- <span class="rf-copy">&copy; {{ year }} Snova POS. All rights reserved.</span> -->
+      <!-- Company name links out only when brand.website is set, so an empty
+           constant leaves plain text rather than a dead anchor. -->
+      <span class="rf-powered">
+        {{ 'login.powered_by' | translate }}
+        <a *ngIf="brand.website; else rfPlain" class="brand-link" [href]="brand.website"
+           target="_blank" rel="noopener noreferrer"><ng-container
+             *ngTemplateOutlet="wordmark"></ng-container></a>
+        <ng-template #rfPlain><ng-container *ngTemplateOutlet="wordmark"></ng-container></ng-template>
+      </span>
+      <!-- Copyright line stays off on purpose: the logo art above already reads
+           "A PRODUCT OF SNOVA TECH" and the line above says "Powered by SNOVA
+           Tech" — a third mention in the same 300px is repetition, not presence.
+           If the legal line is ever wanted, it should REPLACE .rf-powered, not
+           stack under it.
+      <span class="rf-copy">&copy; {{ year }} {{ brand.company }}</span> -->
     </div>
   </div>
 
@@ -188,8 +201,9 @@
 
 <!-- ═══════════════ MOBILE LOGIN — native Android style ═══════════════ -->
 <div class="m-login">
-  <div class="m-bg-blob m-blob-1"></div>
-  <div class="m-bg-blob m-blob-2"></div>
+  <!-- The two ambient glow blobs that used to sit here are gone: see .m-login
+       in the stylesheet. The page background now matches the logo artwork's own
+       background exactly, so the logo no longer reads as a pasted-on box. -->
 
   <div class="m-content">
 
@@ -275,9 +289,32 @@
 
     <!-- Footer branding -->
     <div class="m-footer">
-      <span class="m-powered">{{ 'login.powered_by' | translate }} <strong>SNOVA Tech</strong></span>
-      <!-- <span class="m-copy">&copy; {{ year }} Snova POS · All rights reserved</span> -->
+      <span class="m-powered">
+        {{ 'login.powered_by' | translate }}
+        <a *ngIf="brand.website; else mPlain" class="brand-link" [href]="brand.website"
+           target="_blank" rel="noopener noreferrer"><ng-container
+             *ngTemplateOutlet="wordmark"></ng-container></a>
+        <ng-template #mPlain><ng-container *ngTemplateOutlet="wordmark"></ng-container></ng-template>
+      </span>
+      <!-- Off for the same reason as .rf-copy above. -->
+      <!-- <span class="m-copy">&copy; {{ year }} {{ brand.company }}</span> -->
     </div>
 
   </div>
 </div>
+
+<!-- ═══════════════ Vendor wordmark ═══════════════
+     Defined once and outlet'd into both footers (desktop .rf-powered and
+     mobile .m-powered), each in a linked and an unlinked variant — four call
+     sites, one definition, so the two-tone treatment can never drift apart.
+     ALL CAPS and two-tone to match the logo art exactly: SNOVA blue, TECH
+     green. See --brand-* in styles.css for why the green here is not the
+     literal logo green. -->
+<ng-template #wordmark>
+  <!-- &ngsp; not a literal space: Angular strips whitespace-only text nodes
+       between elements by default, which glued this into "SNOVATECH".
+       No font-weight/letter-spacing here on purpose — .rf-powered strong and
+       .m-powered strong already own those per footer, and overriding them from
+       one shared rule made the two footers render at different weights. -->
+  <strong><span class="bw-snova">SNOVA</span>&ngsp;<span class="bw-tech">TECH</span></strong>
+</ng-template>
