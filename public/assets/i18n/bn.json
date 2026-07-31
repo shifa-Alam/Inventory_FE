@@ -115,7 +115,9 @@
     "stock": "স্টক",
     "setup": "সেটিংস",
     "catalog": "পণ্য তালিকা",
-    "business_settings": "ব্যবসার সেটিংস"
+    "business_settings": "ব্যবসার সেটিংস",
+    "collapse_sidebar": "সাইডবার ছোট করুন",
+    "expand_sidebar": "সাইডবার বড় করুন"
   },
   "login": {
     "title": "আত্মবিশ্বাসের সাথে আপনার ব্যবসা পরিচালনা করুন।",

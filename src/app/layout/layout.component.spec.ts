@@ -96,6 +96,86 @@ describe('LayoutComponent', () => {
       expect(component.isSectionOpen('inventory')).toBe(open);
     });
 
+    // ── Collapsible rail ──
+    it('collapses and expands, and remembers which it was', () => {
+      component.sidebarCollapsed = false;
+      component.toggleCollapsed();
+      expect(component.sidebarCollapsed).toBeTrue();
+      expect(localStorage.getItem('nav.collapsed')).toBe('1');
+      component.toggleCollapsed();
+      expect(component.sidebarCollapsed).toBeFalse();
+      expect(localStorage.getItem('nav.collapsed')).toBe('0');
+    });
+
+    it('floats a section beside the rail instead of expanding it', () => {
+      // Collapsing is a request for screen space. Clicking a section must not
+      // undo that — the children come out in a panel and the rail stays 64px.
+      component.openSections.clear();
+      component.sidebarCollapsed = true;
+
+      component.toggleSection('money');
+
+      expect(component.sidebarCollapsed).toBeTrue();
+      expect(component.flyoutKey).toBe('money');
+      expect(component.isSectionShown('money')).toBeTrue();
+    });
+
+    it('shows only the section asked for, and closes it on a second click', () => {
+      component.sidebarCollapsed = true;
+      component.toggleSection('buy');
+      expect(component.isSectionShown('buy')).toBeTrue();
+      expect(component.isSectionShown('sell')).toBeFalse();
+
+      component.toggleSection('buy');
+      expect(component.flyoutKey).toBeNull();
+    });
+
+    it('leaves the saved open/closed sections untouched while collapsed', () => {
+      // The panel is a temporary look, not a change to how the sidebar is set
+      // up — expanding again must show exactly what it showed before.
+      component.openSections.clear();
+      component.openSections.add('sell');
+      component.sidebarCollapsed = true;
+
+      component.toggleSection('reports');
+
+      expect(component.openSections.has('reports')).toBeFalse();
+      expect(component.openSections.has('sell')).toBeTrue();
+    });
+
+    it('drops the panel when the rail expands, so it cannot hang over the page', () => {
+      component.sidebarCollapsed = true;
+      component.toggleSection('catalog');
+      expect(component.flyoutKey).toBe('catalog');
+
+      component.toggleCollapsed();
+      expect(component.flyoutKey).toBeNull();
+    });
+
+    it('drops the panel once a child is chosen', () => {
+      component.sidebarCollapsed = true;
+      component.toggleSection('inventory');
+      component.closeSidebar();          // every nav link calls this
+      expect(component.flyoutKey).toBeNull();
+    });
+
+    it('closes on a click outside the sidebar but not inside it', () => {
+      component.sidebarCollapsed = true;
+      component.toggleSection('sell');
+
+      const inside = document.createElement('div');
+      inside.className = 'sidebar';
+      const child = document.createElement('button');
+      inside.appendChild(child);
+      document.body.appendChild(inside);
+      component.onDocumentClick({ target: child } as unknown as MouseEvent);
+      expect(component.flyoutKey).toBe('sell');
+
+      component.onDocumentClick({ target: document.body } as unknown as MouseEvent);
+      expect(component.flyoutKey).toBeNull();
+      inside.remove();
+    });
+
     it('persists open sections so the sidebar remembers how you work', () => {
       component.openSections.clear();
       component.toggleSection('money');

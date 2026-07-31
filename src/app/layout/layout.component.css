@@ -30,6 +30,16 @@
   flex-shrink: 0;
 }
 
+/* Logo + collapse toggle share one row, so the rail-toggle is not on a line
+   of its own. In the collapsed rail (below) this switches to a column. */
+.sidebar-head {
+  display: flex;
+  align-items: center;
+}
+.sidebar-head .sidebar-logo {
+  min-width: 0;   /* let the wordmark ellipsize instead of pushing the toggle */
+}
+
 /* Logo — links home; brand mark on a subtle tile + text lockup */
 .sidebar-logo {
   display: flex;
@@ -882,4 +892,141 @@
 @media (prefers-reduced-motion: reduce) {
   .chev { transition: none; }
   .nav-sub { animation: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   COLLAPSIBLE RAIL
+
+   Desktop only. Below 1025px the sidebar is already an off-canvas
+   drawer, so there is nothing there to collapse and these rules must
+   not reach it — hence the whole block sits inside a min-width query.
+══════════════════════════════════════════════════════════════ */
+.rail-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 26px;
+  margin: 0 8px 0 auto;   /* sits at the right end of the logo row */
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--sidebar-text);
+  border-radius: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background .12s, color .12s;
+}
+.rail-toggle:hover { background: rgba(255, 255, 255, 0.14); color: #e2e8f0; }
+.rail-toggle:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* The drawer already has its own control (the hamburger), and a rail makes no
+   sense in an overlay that is either fully open or fully gone. */
+@media (max-width: 1024px) {
+  .rail-toggle { display: none; }
+}
+
+@media (min-width: 1025px) {
+  .shell.sidebar-collapsed .sidebar {
+    width: 64px;
+    min-width: 64px;
+  }
+
+  /* Every label goes; only glyphs remain. */
+  .shell.sidebar-collapsed .logo-text,
+  .shell.sidebar-collapsed .tenant-chip,
+  .shell.sidebar-collapsed .sec-label,
+  .shell.sidebar-collapsed .chev,
+  .shell.sidebar-collapsed .user-info,
+  .shell.sidebar-collapsed .lang-toggle-btn,
+  /* The pinned links and the logout button carry their label as a bare text
+     node, so there was nothing to hide until it was wrapped in .nav-label. */
+  .shell.sidebar-collapsed .nav-label,
+  .shell.sidebar-collapsed .user-info {
+    display: none;
+  }
+
+  /* Rows become squares, so the glyphs form one clean column. */
+  .shell.sidebar-collapsed .sidebar-nav a,
+  .shell.sidebar-collapsed .nav-sec-btn,
+  .shell.sidebar-collapsed .sidebar-logo,
+  .shell.sidebar-collapsed .logout-btn {
+    justify-content: center;
+    gap: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* No room beside a 64px icon — stack the logo and toggle again here. */
+  .shell.sidebar-collapsed .sidebar-head { flex-direction: column; }
+  .shell.sidebar-collapsed .sidebar-logo { margin: 8px auto; }
+  .shell.sidebar-collapsed .logo-tile { width: 36px; height: 36px; }
+  .shell.sidebar-collapsed .logo-tile img { width: 28px; height: 28px; }
+
+  .shell.sidebar-collapsed .rail-toggle { margin: 0 auto 6px; }
+
+  .shell.sidebar-collapsed .sidebar-nav { padding: 8px 6px; }
+  .shell.sidebar-collapsed .nav-section + .nav-section { margin-top: 1px; }
+
+  /* The active-row marker is a left bar in the wide sidebar; at 64px there is
+     no room beside it, so the whole square fills instead. */
+  .shell.sidebar-collapsed .sidebar-nav a.active::after { display: none; }
+
+  /* New Sale stays the one filled row — it is the reason the app is open. */
+  .shell.sidebar-collapsed .sidebar-nav > .nav-primary { margin-bottom: 4px; }
+
+  /* Footer collapses to the avatar and a logout glyph. */
+  .shell.sidebar-collapsed .sidebar-user { justify-content: center; }
+  .shell.sidebar-collapsed .footer-actions { justify-content: center; }
+}
+
+
+/* ── Flyout submenu (collapsed rail only) ──────────────────────────
+   A section's children cannot sit inline in 64px, so clicking the icon floats
+   them out beside it. Click, not hover: hover panels close when the pointer
+   crosses the gap, and they exclude keyboard and touch entirely.
+
+   The labels ARE shown here on purpose. The rail trades names for space, and
+   this panel is where you buy them back for the one section you asked about —
+   a column of unlabelled child glyphs would be unreadable.
+══════════════════════════════════════════════════════════════════ */
+@media (min-width: 1025px) {
+  /* The panel is positioned against its section, and has to escape the
+     sidebar's own clipping to be seen at all. Safe to drop the scroll here:
+     collapsed, the nav is nine icons tall and never needs it. */
+  .shell.sidebar-collapsed .sidebar { overflow: visible; }
+  .shell.sidebar-collapsed .nav-section { position: relative; }
+
+  .shell.sidebar-collapsed .nav-sub.flyout {
+    position: absolute;
+    left: calc(100% + 6px);
+    top: 0;
+    z-index: 400;
+    min-width: 196px;
+    margin: 0;
+    padding: 6px;
+    background: var(--sidebar-bg);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+  }
+
+  /* Full-size rows inside the panel — this is the one place in the collapsed
+     state where reading matters more than saving width. */
+  .shell.sidebar-collapsed .nav-sub.flyout .nav-child {
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 7px 10px;
+    white-space: nowrap;
+  }
+
+  /* .nav-label is hidden across the collapsed rail; inside the panel it is the
+     whole point, so it comes back. */
+  .shell.sidebar-collapsed .nav-sub.flyout .nav-label { display: inline; }
+
+  /* The section whose panel is open stays lit, so it is obvious which icon the
+     floating list belongs to. */
+  .shell.sidebar-collapsed .nav-sec-btn.open {
+    background: var(--sidebar-active);
+    color: var(--sidebar-active-text);
+  }
 }

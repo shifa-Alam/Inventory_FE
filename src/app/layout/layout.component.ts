@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -82,6 +82,17 @@ export class LayoutComponent {
     .sort((a, b) => b[1].length - a[1].length);
 
   private static readonly OPEN_SECTIONS_KEY = 'nav.openSections';
+  private static readonly COLLAPSED_KEY = 'nav.collapsed';
+
+  /**
+   * Icon-only sidebar. Desktop concept only — below 1025px the sidebar is
+   * already an off-canvas drawer, so there is nothing to collapse.
+   *
+   * Kept out of the section state deliberately: which sections you leave open
+   * is about how you work, whether the rail is collapsed is about how much
+   * screen you want. Restoring one should not disturb the other.
+   */
+  sidebarCollapsed = false;
   openSections = new Set<string>();
 
   constructor(
@@ -95,6 +106,7 @@ export class LayoutComponent {
     this.isDark = localStorage.getItem('theme') === 'dark';
     this.applyTheme();
     this.restoreSections();
+    this.restoreCollapsed();
     // Deep links and in-app navigation both land here, so the owning section
     // opens itself either way.
     this.router.events
@@ -152,9 +164,66 @@ export class LayoutComponent {
 
   isSectionOpen(key: string): boolean { return this.openSections.has(key); }
 
+  /**
+   * Section whose children are floating beside the rail, or null.
+   *
+   * Only meaningful while collapsed. Driven by click rather than hover so it
+   * works with a keyboard and on a touch screen, and so it stays open while you
+   * travel across to it — a hover panel that closes when the pointer crosses
+   * the gap is worse than no panel.
+   */
+  flyoutKey: string | null = null;
+
   toggleSection(key: string): void {
+    // Collapsed, the rail is 64px and cannot show a child list inline — so the
+    // children float out beside it instead. Expanding the whole sidebar here
+    // would defeat the point of having collapsed it.
+    if (this.sidebarCollapsed) {
+      this.flyoutKey = this.flyoutKey === key ? null : key;
+      return;
+    }
     this.openSections.has(key) ? this.openSections.delete(key) : this.openSections.add(key);
     this.persistSections();
+  }
+
+  /** True when this section's children should be in the DOM: either the section
+   *  is open in the normal sidebar, or it is the one floating beside the rail. */
+  isSectionShown(key: string): boolean {
+    return this.sidebarCollapsed ? this.flyoutKey === key : this.openSections.has(key);
+  }
+
+  closeFlyout(): void { this.flyoutKey = null; }
+
+  /** Anywhere outside the sidebar dismisses the panel — the usual contract for
+   *  something that floats over the page. */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.flyoutKey) return;
+    const target = event.target as HTMLElement | null;
+    if (!target?.closest('.sidebar')) this.closeFlyout();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void { this.closeFlyout(); }
+
+  toggleCollapsed(): void {
+    this.sidebarCollapsed = !this.sidebarCollapsed;
+    // A panel floating beside a rail that is no longer there would hang in
+    // mid-air over the page.
+    this.flyoutKey = null;
+    this.persistCollapsed();
+  }
+
+  private persistCollapsed(): void {
+    try {
+      localStorage.setItem(LayoutComponent.COLLAPSED_KEY, this.sidebarCollapsed ? '1' : '0');
+    } catch { /* private mode / quota — the rail still works, it just forgets */ }
+  }
+
+  private restoreCollapsed(): void {
+    try {
+      this.sidebarCollapsed = localStorage.getItem(LayoutComponent.COLLAPSED_KEY) === '1';
+    } catch { /* same as above */ }
   }
 
   /** True when a collapsed section contains the current page — lets the header
@@ -168,7 +237,9 @@ export class LayoutComponent {
   get canManage(): boolean { return this.auth.canManage(); }
 
   toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
-  closeSidebar()  { this.sidebarOpen = false; }
+  // Every nav link calls this, so it is also where the floating panel gets
+  // dismissed once you have picked something out of it.
+  closeSidebar()  { this.sidebarOpen = false; this.flyoutKey = null; }
 
   toggleTheme() {
     this.isDark = !this.isDark;

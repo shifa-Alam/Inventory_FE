@@ -115,7 +115,9 @@
     "stock": "Stock",
     "setup": "Settings",
     "catalog": "Catalog",
-    "business_settings": "Business Settings"
+    "business_settings": "Business Settings",
+    "collapse_sidebar": "Collapse sidebar",
+    "expand_sidebar": "Expand sidebar"
   },
   "login": {
     "title": "Manage your business with confidence.",

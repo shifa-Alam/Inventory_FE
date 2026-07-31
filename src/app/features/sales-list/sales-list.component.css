@@ -29,6 +29,19 @@
 /* Action buttons */
 .action-btns { display: flex; gap: 3px; align-items: center; flex-wrap: nowrap; }
 
+/* Icon-only row actions: square and tight.
+   btn-xs pads 9px either side, which around an 11px glyph left the button
+   wider than it was tall and set the width of the whole Action column. Fixed
+   dimensions instead of padding, so all three line up exactly whatever glyph
+   is inside. The Pay button keeps btn-xs — it carries a text label and should
+   read as the primary action of the row. */
+.action-btns .btn-ico {
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
 /* Selected row */
 .row-selected td { background: var(--primary-light) !important; }
 
@@ -148,3 +161,54 @@
 .mb-ret-name { font-size: 12px; font-weight: 600; margin-bottom: 3px; }
 .mb-ret-row  { display: flex; align-items: center; gap: 6px; }
 
+
+/* ══════════════════════════════════════════════════════════════
+   COMPACT ROW DENSITY
+
+   The rows were ~100px tall, and not because of padding: the invoice
+   number wrapped onto three lines and the timestamp onto four. Holding
+   those cells on one line is what actually shrinks the table — roughly
+   100px down to ~40px per row.
+══════════════════════════════════════════════════════════════ */
+.nw { white-space: nowrap; }
+
+/* Invoice number as a capsule. Tabular figures so the digits line up
+   column-wise when you run your eye down the list, and a slightly tighter
+   tracking because INV-20260731-00058 is a long string to fit. */
+.inv-chip {
+  display: inline-block;
+  background: var(--bg-alt, #f1f5f9);
+  color: var(--text);
+  border: 1px solid var(--border-light, #e2e8f0);
+  border-radius: 20px;
+  padding: 2px 9px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Money capsules. Deliberately quieter than the due and status chips beside
+   them: those two carry a warning, these are just figures. If every capsule
+   shouted, none of them would. */
+.amt-chip {
+  display: inline-block;
+  background: var(--bg-alt, #f1f5f9);
+  color: var(--text-muted);
+  border-radius: 20px;
+  padding: 2px 9px;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Net total is the figure people look for, so it alone gets full contrast. */
+.amt-net { color: var(--text); font-weight: 700; }
+.amt-paid { color: var(--success-text, #15803d); }
+
+/* Header matched to the compact body. .compact-rows lives on <tbody>, so it
+   can never reach <th> in <thead> — the header stayed at full height above
+   half-height rows on every table using that convention. */
+.desktop-table thead th { padding: 7px 10px; }

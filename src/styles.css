@@ -621,6 +621,11 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: po
 .btn-ghost:hover { background: var(--bg-alt); color: var(--text); border-color: var(--border-strong); }
 
 .btn-sm  { padding: 6px 12px; font-size: 13px; }
+/* Row-action size, for buttons living inside a compact table cell. btn-sm
+   renders ~32px tall, which set the height of every row it sat in regardless of
+   how tight the cell padding was. Mouse-only by intent — the mobile card lists
+   use full-size controls, so this never becomes a small touch target. */
+.btn-xs  { padding: 3px 9px; font-size: 12px; }
 .btn-lg  { padding: 12px 24px; font-size: 15.5px; border-radius: var(--radius); }
 .btn-icon { padding: 6px; width: 38px; height: 38px; border-radius: var(--radius-sm); }
 
