@@ -1,0 +1,195 @@
+<div class="ud-doc">
+
+  <!-- ── Letterhead ───────────────────────────────────────────────
+       Logo optional; the identity has to survive without one, so the
+       name carries the weight and the logo is a bonus. -->
+  <header class="ud-head">
+    <div class="ud-brand">
+      <img *ngIf="settings.logo_url" class="ud-logo" [src]="settings.logo_url" alt="" />
+      <div class="ud-brand-text">
+        <h1 class="ud-shop">{{ settings.shop_name }}</h1>
+        <p class="ud-sub" *ngIf="settings.shop_sub">{{ settings.shop_sub }}</p>
+        <p class="ud-addr" *ngIf="settings.address">{{ settings.address }}</p>
+        <p class="ud-contact">
+          <span *ngIf="settings.phone">{{ 'invoice.company_phone' | translate }}: {{ settings.phone }}</span>
+          <span *ngIf="settings.settings.mobile">{{ settings.settings.mobile }}</span>
+          <span *ngIf="settings.email">{{ settings.email }}</span>
+          <span *ngIf="settings.settings.website">{{ settings.settings.website }}</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="ud-meta">
+      <div class="ud-title">{{ settings.options.invoice_title || ('invoice.page_title' | translate) }}</div>
+      <table class="ud-meta-tbl">
+        <tr>
+          <td class="ud-meta-k">{{ 'invoice.invoice_no' | translate }}</td>
+          <td class="ud-meta-v">{{ invoice?.invoice_no }}</td>
+        </tr>
+        <tr>
+          <td class="ud-meta-k">{{ 'invoice.date' | translate }}</td>
+          <td class="ud-meta-v">{{ invoice?.created_at | date:'dd MMM yyyy' }}</td>
+        </tr>
+        <tr *ngIf="invoice?.delivery_date">
+          <td class="ud-meta-k">{{ 'invoice.delivery_date' | translate }}</td>
+          <td class="ud-meta-v">{{ invoice?.delivery_date | date:'dd MMM yyyy' }}</td>
+        </tr>
+      </table>
+      <span class="ud-status" *ngIf="settings.options.show_status" [class.is-paid]="isPaid">
+        {{ (isPaid ? 'invoice.status_paid' : 'invoice.status_due') | translate }}
+      </span>
+    </div>
+  </header>
+
+  <!-- Statutory identifiers. A buyer's accounts department looks for these
+       first on a commercial invoice here; the strip hides entirely when the
+       tenant has filled in neither. -->
+  <div class="ud-legal" *ngIf="settings.settings.bin_vat || settings.settings.trade_license">
+    <span *ngIf="settings.settings.bin_vat">
+      <b>{{ 'invoice.bin_vat' | translate }}:</b> {{ settings.settings.bin_vat }}
+    </span>
+    <span *ngIf="settings.settings.trade_license">
+      <b>{{ 'invoice.trade_license' | translate }}:</b> {{ settings.settings.trade_license }}
+    </span>
+    <span *ngIf="settings.settings.tax_info">{{ settings.settings.tax_info }}</span>
+  </div>
+
+  <!-- ── Parties ── -->
+  <section class="ud-parties">
+    <div class="ud-party">
+      <span class="ud-party-lbl">{{ 'invoice.from' | translate }}</span>
+      <span class="ud-party-name">{{ settings.shop_name }}</span>
+      <span class="ud-party-line" *ngIf="settings.address">{{ settings.address }}</span>
+      <span class="ud-party-line" *ngIf="settings.phone">{{ settings.phone }}</span>
+    </div>
+    <div class="ud-party ud-party-to" *ngIf="settings.options.show_customer">
+      <span class="ud-party-lbl">{{ 'invoice.bill_to' | translate }}</span>
+      <span class="ud-party-name">{{ invoice?.customer_name || ('invoice.walk_in' | translate) }}</span>
+      <span class="ud-party-line" *ngIf="invoice?.customer_phone">{{ invoice?.customer_phone }}</span>
+      <span class="ud-party-line" *ngIf="invoice?.customer_address">{{ invoice?.customer_address }}</span>
+    </div>
+  </section>
+
+  <!-- ── Lines ── -->
+  <table class="ud-items">
+    <thead>
+      <tr>
+        <th class="c w-no">{{ 'invoice.col_no' | translate }}</th>
+        <th>{{ 'invoice.col_product' | translate }}</th>
+        <th class="c w-qty">{{ 'invoice.col_qty' | translate }}</th>
+        <th class="r w-num" *ngIf="settings.options.show_mrp">{{ 'invoice.col_mrp' | translate }}</th>
+        <th class="r w-num">{{ 'invoice.col_rate' | translate }}</th>
+        <th class="r w-amt">{{ 'invoice.col_amount' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of invoice?.items; let i = index">
+        <td class="c">{{ i + 1 }}</td>
+        <td>
+          {{ item.product_name }}
+          <small class="ud-sku" *ngIf="settings.options.show_sku && item.barcode">{{ item.barcode }}</small>
+        </td>
+        <td class="c">{{ item.quantity }}<small *ngIf="item.unit_label"> {{ item.unit_label }}</small></td>
+        <td class="r" *ngIf="settings.options.show_mrp">
+          {{ item.mrp ? (item.mrp | invMoney:settings:false) : '—' }}
+        </td>
+        <td class="r">{{ item.rate | invMoney:settings:false }}</td>
+        <td class="r b">{{ item.quantity * item.rate | invMoney:settings:false }}</td>
+      </tr>
+      <tr class="ud-empty" *ngIf="!invoice?.items?.length">
+        <td [attr.colspan]="settings.options.show_mrp ? 6 : 5">—</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td class="c">&nbsp;</td>
+        <td class="ud-count">
+          {{ 'invoice.total_items' | translate }}: {{ lineCount }}
+        </td>
+        <td class="c b">{{ totalQty }}</td>
+        <td *ngIf="settings.options.show_mrp"></td>
+        <td></td>
+        <td class="r b">{{ subtotal | invMoney:settings:false }}</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- ── Money ──
+       Words on the left, figures on the right: the written amount is the legal
+       backstop for the number beside it, so they belong on the same band. -->
+  <section class="ud-money">
+    <div class="ud-words">
+      <span class="ud-words-lbl">{{ 'invoice.in_words' | translate }}</span>
+      <span class="ud-words-val">{{ payableInWords }}</span>
+    </div>
+
+    <table class="ud-totals">
+      <tr>
+        <td>{{ 'invoice.subtotal' | translate }}</td>
+        <td class="r">{{ subtotal | invMoney:settings }}</td>
+      </tr>
+      <tr *ngIf="settings.options.show_discount && invoice?.discount_amount > 0">
+        <td>{{ 'invoice.discount' | translate }}</td>
+        <td class="r">− {{ invoice?.discount_amount | invMoney:settings }}</td>
+      </tr>
+      <tr class="ud-net">
+        <td>{{ 'invoice.net_total' | translate }}</td>
+        <td class="r">{{ invoice?.total_amount | invMoney:settings }}</td>
+      </tr>
+      <tr *ngIf="settings.options.show_paid_due">
+        <td>{{ 'invoice.paid' | translate }}</td>
+        <td class="r">− {{ invoice?.paid_amount | invMoney:settings }}</td>
+      </tr>
+      <tr class="ud-due" *ngIf="settings.options.show_paid_due">
+        <td>{{ 'invoice.balance_due' | translate }}</td>
+        <td class="r">{{ invoice?.due_amount | invMoney:settings }}</td>
+      </tr>
+      <tr class="ud-saved" *ngIf="settings.options.show_savings && savings > 0">
+        <td>{{ 'invoice.savings' | translate }}</td>
+        <td class="r">{{ savings | invMoney:settings }}</td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- ── Terms ── -->
+  <section class="ud-terms" *ngIf="settings.options.show_terms && settings.options.terms_text">
+    <span class="ud-terms-lbl">{{ 'invoice.terms' | translate }}</span>
+    <p class="ud-terms-txt">{{ settings.options.terms_text }}</p>
+  </section>
+
+  <!-- A plain gap before the signature block, NOT a flex spacer: pushing the
+       signatures to the foot of the sheet would need a fixed document height,
+       and that spills a blank second page whenever the print dialog's margin is
+       not zero. A guaranteed gap is worth more than a pinned footer. -->
+  <div class="ud-spacer"></div>
+
+  <!-- ── Codes + signatures ── -->
+  <footer class="ud-foot">
+    <div class="ud-codes" *ngIf="settings.options.show_barcode || settings.options.show_qr">
+      <app-invoice-code *ngIf="settings.options.show_barcode" type="barcode"
+        [value]="invoice?.invoice_no"></app-invoice-code>
+      <app-invoice-code *ngIf="settings.options.show_qr" type="qr" [value]="invoice?.invoice_no"
+        [size]="76"></app-invoice-code>
+    </div>
+
+    <div class="ud-sigs" *ngIf="settings.options.show_signature">
+      <div class="ud-sig">
+        <span class="ud-sig-line"></span>
+        <span class="ud-sig-lbl">{{ 'invoice.customer_sig' | translate }}</span>
+      </div>
+      <div class="ud-seal">{{ 'invoice.company' | translate }}</div>
+      <div class="ud-sig">
+        <span class="ud-sig-line"></span>
+        <span class="ud-sig-lbl">{{ 'invoice.prepared_by' | translate }}</span>
+        <span class="ud-sig-sub" *ngIf="settings.options.show_salesperson && invoice?.created_by">
+          {{ invoice?.created_by }}
+        </span>
+      </div>
+    </div>
+
+    <div class="ud-thanks" *ngIf="settings.options.show_footer_contact">
+      <span>{{ settings.settings.receipt_footer || settings.footer_note || ('invoice.thank_you' | translate) }}</span>
+    </div>
+  </footer>
+
+</div>

@@ -302,6 +302,18 @@
   color: #e2e8f0;
 }
 
+/* The theme toggle exists twice: once in the sidebar footer, once in the mobile
+   topbar. Below 1025px the topbar is on screen, so the sidebar copy is the
+   redundant one and goes — you should not have to open the drawer to reach a
+   control that is already visible behind it.
+
+   1024px is not an arbitrary number: it is exactly where .topbar switches on,
+   so at every width precisely one toggle is reachable. Picking any other
+   breakpoint would leave a band with two toggles or none. */
+@media (max-width: 1024px) {
+  .footer-actions .theme-toggle-btn { display: none; }
+}
+
 .logout-btn {
   display: flex;
   align-items: center;
@@ -759,4 +771,115 @@
   font-size: 13.5px;
   line-height: 1.6;
   color: var(--text-muted);
+}
+/* ── Collapsible sections ────────────────────────────────────────────────
+   The sidebar carries ~29 destinations. Flat, that is a wall of links in
+   which the two screens people actually live in (Dashboard, New Sale) carry
+   no more weight than Stock Count. So those two are pinned at the top and
+   everything else folds into sections that open one at a time.
+
+   The section holding the current page opens itself (see layout.component.ts),
+   which is what makes this safe on a deep link or a hard refresh — you never
+   land on a highlighted page hidden inside a closed header. */
+
+.nav-section { display: flex; flex-direction: column; }
+
+/* Header reads as a nav row, not a form control: same metrics as a link so
+   the left edge of every icon still lines up down the whole sidebar. */
+.nav-sec-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 8px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  color: var(--sidebar-text);
+  font-family: inherit;
+  /* Uppercase + weight + tracking, not size, is what separates a header from a
+     row here. The old header was 12px/500 against a 11.5px/450 child — half a
+     pixel and fifty units of weight, which is no hierarchy at all. Caps are
+     used ONLY on these seven headers: all-caps flattens word shapes and forces
+     letter-by-letter reading, which is fine for labels you learn once and
+     wrong for the twenty-odd rows a cashier scans all day. */
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .9px;
+  text-align: left;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.nav-sec-btn svg { flex-shrink: 0; opacity: .8; }
+.nav-sec-btn:hover { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
+.nav-sec-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.sec-label { flex: 1; min-width: 0; }
+
+/* Chevron points right when closed, down when open. */
+.chev { margin-left: auto; opacity: .45 !important; transition: transform .18s ease; }
+.nav-sec-btn.open .chev { transform: rotate(90deg); opacity: .8 !important; }
+
+/* A collapsed section still says "you are in here", so closing a section
+   never costs you your sense of place. */
+.nav-sec-btn.here { color: var(--sidebar-active-text); }
+.nav-sec-btn.here .sec-label { font-weight: 650; }
+.nav-sec-btn.here::before {
+  content: ''; position: absolute; left: 0; width: 3px; height: 18px;
+  border-radius: 0 3px 3px 0; background: var(--primary);
+}
+.nav-sec-btn { position: relative; }
+
+/* Children sit on a rail: the indent alone is a weak signal at this size. */
+.nav-sub {
+  display: flex; flex-direction: column;
+  margin: 1px 0 6px 15px;
+  padding-left: 9px;
+  border-left: 1px solid rgba(255, 255, 255, .08);
+  animation: nav-sub-in .16s ease;
+}
+@keyframes nav-sub-in { from { opacity: 0; transform: translateY(-3px); } }
+
+/* Sentence case and a lighter weight, deliberately the opposite of the header
+   above it — and slightly LARGER, because this is the text people actually
+   read and click. Size is not what ranks these two; style is. */
+.nav-sub .nav-child {
+  font-size: 12.5px;
+  font-weight: 450;
+  padding: 7px 8px;
+}
+.nav-sub .nav-child svg { opacity: .62; }
+.nav-sub .nav-child.active svg { opacity: 1; }
+
+/* Space between sections, so seven headers read as seven groups rather than
+   one long list. */
+.nav-section + .nav-section { margin-top: 2px; }
+
+/* ── Pinned rows ──
+   Dashboard and New Sale are outside every section, and New Sale is the single
+   thing this application exists to do — so it gets the only filled row in the
+   sidebar. Everything else competes on weight; this one does not compete. */
+.sidebar-nav > .nav-pinned {
+  font-size: 13px;
+  font-weight: 650;
+  padding: 9px 8px;
+}
+
+.sidebar-nav > .nav-primary {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.sidebar-nav > .nav-primary svg { opacity: 1; }
+.sidebar-nav > .nav-primary:hover { background: var(--primary-hover, var(--primary)); color: #fff; }
+.sidebar-nav > .nav-primary:hover svg { color: #fff; }
+/* The filled row is already the loudest thing here; the usual active pill and
+   left bar would only muddy it. */
+.sidebar-nav > .nav-primary.active { background: var(--primary-hover, var(--primary)); color: #fff; }
+.sidebar-nav > .nav-primary.active::after { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .chev { transition: none; }
+  .nav-sub { animation: none; }
 }

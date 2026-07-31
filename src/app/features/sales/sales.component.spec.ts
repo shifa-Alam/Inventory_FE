@@ -88,6 +88,29 @@ describe('SalesComponent', () => {
       expect(back).toHaveBeenCalledTimes(2);
     });
 
+    // Regression: focusing the panel's search input for keyboard use made a
+    // mouse click on a row blur that input, which fired the wrap's focusout with
+    // a null relatedTarget, which closed the panel via *ngIf before the click
+    // landed. Net effect: the mouse could not select a customer at all.
+    it('selects a customer by mouse click', () => {
+      component.ddOpen = true;
+      fixture.detectChanges();
+
+      const rows = (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLElement>('.cust-dd-item');
+      expect(rows.length).toBe(3);
+
+      const down = new MouseEvent('mousedown', { bubbles: true, cancelable: true });
+      rows[1].dispatchEvent(down);
+      // The list must swallow the default action; that is what keeps focus in the
+      // input and therefore keeps the panel alive long enough to be clicked.
+      expect(down.defaultPrevented).toBeTrue();
+
+      rows[1].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      expect(component.customer_id).toBe(2);
+      expect(component.selectedCustomer.name).toBe('Beta Traders');
+      expect(component.ddOpen).toBeFalse();
+    });
+
     it('parks focus back on the search box after F8 exact-paid', () => {
       const back = spyOn(component as any, 'focusSearch');
       component.setFullPaid();
@@ -111,6 +134,27 @@ describe('SalesComponent', () => {
       expect(open).not.toHaveBeenCalled();
       component.onGlobalKey(key('F4'));
       expect(open).toHaveBeenCalledTimes(1);
+    });
+
+    it('F2 jumps to the product search even while another field has focus', () => {
+      // The reason F2 exists: the single-char router stands down whenever a field
+      // is focused, so from the discount box there was no keyboard way back.
+      const discount = document.createElement('input');
+      document.body.appendChild(discount);
+      discount.focus();
+      expect(document.activeElement).toBe(discount);
+
+      const back = spyOn(component as any, 'focusSearch');
+      component.onGlobalKey(key('F2'));
+      expect(back).toHaveBeenCalled();
+
+      discount.remove();
+    });
+
+    it('Ctrl+F2 is left to the browser', () => {
+      const back = spyOn(component as any, 'focusSearch');
+      component.onGlobalKey(key('F2', { ctrlKey: true }));
+      expect(back).not.toHaveBeenCalled();
     });
 
     it('a bare letter routes to the search box but Ctrl+letter is left alone', () => {

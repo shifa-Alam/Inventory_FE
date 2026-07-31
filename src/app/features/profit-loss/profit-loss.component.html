@@ -1,0 +1,185 @@
+<div class="page pl-page">
+
+  <!-- ── Header ── -->
+  <div class="pl-head no-print">
+    <div>
+      <h2>{{ 'profit_loss.title' | translate }}</h2>
+      <p class="sub">{{ 'profit_loss.subtitle' | translate }}</p>
+    </div>
+    <button class="btn-print" (click)="print()" [disabled]="!data">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      {{ 'profit_loss.print' | translate }}
+    </button>
+  </div>
+
+  <!-- ── Range control ── -->
+  <div class="pl-range no-print">
+    <div class="segmented" role="group">
+      <button *ngFor="let p of ['today','this_month','last_month','this_year']"
+              [class.on]="preset === p" (click)="applyPreset($any(p))">
+        {{ 'profit_loss.preset_' + p | translate }}
+      </button>
+    </div>
+    <div class="range-dates">
+      <input type="date" [(ngModel)]="dateFrom" (ngModelChange)="onCustomChange()"
+             [attr.aria-label]="'common.from' | translate" />
+      <span class="dash">–</span>
+      <input type="date" [(ngModel)]="dateTo" (ngModelChange)="onCustomChange()"
+             [attr.aria-label]="'common.to' | translate" />
+    </div>
+  </div>
+
+  <!-- ── Loading skeleton ── -->
+  <div class="skeleton" *ngIf="loading">
+    <div class="sk sk-hero"></div>
+    <div class="sk-row"><div class="sk sk-kpi"></div><div class="sk sk-kpi"></div><div class="sk sk-kpi"></div></div>
+    <div class="sk sk-table"></div>
+  </div>
+
+  <ng-container *ngIf="data && !loading">
+
+    <!-- Range must appear on paper too -->
+    <div class="print-only print-title">
+      <h3>{{ 'profit_loss.title' | translate }}</h3>
+      <p>{{ data.date_from }} — {{ data.date_to }}</p>
+    </div>
+
+    <!-- ── Empty state ── -->
+    <div class="pl-empty" *ngIf="isEmpty">
+      <div class="empty-icon">📊</div>
+      <p class="empty-title">{{ 'profit_loss.empty_title' | translate }}</p>
+      <p class="empty-sub">{{ 'profit_loss.empty_sub' | translate }}</p>
+    </div>
+
+    <ng-container *ngIf="!isEmpty">
+
+      <!-- ── Hero: the answer ── -->
+      <div class="hero" [class.loss]="isLoss">
+        <div class="hero-main">
+          <span class="hero-lbl">{{ 'profit_loss.net_profit' | translate }}</span>
+          <span class="hero-val">৳{{ data.net_profit | number:'1.0-2' }}</span>
+          <div class="hero-meta">
+            <span class="chip margin">{{ data.net_profit_margin }}% {{ 'profit_loss.margin' | translate }}</span>
+            <span class="chip delta" *ngIf="delta('net_profit') !== null"
+                  [class.up]="(delta('net_profit') ?? 0) >= 0" [class.down]="(delta('net_profit') ?? 0) < 0">
+              {{ (delta('net_profit') ?? 0) >= 0 ? '▲' : '▼' }}
+              {{ (delta('net_profit') ?? 0) >= 0 ? '+' : '' }}{{ delta('net_profit') }}%
+              <small>{{ 'profit_loss.vs_previous' | translate }}</small>
+            </span>
+          </div>
+        </div>
+
+        <!-- Where each taka of revenue went -->
+        <div class="hero-bar" *ngIf="composition.length">
+          <div class="bar">
+            <div *ngFor="let seg of composition" class="seg" [ngClass]="seg.key"
+                 [style.width.%]="seg.pct"
+                 [attr.title]="('profit_loss.' + seg.key | translate) + ': ৳' + (seg.value | number:'1.0-2')"></div>
+          </div>
+          <div class="legend">
+            <span *ngFor="let seg of composition" class="lg">
+              <i [ngClass]="seg.key"></i>{{ 'profit_loss.' + seg.key | translate }}
+              <b>{{ seg.pct }}%</b>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Supporting figures ── -->
+      <div class="kpis">
+        <div class="kpi">
+          <span class="k-lbl">{{ 'profit_loss.net_revenue' | translate }}</span>
+          <span class="k-val">৳{{ data.net_revenue | number:'1.0-2' }}</span>
+          <span class="k-delta" *ngIf="delta('net_revenue') !== null"
+                [class.up]="(delta('net_revenue') ?? 0) >= 0" [class.down]="(delta('net_revenue') ?? 0) < 0">
+            {{ (delta('net_revenue') ?? 0) >= 0 ? '+' : '' }}{{ delta('net_revenue') }}%
+          </span>
+        </div>
+        <div class="kpi">
+          <span class="k-lbl">{{ 'profit_loss.gross_profit' | translate }}</span>
+          <span class="k-val">৳{{ data.gross_profit | number:'1.0-2' }}</span>
+          <span class="k-sub">{{ data.gross_profit_margin }}% {{ 'profit_loss.margin' | translate }}</span>
+        </div>
+        <div class="kpi">
+          <span class="k-lbl">{{ 'profit_loss.expenses' | translate }}</span>
+          <span class="k-val">৳{{ data.expenses | number:'1.0-2' }}</span>
+          <span class="k-delta" *ngIf="delta('expenses') !== null"
+                [class.up]="(delta('expenses') ?? 0) < 0" [class.down]="(delta('expenses') ?? 0) >= 0">
+            {{ (delta('expenses') ?? 0) >= 0 ? '+' : '' }}{{ delta('expenses') }}%
+          </span>
+        </div>
+        <div class="kpi">
+          <span class="k-lbl">{{ 'profit_loss.invoices' | translate }}</span>
+          <span class="k-val">{{ data.invoices | number }}</span>
+        </div>
+      </div>
+
+      <div class="pl-grid">
+
+        <!-- ── The statement ── -->
+        <section class="panel statement">
+          <header class="panel-head">
+            <h3>{{ 'profit_loss.statement' | translate }}</h3>
+            <span class="range-note">{{ data.date_from }} — {{ data.date_to }}</span>
+          </header>
+          <table>
+            <tbody>
+              <tr><td>{{ 'profit_loss.sales' | translate }}</td>
+                  <td class="amt">{{ data.sales | number:'1.0-2' }}</td></tr>
+              <tr class="ded"><td>{{ 'profit_loss.less_returns' | translate }}</td>
+                  <td class="amt">({{ data.returns | number:'1.0-2' }})</td></tr>
+              <tr class="sum"><td>{{ 'profit_loss.net_revenue' | translate }}</td>
+                  <td class="amt">{{ data.net_revenue | number:'1.0-2' }}</td></tr>
+
+              <tr><td>{{ 'profit_loss.cogs' | translate }}</td>
+                  <td class="amt">{{ data.cogs | number:'1.0-2' }}</td></tr>
+              <tr class="ded"><td>{{ 'profit_loss.less_returns_cogs' | translate }}</td>
+                  <td class="amt">({{ data.returns_cogs | number:'1.0-2' }})</td></tr>
+              <tr class="sum"><td>{{ 'profit_loss.net_cogs' | translate }}</td>
+                  <td class="amt">({{ data.net_cogs | number:'1.0-2' }})</td></tr>
+
+              <tr class="tot gross"><td>{{ 'profit_loss.gross_profit' | translate }}</td>
+                  <td class="amt">{{ data.gross_profit | number:'1.0-2' }}
+                    <small>{{ data.gross_profit_margin }}%</small></td></tr>
+
+              <tr class="ded"><td>{{ 'profit_loss.expenses' | translate }}</td>
+                  <td class="amt">({{ data.expenses | number:'1.0-2' }})</td></tr>
+              <tr class="ded"><td>{{ 'profit_loss.stock_loss' | translate }}</td>
+                  <td class="amt">({{ data.stock_loss | number:'1.0-2' }})</td></tr>
+
+              <tr class="tot net" [class.loss]="isLoss">
+                <td>{{ 'profit_loss.net_profit' | translate }}</td>
+                <td class="amt">{{ data.net_profit | number:'1.0-2' }}
+                  <small>{{ data.net_profit_margin }}%</small></td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- ── Expenses ── -->
+        <section class="panel expenses" *ngIf="expenseRows.length">
+          <header class="panel-head">
+            <h3>{{ 'profit_loss.expense_breakdown' | translate }}</h3>
+            <span class="range-note">৳{{ data.expenses | number:'1.0-2' }}</span>
+          </header>
+          <ul class="exp-list">
+            <li *ngFor="let e of expenseRows">
+              <div class="exp-top">
+                <span class="exp-name" [attr.title]="e.name">{{ e.name }}</span>
+                <span class="exp-amt">৳{{ e.amount | number:'1.0-2' }}</span>
+              </div>
+              <div class="exp-bar"><i [style.width.%]="e.share"></i></div>
+            </li>
+          </ul>
+        </section>
+      </div>
+
+      <!-- ── Previous period ── -->
+      <p class="compare-note" *ngIf="data.previous">
+        {{ 'profit_loss.compared_with' | translate }}
+        <strong>{{ data.previous.date_from }} — {{ data.previous.date_to }}</strong> ·
+        {{ 'profit_loss.net_profit' | translate }} ৳{{ data.previous.net_profit | number:'1.0-2' }}
+      </p>
+
+    </ng-container>
+  </ng-container>
+</div>

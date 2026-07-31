@@ -35,6 +35,17 @@
   color: var(--text-muted);
 }
 
+/* Same red as the sales screen's required customer field, so "this is
+   mandatory" looks identical on both entry screens. */
+.req-star { color: #e53935; }
+
+/* Empty-and-needed state on the supplier select. Colour alone is never the only
+   signal here — the star and aria-required already state the requirement, and
+   the Save button is disabled — so this stays readable for colour-blind users. */
+.header-supplier select.field-required {
+  border-color: #e53935;
+}
+
 /* Search dropdown */
 .search-wrap { position: relative; overflow: visible; padding: 0 !important; }
 
@@ -89,8 +100,24 @@
 }
 .dropdown-item:last-child { border-bottom: none; }
 .dropdown-item:hover, .dropdown-item.active { background: rgba(99,102,241,0.25); }
-.dp-name  { font-weight: 500; font-size: 13px; color: #e2e8f0; }
+/* Two-part row: .dp-main takes the slack, .dp-cost keeps its natural width so
+   the currency values line up down the list. min-width:0 lets a long product
+   name ellipsis rather than shove the cost off the panel. */
+.dp-main  { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.dp-name  { font-weight: 500; font-size: 13px; color: #e2e8f0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dp-meta  { display: flex; align-items: center; gap: 8px; }
 .dp-stock { font-size: 11.5px; color: #94a3b8; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 20px; }
+
+.dp-cost  { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; }
+/* #94a3b8, not a dimmer grey: this panel is #1e1b4b and the highlighted row is
+   lighter still, where #64748b fell to 2.50:1 — under the 4.5:1 AA needs for
+   text this size. #94a3b8 holds 6.24:1 on the panel and 4.63:1 on the active
+   row, and matches the chip beside it. */
+/* Explicit line-heights, not the default: the em-dash fallback produced a line
+   box 1px shorter than a "৳2,030", so rows were 56/56/55px and the keyboard
+   highlight jittered as it moved down the list. */
+.dp-cost-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: #94a3b8; line-height: 1.2; }
+.dp-cost-val   { font-size: 13px; font-weight: 700; color: #a5b4fc; white-space: nowrap; line-height: 1.35; }
 
 /* Action bar */
 .total-info {

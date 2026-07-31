@@ -54,7 +54,15 @@
               role="combobox" aria-controls="custDdList" aria-expanded="true" aria-autocomplete="list"
               [attr.aria-activedescendant]="ddIndex >= 0 ? 'dd-opt-' + ddIndex : null"
               [placeholder]="'sales.search_name_ph' | translate" autocomplete="off" />
-            <div class="cust-dd-list" id="custDdList" role="listbox">
+            <!-- mousedown.preventDefault keeps focus in the search input when a
+                 row is clicked. Without it the input blurs, the wrap's focusout
+                 fires with a null relatedTarget (the rows are not focusable), the
+                 panel is destroyed by its *ngIf, and the click never reaches the
+                 row — so the mouse could not pick a customer at all. Only on the
+                 list, not the whole panel, so text is still selectable in the
+                 input above. -->
+            <div class="cust-dd-list" id="custDdList" role="listbox"
+              (mousedown)="$event.preventDefault()">
               <div class="cust-dd-item" *ngFor="let c of ddResults; let i = index"
                 [id]="'dd-opt-' + i" role="option" [attr.aria-selected]="i === ddIndex"
                 [class.active]="i === ddIndex" (click)="pickCustomer(c)">
@@ -112,7 +120,8 @@
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <input #searchInput type="text" [placeholder]="'sales.search_placeholder' | translate"
+          <!-- title carries the shortcut, matching how the F8 tender chip does it. -->
+          <input #searchInput type="text" title="F2" [placeholder]="'sales.search_placeholder' | translate"
             [(ngModel)]="productSearch" (ngModelChange)="onSearchChange($event)" (keydown)="onKeyDown($event)" />
           <div class="search-spinner" *ngIf="searching"></div>
         </div>
@@ -121,7 +130,7 @@
           <div class="dp-loading" *ngIf="searching && filteredProducts.length === 0">
             <span class="dp-loading-dot"></span><span class="dp-loading-dot"></span><span class="dp-loading-dot"></span>
           </div>
-          <div class="dropdown-item" *ngFor="let p of filteredProducts; let i = index"
+          <div #dpItem class="dropdown-item" *ngFor="let p of filteredProducts; let i = index"
             [class.active]="i === selectedIndex" (click)="selectProduct(p)">
             <div class="dp-main">
               <span class="dp-name">{{ p.name }}</span>
@@ -209,6 +218,13 @@
                 }}</small>
             </span>
             <span class="stock-chip">{{ item.stock }}</span>
+            <!-- MRP is on the desktop table but was missing here. It sits in the
+                 header row with the stock chip rather than as a fourth column in
+                 .mic-row below: that row is a 3-column grid holding the editable
+                 qty/rate/total, and a fourth column squeezes the rate input on a
+                 375px phone. Labelled, unlike the bare stock chip, so the two
+                 numbers can't be confused. Hidden when the product has no MRP. -->
+            <span class="mic-mrp" *ngIf="item.mrp">{{ 'sales.col_mrp' | translate }} ৳{{ item.mrp | number }}</span>
             <button class="mic-remove" (click)="removeRow(i)">✕</button>
           </div>
           <div class="mic-row">

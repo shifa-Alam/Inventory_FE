@@ -109,8 +109,24 @@ export class PurchaseComponent implements OnInit, AfterViewInit, OnDestroy {
     clearTimeout(this.toastTimer);
   }
 
+  /** Focus the product search box and select what is in it, so the next
+   *  keystroke replaces a half-typed term rather than appending to it. */
+  private focusSearch() {
+    const el = this.searchInputRef?.nativeElement;
+    el?.focus();
+    el?.select();
+  }
+
+  //   F2 → jump to product search
   @HostListener('document:keydown', ['$event'])
   onGlobalKey(event: KeyboardEvent) {
+    // Modified keys belong to the browser or the OS, never to us. Without this
+    // the single-char router below also swallowed Ctrl+P, Alt+D and friends and
+    // typed them into the search box.
+    if (event.ctrlKey || event.altKey || event.metaKey) return;
+    // Deliberately ahead of the focus check: F2 has to work while another field
+    // has focus, which is the one thing the router below cannot do.
+    if (event.key === 'F2') { event.preventDefault(); this.focusSearch(); return; }
     const tag = (document.activeElement as HTMLElement)?.tagName?.toLowerCase();
     const isInputFocused = tag === 'input' || tag === 'select' || tag === 'textarea';
     if (!isInputFocused && event.key.length === 1) {

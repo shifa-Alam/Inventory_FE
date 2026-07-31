@@ -388,6 +388,43 @@
           <span class="card-ttl">{{ 'dashboard.top_due_customers' | translate }}</span>
           <button class="link-btn" (click)="router.navigate(['/customers'])">{{ 'dashboard.view_all' | translate }}</button>
         </div>
+
+        <!-- Aging above the names, not beside them: the list already answers
+             "who owes", and the one thing it cannot answer is "how long" — which
+             is what decides whether anyone makes a call today. Rendered only
+             when something is actually owed, so a clean ledger shows no bar. -->
+        <div class="aging" *ngIf="agingTotal > 0">
+          <div class="aging-head">
+            <span class="aging-lbl">{{ 'dashboard.aging_overdue' | translate }}</span>
+            <span class="aging-overdue" [class.aging-bad]="agingOverdueShare >= 40">
+              ৳{{ fmt(data.receivables_aging?.overdue ?? 0) }}
+              <small>({{ agingOverdueShare }}%)</small>
+            </span>
+          </div>
+          <div class="aging-bar" [attr.aria-label]="'dashboard.aging_overdue' | translate">
+            <div class="ab-seg ab-0" [style.width.%]="agingPct('b0_30')"
+              [title]="('dashboard.aging_0_30' | translate) + ': ৳' + fmt(data.receivables_aging?.b0_30 ?? 0)"></div>
+            <div class="ab-seg ab-1" [style.width.%]="agingPct('b31_60')"
+              [title]="('dashboard.aging_31_60' | translate) + ': ৳' + fmt(data.receivables_aging?.b31_60 ?? 0)"></div>
+            <div class="ab-seg ab-2" [style.width.%]="agingPct('b61_90')"
+              [title]="('dashboard.aging_61_90' | translate) + ': ৳' + fmt(data.receivables_aging?.b61_90 ?? 0)"></div>
+            <div class="ab-seg ab-3" [style.width.%]="agingPct('b90_plus')"
+              [title]="('dashboard.aging_90_plus' | translate) + ': ৳' + fmt(data.receivables_aging?.b90_plus ?? 0)"></div>
+          </div>
+          <!-- Legend carries the figures too: colour alone must not be the only
+               way to read which bucket is which. -->
+          <div class="aging-legend">
+            <span class="al-item"><i class="ab-0"></i>{{ 'dashboard.aging_0_30' | translate }}
+              <b>৳{{ fmt(data.receivables_aging?.b0_30 ?? 0) }}</b></span>
+            <span class="al-item"><i class="ab-1"></i>{{ 'dashboard.aging_31_60' | translate }}
+              <b>৳{{ fmt(data.receivables_aging?.b31_60 ?? 0) }}</b></span>
+            <span class="al-item"><i class="ab-2"></i>{{ 'dashboard.aging_61_90' | translate }}
+              <b>৳{{ fmt(data.receivables_aging?.b61_90 ?? 0) }}</b></span>
+            <span class="al-item"><i class="ab-3"></i>{{ 'dashboard.aging_90_plus' | translate }}
+              <b>৳{{ fmt(data.receivables_aging?.b90_plus ?? 0) }}</b></span>
+          </div>
+        </div>
+
         <div *ngIf="data.top_due_customers?.length">
           <div class="due-item" *ngFor="let c of data.top_due_customers">
             <div class="due-avatar">{{ c.name.charAt(0) }}</div>

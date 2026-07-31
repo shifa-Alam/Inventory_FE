@@ -1,4 +1,5 @@
-<div class="scan-toast" *ngIf="scanToast" [class.toast-success]="scanToast.type === 'success'" [class.toast-error]="scanToast.type === 'error'">
+<div class="scan-toast" *ngIf="scanToast" [class.toast-success]="scanToast.type === 'success'"
+  [class.toast-error]="scanToast.type === 'error'">
   <span class="toast-icon">{{ scanToast.type === 'success' ? '✓' : '✕' }}</span>
   {{ scanToast.message }}
 </div>
@@ -12,8 +13,15 @@
       <p class="sub">{{ 'purchase.subtitle' | translate }}</p>
     </div>
     <div class="header-supplier">
-      <label class="field-label">{{ 'purchase.supplier_label' | translate }}</label>
-      <select [(ngModel)]="supplier_id" style="width:220px">
+      <label class="field-label">
+        {{ 'purchase.supplier_label' | translate }} <span class="req-star">*</span>
+      </label>
+      <!-- Turns red only once there are lines to save, so an untouched screen
+           does not nag. Same rule as the customer field on the sales screen.
+           aria-required carries the same fact to a screen reader, which cannot
+           see the star. -->
+      <select [(ngModel)]="supplier_id" style="width:220px" aria-required="true"
+        [class.field-required]="(!supplier_id || +supplier_id === 0) && items.length > 0">
         <option value="0">{{ 'purchase.select_supplier' | translate }}</option>
         <option *ngFor="let s of suppliers" [value]="s.id">{{ s.name }}</option>
       </select>
@@ -23,15 +31,13 @@
   <!-- SEARCH -->
   <div class="card card-body search-wrap" style="margin-bottom:16px">
     <div class="search-input-row">
-      <svg class="search-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input
-        #searchInput
-        type="text"
-        [placeholder]="'purchase.search_placeholder' | translate"
-        [(ngModel)]="productSearch"
-        (ngModelChange)="onSearchChange($event)"
-        (keydown)="onKeyDown($event)"
-      />
+      <svg class="search-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </svg>
+      <input #searchInput type="text" title="F2" [placeholder]="'purchase.search_placeholder' | translate"
+        [(ngModel)]="productSearch" (ngModelChange)="onSearchChange($event)" (keydown)="onKeyDown($event)" />
       <div class="search-spinner" *ngIf="searching"></div>
     </div>
     <div class="search-progress" *ngIf="searching"></div>
@@ -39,14 +45,25 @@
       <div class="dp-loading" *ngIf="searching && filteredProducts.length === 0">
         <span class="dp-loading-dot"></span><span class="dp-loading-dot"></span><span class="dp-loading-dot"></span>
       </div>
-      <div
-        class="dropdown-item"
-        *ngFor="let p of filteredProducts; let i = index"
-        [class.active]="i === selectedIndex"
-        (click)="selectProduct(p)"
-      >
-        <span class="dp-name">{{ p.name }}</span>
-        <span class="dp-stock">{{ 'purchase.col_stock' | translate }}: {{ p.current_stock }}</span>
+      <!-- Name + stock on the left, average cost pinned right. The cost gets its
+           own right-aligned column rather than a second inline chip so it can be
+           scanned straight down the list: as a second chip its position shifted
+           with the width of the stock number. On a purchase screen this is the
+           number the buyer checks their new rate against. -->
+      <div class="dropdown-item" *ngFor="let p of filteredProducts; let i = index" [class.active]="i === selectedIndex"
+        (click)="selectProduct(p)">
+        <div class="dp-main">
+          <span class="dp-name">{{ p.name }}</span>
+          <span class="dp-meta">
+            <span class="dp-stock">{{ 'purchase.col_stock' | translate }}: {{ p.current_stock | number }}</span>
+          </span>
+        </div>
+        <span class="dp-cost">
+          <span class="dp-cost-label">{{ 'purchase.col_avg_cost' | translate }}</span>
+          <!-- average_cost is Optional on the API and null for anything never
+               purchased, so fall back to an em dash instead of a blank or "0". -->
+          <span class="dp-cost-val">{{ p.average_cost ? ('৳' + (p.average_cost | number:'1.0-2')) : '—' }}</span>
+        </span>
       </div>
     </div>
   </div>
@@ -69,13 +86,15 @@
           <tr *ngFor="let item of items; let i = index">
             <td class="muted">{{ i + 1 }}</td>
             <td class="bold">{{ item.product_name }}
-              <select *ngIf="item.unitOptions?.length > 1" class="line-unit"
-                      [(ngModel)]="item.unit_id" (ngModelChange)="onLineUnitChange(item)">
+              <select *ngIf="item.unitOptions?.length > 1" class="line-unit" [(ngModel)]="item.unit_id"
+                (ngModelChange)="onLineUnitChange(item)">
                 <option *ngFor="let o of item.unitOptions" [ngValue]="o.id">{{ o.name }}</option>
               </select>
-              <small *ngIf="!(item.unitOptions?.length > 1) && item.unit_label" class="unit-tag">/ {{ item.unit_label }}</small>
+              <small *ngIf="!(item.unitOptions?.length > 1) && item.unit_label" class="unit-tag">/ {{ item.unit_label
+                }}</small>
             </td>
-            <td><input #qtyInput type="number" [(ngModel)]="item.quantity" min="1" (ngModelChange)="onQtyChange(item)" /></td>
+            <td><input #qtyInput type="number" [(ngModel)]="item.quantity" min="1"
+                (ngModelChange)="onQtyChange(item)" /></td>
             <td><input type="number" [(ngModel)]="item.total" min="0" (ngModelChange)="onTotalChange(item)" /></td>
             <td class="muted">{{ item.rate | number:'1.0-2' }}</td>
             <td>
@@ -97,24 +116,25 @@
       <div class="mic-top">
         <span class="mic-num">{{ i + 1 }}</span>
         <span class="mic-name">{{ item.product_name }}
-          <select *ngIf="item.unitOptions?.length > 1" class="line-unit"
-                  [(ngModel)]="item.unit_id" (ngModelChange)="onLineUnitChange(item)">
+          <select *ngIf="item.unitOptions?.length > 1" class="line-unit" [(ngModel)]="item.unit_id"
+            (ngModelChange)="onLineUnitChange(item)">
             <option *ngFor="let o of item.unitOptions" [ngValue]="o.id">{{ o.name }}</option>
           </select>
-          <small *ngIf="!(item.unitOptions?.length > 1) && item.unit_label" class="unit-tag">/ {{ item.unit_label }}</small>
+          <small *ngIf="!(item.unitOptions?.length > 1) && item.unit_label" class="unit-tag">/ {{ item.unit_label
+            }}</small>
         </span>
         <button class="mic-remove" (click)="removeRow(i)">✕</button>
       </div>
       <div class="mic-row">
         <div class="mic-field">
           <span class="mic-lbl">{{ 'purchase.col_qty' | translate }}</span>
-          <input #qtyInput type="number" [(ngModel)]="item.quantity" min="1"
-            (ngModelChange)="onQtyChange(item)" class="mic-input" />
+          <input #qtyInput type="number" [(ngModel)]="item.quantity" min="1" (ngModelChange)="onQtyChange(item)"
+            class="mic-input" />
         </div>
         <div class="mic-field">
           <span class="mic-lbl">{{ 'purchase.col_total' | translate }}</span>
-          <input type="number" [(ngModel)]="item.total" min="0"
-            (ngModelChange)="onTotalChange(item)" class="mic-input" />
+          <input type="number" [(ngModel)]="item.total" min="0" (ngModelChange)="onTotalChange(item)"
+            class="mic-input" />
         </div>
         <div class="mic-field">
           <span class="mic-lbl">{{ 'purchase.col_rate' | translate }}</span>
@@ -131,8 +151,7 @@
         <label class="field-label">{{ 'purchase.payment_method' | translate }}</label>
         <div class="pm-pills">
           <button type="button" class="pm-pill" *ngFor="let m of paymentMethods"
-            [class.active]="payment_method === m.value"
-            (click)="payment_method = m.value">{{ m.label }}</button>
+            [class.active]="payment_method === m.value" (click)="payment_method = m.value">{{ m.label }}</button>
         </div>
       </div>
       <div class="pay-field pay-amount">
@@ -157,7 +176,10 @@
       <span class="total-label">{{ 'purchase.total_amount' | translate }}</span>
       <span class="total-value">{{ getTotal() | number }}</span>
     </div>
-    <button class="btn btn-primary btn-lg" (click)="save()" [disabled]="items.length === 0">
+    <!-- Supplier was already enforced inside save() with a toast; blocking the
+         button too means the requirement is visible before the click, not after. -->
+    <button class="btn btn-primary btn-lg" (click)="save()"
+      [disabled]="items.length === 0 || !supplier_id || +supplier_id === 0">
       {{ 'purchase.save' | translate }}
     </button>
   </div>

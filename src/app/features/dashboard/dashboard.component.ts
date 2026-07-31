@@ -49,6 +49,32 @@ export class DashboardComponent implements OnInit {
     }[type] ?? 'ins-info';
   }
 
+  // ── Receivables aging ──────────────────────────────────────────────
+  // The bar is only meaningful as a share of what is owed, so every getter
+  // below guards the empty case: a tenant with a clean ledger must render no
+  // bar at all rather than four zero-width segments.
+
+  get agingTotal(): number {
+    return Number(this.data.receivables_aging?.total) || 0;
+  }
+
+  /** Share of receivables past the first bucket, as a whole percent. */
+  get agingOverdueShare(): number {
+    const total = this.agingTotal;
+    if (!total) return 0;
+    return Math.round((Number(this.data.receivables_aging?.overdue) || 0) / total * 100);
+  }
+
+  /** One bucket's width. Floored at 1% so a small-but-real bucket stays visible
+   *  instead of collapsing to nothing next to a large one. */
+  agingPct(bucket: 'b0_30' | 'b31_60' | 'b61_90' | 'b90_plus'): number {
+    const total = this.agingTotal;
+    if (!total) return 0;
+    const value = Number(this.data.receivables_aging?.[bucket]) || 0;
+    if (value <= 0) return 0;
+    return Math.max(1, Math.round(value / total * 100));
+  }
+
   categoryBarWidth(rev: number): number {
     const rows: any[] = this.data.sales_by_category ?? [];
     const max = Math.max(...rows.map(r => r.revenue), 1);

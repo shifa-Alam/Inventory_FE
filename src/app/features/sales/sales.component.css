@@ -201,7 +201,13 @@
   border: 1px solid var(--border);
   border-radius: 10px;
   box-shadow: var(--shadow-lg);
-  z-index: 100; max-height: 240px; overflow-y: auto;
+  z-index: 100; overflow-y: auto;
+  /* Was a flat 240px, which showed about four of the fifteen results the API
+     returns — arrowing past the fourth moved the highlight out of sight. The vh
+     cap keeps the panel off the bottom of a phone screen while desktop gets
+     roughly eight rows. Paired with scrollIntoView in onKeyDown, so the
+     highlight is always on screen no matter how long the list is. */
+  max-height: min(60vh, 420px);
 }
 .dp-loading {
   display: flex; align-items: center; justify-content: center;
@@ -346,6 +352,14 @@
 .mic-name {
   flex: 1; min-width: 0; font-size: 13px; font-weight: 700; color: var(--text);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* MRP reference in the mobile card header. Deliberately quieter than the stock
+   chip beside it — stock is a live constraint the cashier acts on, MRP is a
+   ceiling they only glance at — so it is a plain muted label, not a filled
+   pill, and the two never read as the same kind of value. */
+.mic-mrp {
+  font-size: 10.5px; font-weight: 600; color: var(--text-muted);
+  white-space: nowrap; flex-shrink: 0;
 }
 .mic-remove {
   padding: 3px 7px; font-size: 12px; font-weight: 700;

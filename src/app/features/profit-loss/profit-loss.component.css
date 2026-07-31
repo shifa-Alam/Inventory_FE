@@ -1,0 +1,184 @@
+/* Profit & Loss
+   Reading order is deliberate: the answer (net profit) first, then where the
+   money went (composition bar), then supporting figures, then the full
+   statement for anyone who wants the exact lines. Everything is built on the
+   shared design tokens, so dark mode (body.dark redefines them) needs no
+   separate rules. */
+
+.pl-page { max-width: 1080px; }
+.print-only { display: none; }
+
+/* ── Header ── */
+.pl-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 18px; flex-wrap: wrap; }
+.pl-head h2 { margin: 0 0 2px; font-size: 20px; letter-spacing: -.3px; }
+.pl-head .sub { margin: 0; color: var(--text-muted); font-size: 13px; }
+.btn-print {
+  display: inline-flex; align-items: center; gap: 7px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text-muted);
+  padding: 8px 14px; border-radius: var(--radius, 10px); font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.btn-print:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+.btn-print:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ── Range control ──
+   A segmented control, not four loose buttons: the presets are one choice, so
+   they read as one control with a single selected state. */
+.pl-range { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 18px; }
+.segmented { display: inline-flex; background: var(--bg-alt); border-radius: var(--radius, 10px); padding: 3px; gap: 2px; }
+.segmented button {
+  border: none; background: transparent; color: var(--text-muted);
+  font-size: 12.5px; font-weight: 600; padding: 7px 14px;
+  border-radius: calc(var(--radius, 10px) - 3px); cursor: pointer;
+  transition: background .15s, color .15s, box-shadow .15s; white-space: nowrap;
+}
+.segmented button:hover { color: var(--text); }
+.segmented button.on { background: var(--surface); color: var(--primary); box-shadow: var(--shadow-xs); }
+
+.range-dates { display: inline-flex; align-items: center; gap: 6px; }
+.range-dates input {
+  padding: 7px 10px; font-size: 12.5px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 6px); background: var(--surface); color: var(--text);
+}
+.range-dates .dash { color: var(--text-light); }
+
+/* ── Hero ──
+   The single number the owner came for. Tinted by outcome so profit vs loss
+   registers before the digits are read. */
+.hero {
+  background: linear-gradient(135deg, var(--success-light), var(--surface) 70%);
+  border: 1px solid var(--success-mid); border-radius: var(--radius-xl, 18px);
+  padding: 22px 24px; margin-bottom: 16px;
+  display: flex; justify-content: space-between; align-items: center; gap: 28px; flex-wrap: wrap;
+}
+.hero.loss { background: linear-gradient(135deg, var(--danger-light), var(--surface) 70%); border-color: var(--danger-mid); }
+
+.hero-lbl { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text-muted); }
+.hero-val {
+  display: block; margin-top: 4px;
+  font-size: 40px; font-weight: 800; letter-spacing: -1.2px; line-height: 1.05;
+  color: var(--success-text); font-variant-numeric: tabular-nums;
+}
+.hero.loss .hero-val { color: var(--danger-text); }
+.hero-meta { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+
+.chip { font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full, 9999px); background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); }
+.chip.delta small { font-weight: 600; opacity: .75; margin-left: 3px; }
+.chip.delta.up { color: var(--success-text); border-color: var(--success-mid); }
+.chip.delta.down { color: var(--danger-text); border-color: var(--danger-mid); }
+
+/* Composition: one bar, so margin structure is legible at a glance. */
+.hero-bar { flex: 1 1 320px; min-width: 260px; }
+.bar { display: flex; height: 12px; border-radius: var(--radius-full, 9999px); overflow: hidden; background: var(--bg-alt); }
+.seg { height: 100%; transition: width .35s ease; }
+.seg.cogs       { background: var(--primary); }
+.seg.expenses   { background: var(--warning); }
+.seg.stock_loss { background: var(--danger); }
+.seg.profit     { background: var(--success); }
+
+.legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
+.lg { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--text-muted); }
+.lg b { color: var(--text); font-weight: 700; }
+.lg i { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
+.lg i.cogs { background: var(--primary); } .lg i.expenses { background: var(--warning); }
+.lg i.stock_loss { background: var(--danger); } .lg i.profit { background: var(--success); }
+
+/* ── Supporting KPIs ── */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.kpi {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg, 14px);
+  padding: 14px 16px; display: flex; flex-direction: column; gap: 3px;
+}
+.k-lbl { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-light); }
+.k-val { font-size: 21px; font-weight: 800; letter-spacing: -.5px; font-variant-numeric: tabular-nums; }
+.k-sub, .k-delta { font-size: 11.5px; font-weight: 600; color: var(--text-muted); }
+.k-delta.up { color: var(--success-text); } .k-delta.down { color: var(--danger-text); }
+
+/* ── Panels ── */
+.pl-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 16px; align-items: start; }
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg, 14px); overflow: hidden; }
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 14px 18px 10px; border-bottom: 1px solid var(--border-light); }
+.panel-head h3 { margin: 0; font-size: 13.5px; font-weight: 700; }
+.range-note { font-size: 11.5px; color: var(--text-light); font-variant-numeric: tabular-nums; }
+
+/* Statement: indentation and rules carry the hierarchy, not colour alone. */
+.statement table { width: 100%; border-collapse: collapse; }
+.statement td { padding: 9px 18px; font-size: 13.5px; }
+.statement .amt { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.statement .amt small { display: block; font-size: 10.5px; font-weight: 600; color: var(--text-light); margin-top: 1px; }
+.statement .ded td:first-child { padding-left: 32px; color: var(--text-muted); }
+.statement .ded .amt { color: var(--text-muted); }
+.statement .sum td { font-weight: 700; border-top: 1px solid var(--border); }
+.statement .tot td { font-weight: 800; font-size: 14.5px; border-top: 2px solid var(--border-strong); }
+.statement .tot.gross td { color: var(--primary-dark); }
+.statement .tot.net td { color: var(--success-text); border-top: 2px solid var(--success); background: var(--success-light); }
+.statement .tot.net.loss td { color: var(--danger-text); border-top-color: var(--danger); background: var(--danger-light); }
+
+/* Expenses: a bar per row ranks them without reading the numbers. */
+.exp-list { list-style: none; margin: 0; padding: 8px 18px 16px; display: flex; flex-direction: column; gap: 12px; }
+.exp-top { display: flex; justify-content: space-between; gap: 12px; font-size: 12.5px; }
+.exp-name { color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.exp-amt { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.exp-bar { height: 6px; background: var(--bg-alt); border-radius: var(--radius-full, 9999px); margin-top: 5px; overflow: hidden; }
+.exp-bar i { display: block; height: 100%; background: var(--warning); border-radius: inherit; transition: width .35s ease; }
+
+.compare-note { font-size: 12.5px; color: var(--text-muted); margin: 16px 2px 0; }
+
+/* ── Empty state ── */
+.pl-empty { text-align: center; padding: 56px 20px; background: var(--surface); border: 1px dashed var(--border-strong); border-radius: var(--radius-lg, 14px); }
+.empty-icon { font-size: 34px; margin-bottom: 8px; }
+.empty-title { font-weight: 700; margin: 0 0 4px; }
+.empty-sub { color: var(--text-muted); font-size: 13px; margin: 0; }
+
+/* ── Loading skeleton (shape of the result, so the layout doesn't jump) ── */
+.skeleton { display: flex; flex-direction: column; gap: 14px; }
+.sk { background: var(--bg-alt); border-radius: var(--radius-lg, 14px); position: relative; overflow: hidden; }
+.sk::after {
+  content: ''; position: absolute; inset: 0; transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+  animation: sk-shimmer 1.3s infinite;
+}
+@keyframes sk-shimmer { 100% { transform: translateX(100%); } }
+.sk-hero { height: 128px; } .sk-table { height: 300px; }
+.sk-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.sk-kpi { height: 76px; }
+@media (prefers-reduced-motion: reduce) { .sk::after { animation: none; } .seg, .exp-bar i { transition: none; } }
+
+/* ── Responsive ── */
+@media (max-width: 900px) { .pl-grid { grid-template-columns: 1fr; } }
+@media (max-width: 640px) {
+  .hero { padding: 18px; gap: 18px; }
+  .hero-val { font-size: 30px; }
+  .segmented { width: 100%; overflow-x: auto; }
+  .range-dates { width: 100%; }
+  .range-dates input { flex: 1; min-width: 0; }
+  .statement td { padding: 8px 12px; font-size: 12.5px; }
+  .statement .ded td:first-child { padding-left: 22px; }
+  .exp-list { padding: 8px 12px 14px; }
+}
+
+/* ── Print ──
+   Whitespace lives in padding, never @page margin: the print dialog's
+   Default/None/Minimum choice overrides @page and would otherwise collapse it.
+   Everything prints pure black on white so a low-toner printer stays legible. */
+@media print {
+  @page { size: A4; margin: 0; }
+  :host { display: block; padding: 12mm 10mm !important; }
+
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+  .print-title { margin-bottom: 8mm; }
+  .print-title h3 { margin: 0 0 2px; font-size: 16px; }
+  .print-title p { margin: 0; font-size: 12px; }
+
+  .pl-page, .pl-page * {
+    color: #000 !important; background: transparent !important;
+    box-shadow: none !important; opacity: 1 !important;
+  }
+  .hero, .panel, .kpi { border: 1px solid #000 !important; border-radius: 0 !important; }
+  .statement .sum td, .statement .tot td { border-color: #000 !important; }
+  /* Bars are colour-coded; without colour they carry no meaning on paper. */
+  .hero-bar, .exp-bar { display: none !important; }
+  .pl-grid { grid-template-columns: 1fr; gap: 8mm; }
+  .hero, .kpis, .panel { page-break-inside: avoid; }
+}

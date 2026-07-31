@@ -463,3 +463,84 @@
   .insights-strip { gap: 6px; }
   .insight-pill { font-size: 12px; padding: 7px 11px; }
 }
+
+/* ── Receivables aging bar (Due Customers card) ──────────────────────
+   A single stacked bar rather than four tiles: the question it answers is
+   "what proportion of what I am owed has gone stale", and a proportion is
+   read from relative width, not from four numbers side by side.
+
+   Colour runs cool → hot with age. It is never the only signal: the legend
+   below the bar repeats every bucket with its figure, and each segment
+   carries a title, so the bar works without colour vision too. */
+.aging {
+  padding: 10px 0 12px;
+  border-bottom: 1px solid var(--border-light, #eef0f4);
+  margin-bottom: 8px;
+}
+
+.aging-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 7px;
+}
+
+.aging-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+}
+
+.aging-overdue {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.aging-overdue small { font-size: 10.5px; font-weight: 700; color: var(--text-muted); }
+
+/* Past 40% stale, the figure itself turns — at that point the receivable is
+   the story, not a footnote. */
+.aging-overdue.aging-bad { color: #dc2626; }
+.aging-overdue.aging-bad small { color: #dc2626; }
+
+.aging-bar {
+  display: flex;
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--bg-alt, #f1f5f9);
+}
+
+.ab-seg { height: 100%; transition: width 0.25s ease; }
+.ab-seg:first-child { border-radius: 999px 0 0 999px; }
+.ab-seg:last-child { border-radius: 0 999px 999px 0; }
+
+.ab-0 { background: #16a34a; }   /* current */
+.ab-1 { background: #eab308; }   /* slipping */
+.ab-2 { background: #f97316; }   /* late */
+.ab-3 { background: #dc2626; }   /* bad debt territory */
+
+.aging-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-top: 8px;
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.al-item { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+
+.al-item i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.al-item b { color: var(--text); font-weight: 700; }

@@ -1,5 +1,6 @@
 import { Type } from '@angular/core';
 import { PrintSaleInvoiceAt01Component } from './print-sale-invoice-at-01.component';
+import { PrintSaleInvoiceUd01Component } from './print-sale-invoice-ud-01.component';
 
 /**
  * Bespoke sale-invoice templates keyed by the tenant's unique CODE (not id).
@@ -17,4 +18,5 @@ import { PrintSaleInvoiceAt01Component } from './print-sale-invoice-at-01.compon
  */
 export const TENANT_TEMPLATES: Record<string, Type<unknown>> = {
   at_01: PrintSaleInvoiceAt01Component,   // Amira Traders
+  ud_01: PrintSaleInvoiceUd01Component,   // Bangladesh commercial invoice
 };

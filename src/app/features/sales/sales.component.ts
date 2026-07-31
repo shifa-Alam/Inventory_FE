@@ -23,6 +23,7 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
   @ViewChildren('qtyInput') qtyInputs!: QueryList<ElementRef<HTMLInputElement>>;
   @ViewChild('ddSearch') ddSearchRef?: ElementRef<HTMLInputElement>;
+  @ViewChildren('dpItem') dpItems!: QueryList<ElementRef<HTMLElement>>;
 
   customer_id: number = 0;
   paid_amount: number = 0;
@@ -153,7 +154,8 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Cashier keyboard shortcuts + keypress-to-search routing.
-  //   F4 → open customer picker · F8 → mark fully paid · F9 → complete sale
+  //   F2 → jump to product search · F4 → open customer picker
+  //   F8 → mark fully paid · F9 → complete sale
   @HostListener('document:keydown', ['$event'])
   onGlobalKey(event: KeyboardEvent) {
     // A modified key is never ours. It belongs to the browser (Ctrl+P), the OS
@@ -162,6 +164,11 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
     // Without this the single-char router at the bottom swallowed Ctrl+P, Alt+D
     // and friends too, and typed them into the search box.
     if (event.ctrlKey || event.altKey || event.metaKey) return;
+    // F2 works even while another field has focus — that is the whole point of
+    // it. The single-char router below only fires when focus is nowhere, so
+    // without this there was no way back to the search box from, say, the
+    // discount field except reaching for the mouse.
+    if (event.key === 'F2') { event.preventDefault(); this.focusSearch(); return; }
     if (event.key === 'F9') { event.preventDefault(); this.submit(); return; }
     if (event.key === 'F8') { event.preventDefault(); this.setFullPaid(); return; }
     if (event.key === 'F4') { event.preventDefault(); this.openDropdown(); return; }
@@ -187,7 +194,13 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
    * cash-received field, which is the classic POS data-corruption bug.
    */
   private focusSearch() {
-    setTimeout(() => this.searchInputRef?.nativeElement.focus(), 0);
+    setTimeout(() => {
+      const el = this.searchInputRef?.nativeElement;
+      el?.focus();
+      // Select whatever is sitting there so the next keystroke replaces it. On
+      // F2 the box often still holds a half-typed term the cashier abandoned.
+      el?.select();
+    }, 0);
   }
 
   /**
@@ -434,12 +447,14 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.filteredProducts.length) {
         this.selectedIndex = this.selectedIndex < this.filteredProducts.length - 1
           ? this.selectedIndex + 1 : 0;
+        this.revealSelected();
       }
     } else if (event.key === 'ArrowUp') {
       event.preventDefault();
       if (this.filteredProducts.length) {
         this.selectedIndex = this.selectedIndex > 0
           ? this.selectedIndex - 1 : this.filteredProducts.length - 1;
+        this.revealSelected();
       }
     } else if (event.key === 'Enter') {
       event.preventDefault();
@@ -460,6 +475,19 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.filteredProducts = [];
       this.productSearch = '';
     }
+  }
+
+  /**
+   * Keep the arrow-key highlight inside the scrollable dropdown.
+   *
+   * The panel is capped in height and the API returns up to 15 matches, so
+   * without this the highlight walked off the bottom and the cashier was
+   * arrowing blind — the list itself never moved. `block: 'nearest'` scrolls the
+   * minimum needed, so the panel does not jump when the row is already visible.
+   */
+  private revealSelected() {
+    const el = this.dpItems?.toArray()[this.selectedIndex]?.nativeElement;
+    el?.scrollIntoView({ block: 'nearest' });
   }
 
   private lookupBarcode(sku: string) {
