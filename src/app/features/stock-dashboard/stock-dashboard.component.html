@@ -120,9 +120,20 @@
               <span class="status-pill dot-out" *ngIf="s.status==='OUT'">● {{ 'stock.badge_out' | translate }}</span>
             </td>
           </tr>
-          <tr *ngIf="loading" class="loading-row">
-            <td colspan="10"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
-          </tr>
+          <ng-container *ngIf="loading">
+            <tr class="skel-tr" *ngFor="let i of [1,2,3,4,5]">
+              <td><div class="skel skel-line w25"></div></td>
+              <td><div class="skel skel-line w80"></div></td>
+              <td><div class="skel skel-line w60"></div></td>
+              <td><div class="skel skel-line w60"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w25" style="margin:0 auto"></div></td>
+              <td><div class="skel skel-line w40" style="margin-left:auto"></div></td>
+              <td><div class="skel skel-line w40" style="margin:0 auto"></div></td>
+            </tr>
+          </ng-container>
           <tr *ngIf="!loading && stocks.length === 0">
             <td colspan="10" class="empty-row"><div class="empty-icon">📦</div>{{ 'stock.no_data' | translate }}</td>
           </tr>
@@ -139,9 +150,17 @@
       <span class="count-badge">{{ total }} {{ 'stock.items' | translate }}</span>
     </div>
 
-    <div *ngIf="loading" class="mobile-loading">
-      <div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span>
-    </div>
+    <ng-container *ngIf="loading">
+      <div class="mobile-card skel-card" *ngFor="let i of [1,2,3,4]">
+        <div class="mc-top">
+          <div class="mc-name-wrap" style="flex:1">
+            <div class="skel skel-circle" style="width:20px;height:20px"></div>
+            <div style="width:100%"><div class="skel skel-line w60"></div><div class="skel skel-line sm w40" style="margin-top:8px"></div></div>
+          </div>
+          <div class="skel skel-line sm" style="width:44px; flex-shrink:0"></div>
+        </div>
+      </div>
+    </ng-container>
 
     <div *ngIf="!loading && stocks.length === 0" class="mobile-empty">
       <div class="empty-icon">📦</div>

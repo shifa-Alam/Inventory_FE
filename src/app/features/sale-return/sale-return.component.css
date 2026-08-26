@@ -184,6 +184,11 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   .hide-mobile { display: none !important; }
   .show-mobile { display: block !important; }
   .loading-spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.65s linear infinite; margin-right: 8px; vertical-align: middle; }
+
+  /* .rh-qb is a local class, not the shared .btn, so it never picked up the
+     app-wide 44px mobile touch-target rule — same recurring gap already
+     fixed on Sales History's identical quick-filter chip pattern. */
+  .rh-qb { padding: 9px 14px; font-size: 12.5px; min-height: 36px; }
 }
 
 /* ── Refund method toggle (store credit vs cash) ─────────────── */

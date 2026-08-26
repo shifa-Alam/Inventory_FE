@@ -194,9 +194,16 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngIf="loadingWastes" class="loading-row">
-            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
-          </tr>
+          <ng-container *ngIf="loadingWastes">
+            <tr class="skel-tr" *ngFor="let i of [1,2,3,4,5]">
+              <td><div class="skel skel-line w80"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w60"></div></td>
+              <td><div class="skel skel-line w25"></div></td>
+              <td><div class="skel skel-line w60"></div></td>
+            </tr>
+          </ng-container>
           <tr *ngFor="let w of wastes">
             <td class="muted">{{ w.created_at | date:'dd MMM yyyy, hh:mm a' }}</td>
             <td><span class="ref-badge waste-badge">{{ w.waste_no }}</span></td>
@@ -214,7 +221,13 @@
 
     <!-- Mobile history cards -->
     <div class="show-mobile" style="padding:10px 12px">
-      <div class="mobile-loading" *ngIf="loadingWastes"><div class="loading-spinner"></div> {{ 'common.loading' | translate }}</div>
+      <ng-container *ngIf="loadingWastes">
+        <div class="mobile-card skel-card" *ngFor="let i of [1,2,3,4]">
+          <div class="mc-top">
+            <div><div class="skel skel-line w60"></div><div class="skel skel-line sm w40" style="margin-top:8px"></div></div>
+          </div>
+        </div>
+      </ng-container>
       <div class="mobile-empty" *ngIf="!loadingWastes && wastes.length === 0">{{ 'product_waste.history_empty' | translate }}</div>
       <div class="mobile-card" *ngFor="let w of wastes">
         <div class="mc-top">

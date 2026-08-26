@@ -258,9 +258,18 @@
 
           </ng-container>
 
-          <tr *ngIf="loading" class="loading-row">
-            <td colspan="8"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
-          </tr>
+          <ng-container *ngIf="loading">
+            <tr class="skel-tr" *ngFor="let i of [1,2,3,4,5]">
+              <td><div class="skel skel-line w60"></div></td>
+              <td><div class="skel skel-line w80"></div></td>
+              <td><div class="skel skel-line w80"></div></td>
+              <td class="right"><div class="skel skel-line w60"></div></td>
+              <td class="right"><div class="skel skel-line w60"></div></td>
+              <td class="right"><div class="skel skel-line w60"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+            </tr>
+          </ng-container>
           <tr *ngIf="!loading && sales.length === 0">
             <td colspan="8" class="empty-row">{{ 'sales_list.empty' | translate }}</td>
           </tr>
@@ -328,7 +337,24 @@
     </div>
     <div class="alert alert-success" *ngIf="successMsg" style="margin-bottom:8px"><span class="alert-icon">✓</span> {{ successMsg }}</div>
     <div class="alert alert-error"   *ngIf="errorMsg"   style="margin-bottom:8px"><span class="alert-icon">✕</span> {{ errorMsg }}</div>
-    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
+    <ng-container *ngIf="loading">
+      <div class="mobile-card skel-card" *ngFor="let i of [1,2,3,4]">
+        <div class="mc-top">
+          <div class="mc-name-wrap" style="flex:1">
+            <div style="width:100%">
+              <div class="skel skel-line w40"></div>
+              <div class="skel skel-line sm w80" style="margin-top:8px"></div>
+            </div>
+          </div>
+          <div class="skel skel-line sm w25" style="width:56px; flex-shrink:0"></div>
+        </div>
+        <div class="mc-grid">
+          <div class="mc-field"><div class="skel skel-line sm w60"></div></div>
+          <div class="mc-field"><div class="skel skel-line sm w60"></div></div>
+          <div class="mc-field"><div class="skel skel-line sm w60"></div></div>
+        </div>
+      </div>
+    </ng-container>
     <div class="mobile-empty" *ngIf="!loading && sales.length === 0"><p>{{ 'sales_list.empty' | translate }}</p></div>
 
     <div class="mobile-card" *ngFor="let s of sales" [class.mc-warn]="s.due_amount > 0" [class.mc-selected]="selectedSale?.id === s.id">

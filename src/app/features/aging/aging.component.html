@@ -74,9 +74,18 @@
             <td class="text-right cell-danger">{{ r.b90_plus ? '৳' + fmt(r.b90_plus) : '—' }}</td>
             <td class="text-right bold">৳{{ fmt(r.total) }}</td>
           </tr>
-          <tr *ngIf="loading">
-            <td colspan="8" class="loading-row"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
-          </tr>
+          <ng-container *ngIf="loading">
+            <tr class="skel-tr" *ngFor="let i of [1,2,3,4,5]">
+              <td><div class="skel skel-line w25"></div></td>
+              <td><div class="skel skel-line w80"></div></td>
+              <td><div class="skel skel-line w60"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+            </tr>
+          </ng-container>
           <tr *ngIf="!loading && rows.length === 0">
             <td colspan="8" class="empty-row">{{ 'aging.empty' | translate }}</td>
           </tr>
@@ -97,7 +106,14 @@
 
   <!-- Mobile cards -->
   <div class="mobile-list">
-    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div></div>
+    <ng-container *ngIf="loading">
+      <div class="aging-card" *ngFor="let i of [1,2,3,4]">
+        <div class="ac-top">
+          <div style="width:60%"><div class="skel skel-line w80"></div><div class="skel skel-line sm w60" style="margin-top:8px"></div></div>
+          <div class="skel skel-line sm" style="width:60px"></div>
+        </div>
+      </div>
+    </ng-container>
     <div class="mobile-empty" *ngIf="!loading && rows.length === 0">{{ 'aging.empty' | translate }}</div>
 
     <div class="aging-card" *ngFor="let r of rows">

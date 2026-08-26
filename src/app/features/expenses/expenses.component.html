@@ -128,9 +128,17 @@
           <tr *ngIf="!loading && expenses.length === 0">
             <td colspan="7" class="empty-row"><div class="empty-icon">💸</div>{{ 'expenses.empty' | translate }}</td>
           </tr>
-          <tr *ngIf="loading">
-            <td colspan="7" class="loading-row"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
-          </tr>
+          <ng-container *ngIf="loading">
+            <tr class="skel-tr" *ngFor="let i of [1,2,3,4,5]">
+              <td><div class="skel skel-line w25"></div></td>
+              <td><div class="skel skel-line w60"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w80"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+            </tr>
+          </ng-container>
         </tbody>
       </table>
     </div>
@@ -155,7 +163,16 @@
       <span class="count-badge">{{ total }}</span>
     </div>
 
-    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
+    <ng-container *ngIf="loading">
+      <div class="mobile-card skel-card" *ngFor="let i of [1,2,3,4]">
+        <div class="mc-top">
+          <div class="mc-name-wrap" style="flex:1">
+            <div class="skel skel-circle" style="width:20px;height:20px"></div>
+            <div style="width:100%"><div class="skel skel-line w60"></div><div class="skel skel-line sm w40" style="margin-top:8px"></div></div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
     <div class="mobile-empty" *ngIf="!loading && expenses.length === 0"><div class="empty-icon">💸</div><p>{{ 'expenses.empty' | translate }}</p></div>
 
     <div class="mobile-card" *ngFor="let e of expenses; let i = index">

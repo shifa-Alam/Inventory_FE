@@ -90,9 +90,17 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngIf="loadingHistory" class="loading-row">
-            <td colspan="7"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
-          </tr>
+          <ng-container *ngIf="loadingHistory">
+            <tr class="skel-tr" *ngFor="let i of [1,2,3,4,5]">
+              <td><div class="skel skel-line w80"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w80"></div></td>
+              <td><div class="skel skel-line w25"></div></td>
+              <td><div class="skel skel-line w25"></div></td>
+              <td><div class="skel skel-line w25"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+            </tr>
+          </ng-container>
           <tr *ngFor="let c of history">
             <td class="muted">{{ c.created_at | date:'dd MMM yyyy, hh:mm a' }}</td>
             <td><span class="ref-badge">{{ c.count_no }}</span></td>
@@ -121,7 +129,13 @@
       <span class="mobile-title">{{ 'stock_count.count_history' | translate }}</span>
       <span class="count-badge">{{ total }} {{ 'stock_count.records' | translate }}</span>
     </div>
-    <div class="mobile-loading" *ngIf="loadingHistory"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
+    <ng-container *ngIf="loadingHistory">
+      <div class="mobile-card skel-card" *ngFor="let i of [1,2,3,4]">
+        <div class="mc-top">
+          <div><div class="skel skel-line w60"></div><div class="skel skel-line sm w40" style="margin-top:8px"></div></div>
+        </div>
+      </div>
+    </ng-container>
     <div class="mobile-empty" *ngIf="!loadingHistory && history.length === 0"><p>{{ 'stock_count.empty' | translate }}</p></div>
 
     <div class="mobile-card" *ngFor="let c of history">

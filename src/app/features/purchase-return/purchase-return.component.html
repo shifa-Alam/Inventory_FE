@@ -90,9 +90,16 @@
             </tr>
           </ng-container>
 
-          <tr *ngIf="loadingPurchases" class="loading-row">
-            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
-          </tr>
+          <ng-container *ngIf="loadingPurchases">
+            <tr class="skel-tr" *ngFor="let i of [1,2,3,4,5]">
+              <td><div class="skel skel-line w80"></div></td>
+              <td><div class="skel skel-line w60"></div></td>
+              <td><div class="skel skel-line w80"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w40" style="margin-left:auto"></div></td>
+            </tr>
+          </ng-container>
           <tr *ngIf="!loadingPurchases && purchases.length === 0">
             <td colspan="6" class="empty-row">{{ 'purchase_return.no_purchases' | translate }}</td>
           </tr>
@@ -108,7 +115,13 @@
       <span class="mobile-title">{{ 'purchase_return.select_purchase' | translate }}</span>
       <input class="pr-search" type="text" [(ngModel)]="searchInvoice" (ngModelChange)="onSearch()" [placeholder]="'purchase_return.filter_invoice_ph' | translate" />
     </div>
-    <div class="mobile-loading" *ngIf="loadingPurchases"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
+    <ng-container *ngIf="loadingPurchases">
+      <div class="mobile-card skel-card" *ngFor="let i of [1,2,3,4]">
+        <div class="mc-top">
+          <div><div class="skel skel-line w60"></div><div class="skel skel-line sm w40" style="margin-top:8px"></div></div>
+        </div>
+      </div>
+    </ng-container>
     <div class="mobile-empty" *ngIf="!loadingPurchases && purchases.length === 0"><p>{{ 'purchase_return.no_purchases' | translate }}</p></div>
 
     <div class="mobile-card" *ngFor="let p of purchases" [class.mc-selected]="selected?.id === p.id">
@@ -150,9 +163,16 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngIf="loadingHistory" class="loading-row">
-            <td colspan="6"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
-          </tr>
+          <ng-container *ngIf="loadingHistory">
+            <tr class="skel-tr" *ngFor="let i of [1,2,3,4,5]">
+              <td><div class="skel skel-line w80"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w60"></div></td>
+              <td><div class="skel skel-line w60"></div></td>
+              <td><div class="skel skel-line w40" style="margin-left:auto"></div></td>
+              <td><div class="skel skel-line w60"></div></td>
+            </tr>
+          </ng-container>
           <tr *ngFor="let r of history">
             <td class="muted">{{ r.created_at | date:'dd MMM yyyy, hh:mm a' }}</td>
             <td><span class="ref-badge">{{ r.return_no }}</span></td>
@@ -176,7 +196,13 @@
       <span class="mobile-title">{{ 'purchase_return.history_title' | translate }}</span>
       <span class="count-badge">{{ histTotal }} {{ 'common.records' | translate }}</span>
     </div>
-    <div class="mobile-loading" *ngIf="loadingHistory"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></div>
+    <ng-container *ngIf="loadingHistory">
+      <div class="mobile-card skel-card" *ngFor="let i of [1,2,3,4]">
+        <div class="mc-top">
+          <div><div class="skel skel-line w60"></div><div class="skel skel-line sm w40" style="margin-top:8px"></div></div>
+        </div>
+      </div>
+    </ng-container>
     <div class="mobile-empty" *ngIf="!loadingHistory && history.length === 0"><p>{{ 'purchase_return.no_history' | translate }}</p></div>
 
     <div class="mobile-card" *ngFor="let r of history">

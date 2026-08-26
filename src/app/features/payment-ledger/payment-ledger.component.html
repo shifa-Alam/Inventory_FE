@@ -105,8 +105,12 @@
         <div class="sg-count">{{ 'payment_ledger.all_customers' | translate }}</div>
       </div>
     </div>
-    <div class="loading-row" *ngIf="loadingSummary" style="padding:16px 0">
-      <div class="loading-spinner"></div><span class="loading-text">{{ 'payment_ledger.summary_loading' | translate }}</span>
+    <div class="sg-grid" *ngIf="loadingSummary" style="margin-top:10px">
+      <div class="sg-block" *ngFor="let i of [1,2,3]">
+        <div class="skel skel-line sm w60"></div>
+        <div class="skel skel-line lg w40" style="margin-top:8px"></div>
+        <div class="skel skel-line sm w80" style="margin-top:8px"></div>
+      </div>
     </div>
   </div>
 
@@ -150,9 +154,17 @@
               {{ isNegative(e) ? '−' : '+' }}৳{{ (e.amount < 0 ? -e.amount : e.amount) | number:'1.0-2' }}
             </td>
           </tr>
-          <tr *ngIf="loading" class="loading-row">
-            <td colspan="7"><div class="loading-spinner"></div><span class="loading-text">{{ 'common.loading' | translate }}</span></td>
-          </tr>
+          <ng-container *ngIf="loading">
+            <tr class="skel-tr" *ngFor="let i of [1,2,3,4,5]">
+              <td><div class="skel skel-line w80"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w60"></div></td>
+              <td><div class="skel skel-line w60"></div></td>
+              <td><div class="skel skel-line w60"></div></td>
+              <td><div class="skel skel-line w40"></div></td>
+              <td><div class="skel skel-line w40" style="margin-left:auto"></div></td>
+            </tr>
+          </ng-container>
           <tr *ngIf="!loading && entries.length === 0">
             <td colspan="7" class="empty-row"><div class="empty-icon">📋</div>{{ 'payment_ledger.no_transactions' | translate }}</td>
           </tr>
@@ -168,7 +180,13 @@
       <span class="mobile-title">{{ 'payment_ledger.mobile_title' | translate }}</span>
       <span class="count-badge">{{ total }}</span>
     </div>
-    <div class="mobile-loading" *ngIf="loading"><div class="loading-spinner"></div></div>
+    <ng-container *ngIf="loading">
+      <div class="mobile-card skel-card" *ngFor="let i of [1,2,3,4]">
+        <div class="mc-top">
+          <div><div class="skel skel-line w60"></div><div class="skel skel-line sm w40" style="margin-top:8px"></div></div>
+        </div>
+      </div>
+    </ng-container>
     <div class="mobile-empty" *ngIf="!loading && entries.length === 0"><div class="empty-icon">📋</div><p>{{ 'payment_ledger.no_transactions' | translate }}</p></div>
     <div class="mobile-card" *ngFor="let e of entries" [ngClass]="isNegative(e) ? 'mc-danger' : 'mc-success'">
       <div class="mc-top">

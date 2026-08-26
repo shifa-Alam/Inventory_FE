@@ -208,6 +208,12 @@
   .show-mobile { display: block !important; }
   .action-bar { flex-direction: column; gap: 8px; align-items: stretch; }
   .action-bar .btn { justify-content: center; }
+
+  /* .wh-qb and .mic-remove are local classes, not the shared .btn, so they
+     never picked up the app-wide 44px mobile touch-target rule — same
+     recurring gap already fixed on Sales History's identical patterns. */
+  .wh-qb { padding: 9px 14px; font-size: 12.5px; min-height: 36px; }
+  .mic-remove { padding: 8px 11px; min-height: 34px; }
 }
 
 .loading-spinner {
