@@ -1,26 +1,76 @@
-.import-page { max-width: 900px; margin: 0 auto; padding: 4px; }
-.import-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-.import-head h2 { margin: 0 0 4px; font-size: 20px; }
-.sub { margin: 0; color: var(--text-muted, #64748b); font-size: 13px; max-width: 560px; }
+.import-page { max-width: 720px; margin: 0 auto; padding: 4px; }
 
-.card { background: var(--surface, #fff); border: 1px solid var(--border, #e2e8f0); border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+.import-head { margin-bottom: 20px; }
+.import-head h2 { margin: 0; font-size: 22px; font-weight: 700; color: var(--text, #0f172a); letter-spacing: -0.3px; }
+.sub { margin: 0 0 18px; color: var(--text-muted, #64748b); font-size: 13.5px; line-height: 1.6; max-width: 560px; }
+.sub strong { color: var(--text, #334155); font-weight: 600; }
 
-.export-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-.export-title { margin: 0 0 2px; font-weight: 600; font-size: 14px; }
-.export-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.export-row .btn-ghost { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.card { background: var(--surface, #fff); border: 1px solid var(--border, #e2e8f0); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
 
-.file-drop { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;
-  border: 2px dashed var(--border, #cbd5e1); border-radius: 10px; padding: 28px 16px; cursor: pointer; transition: border-color .15s, background .15s; }
+/* ── Segmented tabs (Material 3 style) ────────────────────────────
+   Import and Export are two unrelated jobs, not two steps of one task —
+   a native Android screen would give each its own tab rather than stack
+   both as cards someone has to scroll past to reach the one they want. */
+.seg-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg, #f1f5f9);
+  padding: 4px;
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+.seg-tab {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 11px 14px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-muted, #64748b);
+  font-weight: 600;
+  font-size: 13.5px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .15s, color .15s, box-shadow .15s, transform .1s;
+}
+.seg-tab.active {
+  background: var(--surface, #fff);
+  color: var(--primary, #4f46e5);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .08);
+}
+.seg-tab:active { transform: scale(0.98); }
+
+.tab-panel { animation: tab-in .18s ease both; }
+@keyframes tab-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.file-drop {
+  display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
+  border: 2px dashed var(--border, #cbd5e1); border-radius: 14px; padding: 34px 20px;
+  cursor: pointer; transition: border-color .15s, background .15s, color .15s;
+  color: var(--text-muted, #64748b);
+}
 .file-drop:hover { border-color: var(--primary, #4f46e5); background: var(--primary-light, #eef2ff); }
-.file-drop.has-file { border-style: solid; border-color: var(--primary, #4f46e5); }
-.fd-icon { font-size: 30px; }
-.fd-text { font-weight: 600; font-size: 14px; }
+.file-drop.has-file { border-style: solid; border-color: #16a34a; background: #f0fdf4; }
+
+.fd-icon { display: flex; color: var(--text-light, #94a3b8); }
+.file-drop.has-file .fd-icon { color: #16a34a; }
+.fd-text { font-weight: 600; font-size: 14px; color: var(--text, #1e293b); }
+.file-drop.has-file .fd-text { color: #15803d; }
 .fd-hint { font-size: 11.5px; color: var(--text-light, #94a3b8); }
 
-.actions { display: flex; gap: 8px; margin-top: 16px; }
+.template-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 14px; background: none; border: none; padding: 0;
+  font-size: 12.5px; font-weight: 600; color: var(--primary, #4f46e5); cursor: pointer;
+}
+.template-link:hover { text-decoration: underline; }
 
-.progress-wrap { margin-top: 14px; }
+.actions { display: flex; gap: 10px; margin-top: 20px; }
+
+.progress-wrap { margin-top: 16px; }
 .progress-track { position: relative; height: 8px; border-radius: 999px; background: var(--bg, #f1f5f9); overflow: hidden; }
 .progress-fill { height: 100%; border-radius: 999px; background: var(--primary, #4f46e5); transition: width .2s ease; }
 .progress-fill.indeterminate {
@@ -34,9 +84,17 @@
 }
 .progress-label { margin: 6px 0 0; font-size: 12px; color: var(--text-muted, #64748b); }
 .progress-label .elapsed { color: var(--text-light, #94a3b8); }
-.btn-primary { background: var(--primary, #4f46e5); color: #fff; border: none; border-radius: 8px; padding: 9px 18px; font-weight: 600; cursor: pointer; }
-.btn-primary:disabled { opacity: .55; cursor: not-allowed; }
-.btn-ghost { background: transparent; border: 1px solid var(--border, #cbd5e1); border-radius: 8px; padding: 8px 14px; cursor: pointer; color: var(--text, #334155); }
+
+.btn-primary { background: var(--primary, #4f46e5); color: #fff; border: none; border-radius: 10px; padding: 11px 20px; font-weight: 600; font-size: 14px; cursor: pointer; transition: background .15s; }
+.btn-primary:hover:not(:disabled) { background: var(--primary-dark, #4338ca); }
+.btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  background: transparent; border: 1px solid var(--border, #cbd5e1); border-radius: 10px;
+  padding: 10px 16px; font-size: 14px; cursor: pointer; color: var(--text, #334155);
+  transition: background .15s, border-color .15s;
+}
+.btn-ghost:hover:not(:disabled) { border-color: var(--primary-mid, #a5b4fc); background: var(--primary-light, #eef2ff); }
 .btn-ghost:disabled { opacity: .5; cursor: not-allowed; }
 
 .summary { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -47,9 +105,9 @@
 .stat.warn .num { color: #d97706; }
 .stat.bad .num { color: #dc2626; }
 
-.all-good { margin: 14px 0 0; color: #16a34a; font-weight: 600; }
+.all-good { display: flex; align-items: center; gap: 8px; margin: 16px 0 0; color: #16a34a; font-weight: 600; font-size: 13.5px; }
 
-.table-wrap { margin-top: 16px; overflow-x: auto; }
+.table-wrap { margin-top: 18px; overflow-x: auto; }
 .problem-title { font-weight: 600; font-size: 13px; margin: 0 0 8px; }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
 th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border, #eef2f7); }
@@ -61,6 +119,52 @@ td.reason { color: var(--text-muted, #64748b); }
 .badge.bad { background: #fee2e2; color: #b91c1c; }
 .fix-hint { font-size: 12px; color: var(--text-muted, #64748b); margin: 10px 0 0; }
 
+/* ── Export tiles (Material list-item pattern) ────────────────────
+   Two tappable rows — icon, two-line label, chevron — rather than two
+   ghost buttons side by side. Reads as a native Android settings-style
+   list rather than a web form. */
+.export-card { padding: 8px; }
+
+.export-tile {
+  width: 100%;
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background .15s;
+}
+.export-tile:hover:not(:disabled) { background: var(--bg, #f1f5f9); }
+.export-tile:active:not(:disabled) { background: var(--primary-light, #eef2ff); }
+.export-tile:disabled { opacity: .5; cursor: not-allowed; }
+.export-tile + .export-tile { border-top: 1px solid var(--border, #eef2f7); }
+
+.et-icon {
+  width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+  background: var(--primary-light, #eef2ff); color: var(--primary, #4f46e5);
+  display: flex; align-items: center; justify-content: center;
+}
+.et-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.et-title { font-weight: 600; font-size: 14px; color: var(--text, #0f172a); }
+.et-sub { font-size: 12px; color: var(--text-muted, #64748b); }
+.et-chev { color: var(--text-light, #94a3b8); flex-shrink: 0; }
+
 @media (max-width: 640px) {
-  .import-head { flex-direction: column; }
+  .import-page { padding: 14px 14px calc(88px + env(safe-area-inset-bottom)); }
+  .card { padding: 18px; border-radius: 14px; }
+  .export-card { padding: 6px; }
+
+  .seg-tab { padding: 12px 10px; font-size: 13px; min-height: 44px; }
+
+  .actions { flex-direction: column; }
+  .btn-primary, .btn-ghost { min-height: 44px; font-size: 14px; }
+  .actions .btn-primary, .actions .btn-ghost {
+    width: 100%; display: flex; align-items: center; justify-content: center;
+  }
+
+  .summary { gap: 8px; }
+  .stat { flex: 1 1 calc(50% - 8px); min-width: 0; }
 }

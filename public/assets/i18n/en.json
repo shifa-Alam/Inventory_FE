@@ -1304,6 +1304,7 @@
     "subtitle_menu": "File → Download → CSV",
     "subtitle_outro": ", then upload it here.",
     "download_template": "Download template",
+    "xlsx_sub": "Editable spreadsheet, same columns the importer expects",
     "choose_file": "Choose a .csv or .xlsx file",
     "columns_hint": "Columns: name, barcode, category, cost, sale_price, mrp, minimum_stock, opening_stock",
     "importing": "Importing…",

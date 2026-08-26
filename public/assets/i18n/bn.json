@@ -1304,6 +1304,7 @@
     "subtitle_menu": "File → Download → CSV",
     "subtitle_outro": ", তারপর এখানে আপলোড করুন।",
     "download_template": "টেমপ্লেট ডাউনলোড",
+    "xlsx_sub": "এডিট করা যায় এমন স্প্রেডশিট, ইমপোর্টের একই কলাম",
     "choose_file": "একটি .csv বা .xlsx ফাইল নির্বাচন করুন",
     "columns_hint": "কলাম: name, barcode, category, cost, sale_price, mrp, minimum_stock, opening_stock",
     "importing": "ইমপোর্ট হচ্ছে…",

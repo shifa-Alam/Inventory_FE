@@ -24,3 +24,11 @@
 
 /* Mobile */
 .mobile-filter { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 14px; }
+
+/* .ph-qb/.ph-inp are local classes, not the shared .btn, so they never picked
+   up the app-wide 44px mobile touch-target rule — same gap found and fixed
+   on Sales History's identical .sl-qb/.sl-inp pattern. */
+@media (max-width: 640px) {
+  .ph-qb { padding: 9px 14px; font-size: 12.5px; min-height: 36px; }
+  .ph-inp { height: 40px; font-size: 14px; }
+}

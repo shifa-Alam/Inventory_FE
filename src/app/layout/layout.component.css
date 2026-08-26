@@ -395,8 +395,15 @@
   padding: 0 14px;
   height: 54px;
   background: var(--sidebar-bg);
+  /* A hairline border alone read flat; a soft shadow underneath gives the
+     bar the same physical "floating above the content" depth a native
+     iOS/Android app bar has, without needing the page to scroll under it
+     (it doesn't — .content is a separate flex sibling, not overlapped). */
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
   flex-shrink: 0;
+  position: relative;
+  z-index: 5;
 }
 
 .topbar-logo {
@@ -502,7 +509,14 @@
   left: 0;
   right: 0;
   height: 68px;
+  /* Fixed + overlaying scrolling page content (unlike .topbar, a plain flex
+     sibling with nothing to blur) — a real frosted-glass bar, the way every
+     native iOS tab bar and Android bottom nav renders. Solid var(--surface)
+     stays as the fallback for browsers without color-mix/backdrop-filter. */
   background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
   border-top: 1px solid var(--border-light);
   z-index: 200;
   padding: 0 4px;
@@ -510,6 +524,10 @@
   box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.07);
   align-items: stretch;
   justify-content: space-around;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .bottom-nav { background: var(--surface); }
 }
 
 .bottom-nav a,

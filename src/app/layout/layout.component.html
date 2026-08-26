@@ -520,7 +520,7 @@
         </svg>
         <span>{{ 'nav.sales' | translate }}</span>
       </a>
-      <a routerLink="/products" routerLinkActive="bn-active" (click)="closeSidebar()">
+      <a routerLink="/products" routerLinkActive="bn-active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidebar()">
         <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
           <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />

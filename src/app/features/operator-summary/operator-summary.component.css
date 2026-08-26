@@ -132,3 +132,15 @@
   .gb-block { border-right: none; border-bottom: 1px solid var(--border); }
   .gb-block:last-child { border-bottom: none; }
 }
+
+@media (max-width: 640px) {
+  /* .filter-actions wraps as ONE unit within .filter-row (it never wraps its
+     own 4 buttons), so once the two date fields plus a 4-button row no
+     longer fit one line, that whole button row pushed 9px past the screen
+     edge instead of breaking onto a second line. */
+  .filter-row { flex-direction: column; align-items: stretch; }
+  .filter-group { min-width: 0; width: 100%; }
+  .filter-group input { width: 100%; }
+  .filter-actions { flex-wrap: wrap; width: 100%; }
+  .filter-actions .btn { flex: 1 1 calc(50% - 3px); justify-content: center; min-height: 40px; }
+}

@@ -13,6 +13,11 @@ import { TranslateService, TranslatePipe } from '@ngx-translate/core';
   styleUrls: ['./import-products.component.css'],
 })
 export class ImportProductsComponent implements OnDestroy {
+  /** Import and Export are two unrelated jobs someone comes here to do —
+   *  tabs keep each one's full attention on screen instead of making every
+   *  visit scroll past whichever task isn't wanted right now. */
+  activeTab: 'import' | 'export' = 'import';
+
   file: File | null = null;
   importing = false;
   report: any = null;

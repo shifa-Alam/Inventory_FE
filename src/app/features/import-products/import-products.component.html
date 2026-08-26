@@ -1,96 +1,163 @@
 <div class="import-page">
+
   <div class="import-head">
-    <div>
-      <h2>{{ 'import_products.title' | translate }}</h2>
-      <p class="sub">{{ 'import_products.subtitle_intro' | translate }}
-        <strong>{{ 'import_products.subtitle_menu' | translate }}</strong>{{ 'import_products.subtitle_outro' | translate }}</p>
-    </div>
-    <button class="btn-ghost" (click)="downloadTemplate()">⬇ {{ 'import_products.download_template' | translate }}</button>
+    <h2>{{ 'import_products.title' | translate }}</h2>
   </div>
 
-  <!-- Export card -->
-  <div class="card export-card">
-    <div class="export-row">
-      <div>
-        <p class="export-title">{{ 'products.export_btn' | translate }}</p>
-        <p class="fd-hint">{{ 'products.export_hint' | translate }}</p>
-      </div>
-      <div class="export-actions">
-        <button class="btn-ghost" [disabled]="exportingFormat !== null" (click)="exportProducts('xlsx')">
-          <span *ngIf="exportingFormat === 'xlsx'" class="spinner"></span>
-          <svg *ngIf="exportingFormat !== 'xlsx'" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          {{ exportingFormat === 'xlsx' ? ('products.exporting' | translate) : ('products.export_xlsx_btn' | translate) }}
-        </button>
-        <button class="btn-ghost" [disabled]="exportingFormat !== null" (click)="exportProducts('pdf')" [title]="'products.export_pdf_hint' | translate">
-          <span *ngIf="exportingFormat === 'pdf'" class="spinner"></span>
-          <svg *ngIf="exportingFormat !== 'pdf'" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          {{ exportingFormat === 'pdf' ? ('products.exporting' | translate) : ('products.export_pdf_btn' | translate) }}
-        </button>
-      </div>
-    </div>
+  <!-- Material-style segmented control — Import and Export are two unrelated
+       jobs, not steps in one flow, so they get their own full screen each
+       instead of being two cards someone has to scroll past. -->
+  <div class="seg-tabs" role="tablist">
+    <button type="button" role="tab" class="seg-tab" [class.active]="activeTab === 'import'"
+            [attr.aria-selected]="activeTab === 'import'" (click)="activeTab = 'import'">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+      {{ 'import_products.import_btn' | translate }}
+    </button>
+    <button type="button" role="tab" class="seg-tab" [class.active]="activeTab === 'export'"
+            [attr.aria-selected]="activeTab === 'export'" (click)="activeTab = 'export'">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M12 3v13" />
+        <polyline points="7 11 12 16 17 11" />
+        <path d="M5 19h14" />
+      </svg>
+      {{ 'products.export_btn' | translate }}
+    </button>
   </div>
 
-  <!-- Upload card -->
-  <div class="card">
-    <label class="file-drop" [class.has-file]="file">
-      <input type="file" accept=".csv,.xlsx,.xls" (change)="onFile($event)" hidden />
-      <span class="fd-icon">📄</span>
-      <span class="fd-text">{{ file ? file.name : ('import_products.choose_file' | translate) }}</span>
-      <span class="fd-hint" *ngIf="file">{{ formatBytes(file.size) }}</span>
-      <span class="fd-hint" *ngIf="!file">{{ 'import_products.columns_hint' | translate }}</span>
-    </label>
+  <!-- ═══════════════ IMPORT ═══════════════ -->
+  <section *ngIf="activeTab === 'import'" class="tab-panel">
+    <p class="sub">{{ 'import_products.subtitle_intro' | translate }}
+      <strong>{{ 'import_products.subtitle_menu' | translate }}</strong>{{ 'import_products.subtitle_outro' | translate }}</p>
 
-    <div class="actions">
-      <button class="btn-primary" [disabled]="!file || importing" (click)="import()">
-        {{ importing ? ('import_products.importing' | translate) : ('import_products.import_btn' | translate) }}
+    <div class="card import-card">
+      <label class="file-drop" [class.has-file]="file">
+        <input type="file" accept=".csv,.xlsx,.xls" (change)="onFile($event)" hidden />
+        <span class="fd-icon">
+          <svg *ngIf="!file" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+            <path d="M4 14.9A5 5 0 0 1 6 5.3a6 6 0 0 1 11.3-1.6A5.5 5.5 0 0 1 20 13.5" />
+            <polyline points="12 12 12 21 9 18" />
+            <line x1="12" y1="12" x2="15" y2="15" />
+          </svg>
+          <svg *ngIf="file" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <polyline points="9 15 11 17 15 12.5" />
+          </svg>
+        </span>
+        <span class="fd-text">{{ file ? file.name : ('import_products.choose_file' | translate) }}</span>
+        <span class="fd-hint" *ngIf="file">{{ formatBytes(file.size) }}</span>
+        <span class="fd-hint" *ngIf="!file">{{ 'import_products.columns_hint' | translate }}</span>
+      </label>
+
+      <button type="button" class="template-link" (click)="downloadTemplate()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.25" viewBox="0 0 24 24">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        {{ 'import_products.download_template' | translate }}
       </button>
-      <button class="btn-ghost" *ngIf="file || report" [disabled]="importing" (click)="reset()">{{ 'common.clear' | translate }}</button>
-    </div>
 
-    <div class="progress-wrap" *ngIf="phase">
-      <div class="progress-track">
-        <div class="progress-fill" [class.indeterminate]="phase === 'processing'"
-             [style.width.%]="phase === 'uploading' ? uploadPercent : null"></div>
+      <div class="actions">
+        <button class="btn-primary" [disabled]="!file || importing" (click)="import()">
+          {{ importing ? ('import_products.importing' | translate) : ('import_products.import_btn' | translate) }}
+        </button>
+        <button class="btn-ghost" *ngIf="file || report" [disabled]="importing" (click)="reset()">{{ 'common.clear' | translate }}</button>
       </div>
-      <p class="progress-label">
-        {{ (phase === 'uploading' ? 'import_products.uploading' : 'import_products.processing') | translate }}
-        <span *ngIf="phase === 'uploading'">{{ uploadPercent }}% · {{ formatBytes(uploadedBytes) }} / {{ formatBytes(totalBytes) }}</span>
-        <span class="elapsed">· {{ 'import_products.elapsed' | translate: { s: elapsedSeconds } }}</span>
+
+      <div class="progress-wrap" *ngIf="phase">
+        <div class="progress-track">
+          <div class="progress-fill" [class.indeterminate]="phase === 'processing'"
+               [style.width.%]="phase === 'uploading' ? uploadPercent : null"></div>
+        </div>
+        <p class="progress-label">
+          {{ (phase === 'uploading' ? 'import_products.uploading' : 'import_products.processing') | translate }}
+          <span *ngIf="phase === 'uploading'">{{ uploadPercent }}% · {{ formatBytes(uploadedBytes) }} / {{ formatBytes(totalBytes) }}</span>
+          <span class="elapsed">· {{ 'import_products.elapsed' | translate: { s: elapsedSeconds } }}</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Result report -->
+    <div class="card report" *ngIf="report">
+      <div class="summary">
+        <div class="stat ok"><span class="num">{{ report.created }}</span><span>{{ 'import_products.created' | translate }}</span></div>
+        <div class="stat ok" *ngIf="report.updated > 0"><span class="num">{{ report.updated }}</span><span>{{ 'import_products.updated' | translate }}</span></div>
+        <div class="stat warn"><span class="num">{{ report.skipped }}</span><span>{{ 'import_products.skipped' | translate }}</span></div>
+        <div class="stat bad"><span class="num">{{ report.failed }}</span><span>{{ 'import_products.failed' | translate }}</span></div>
+        <div class="stat"><span class="num">{{ report.total }}</span><span>{{ 'import_products.rows' | translate }}</span></div>
+      </div>
+
+      <p class="all-good" *ngIf="problemRows.length === 0 && (report.created > 0 || report.updated > 0)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.25" viewBox="0 0 24 24">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+        {{ 'import_products.all_good' | translate }}
       </p>
-    </div>
-  </div>
 
-  <!-- Result report -->
-  <div class="card report" *ngIf="report">
-    <div class="summary">
-      <div class="stat ok"><span class="num">{{ report.created }}</span><span>{{ 'import_products.created' | translate }}</span></div>
-      <div class="stat ok" *ngIf="report.updated > 0"><span class="num">{{ report.updated }}</span><span>{{ 'import_products.updated' | translate }}</span></div>
-      <div class="stat warn"><span class="num">{{ report.skipped }}</span><span>{{ 'import_products.skipped' | translate }}</span></div>
-      <div class="stat bad"><span class="num">{{ report.failed }}</span><span>{{ 'import_products.failed' | translate }}</span></div>
-      <div class="stat"><span class="num">{{ report.total }}</span><span>{{ 'import_products.rows' | translate }}</span></div>
+      <div class="table-wrap" *ngIf="problemRows.length">
+        <p class="problem-title">{{ 'import_products.problem_title' | translate }}</p>
+        <table>
+          <thead>
+            <tr><th *ngIf="hasSheetInfo">{{ 'import_products.col_sheet' | translate }}</th><th>{{ 'import_products.col_row' | translate }}</th><th>{{ 'common.name' | translate }}</th><th>{{ 'common.status' | translate }}</th><th>{{ 'import_products.col_reason' | translate }}</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of problemRows">
+              <td class="muted" *ngIf="hasSheetInfo">{{ r.sheet || '—' }}</td>
+              <td class="muted">{{ r.row }}</td>
+              <td>{{ r.name || '—' }}</td>
+              <td><span class="badge" [class.warn]="r.status === 'skipped'" [class.bad]="r.status === 'error'">{{ r.status }}</span></td>
+              <td class="reason">{{ r.message }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="fix-hint">{{ 'import_products.fix_hint' | translate }}</p>
+      </div>
     </div>
+  </section>
 
-    <p class="all-good" *ngIf="problemRows.length === 0 && (report.created > 0 || report.updated > 0)">
-      ✅ {{ 'import_products.all_good' | translate }}
-    </p>
+  <!-- ═══════════════ EXPORT ═══════════════ -->
+  <section *ngIf="activeTab === 'export'" class="tab-panel">
+    <p class="sub">{{ 'products.export_hint' | translate }}</p>
 
-    <div class="table-wrap" *ngIf="problemRows.length">
-      <p class="problem-title">{{ 'import_products.problem_title' | translate }}</p>
-      <table>
-        <thead>
-          <tr><th *ngIf="hasSheetInfo">{{ 'import_products.col_sheet' | translate }}</th><th>{{ 'import_products.col_row' | translate }}</th><th>{{ 'common.name' | translate }}</th><th>{{ 'common.status' | translate }}</th><th>{{ 'import_products.col_reason' | translate }}</th></tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let r of problemRows">
-            <td class="muted" *ngIf="hasSheetInfo">{{ r.sheet || '—' }}</td>
-            <td class="muted">{{ r.row }}</td>
-            <td>{{ r.name || '—' }}</td>
-            <td><span class="badge" [class.warn]="r.status === 'skipped'" [class.bad]="r.status === 'error'">{{ r.status }}</span></td>
-            <td class="reason">{{ r.message }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <p class="fix-hint">{{ 'import_products.fix_hint' | translate }}</p>
+    <div class="card export-card">
+      <button type="button" class="export-tile" [disabled]="exportingFormat !== null" (click)="exportProducts('xlsx')">
+        <span class="et-icon">
+          <span *ngIf="exportingFormat === 'xlsx'" class="spinner"></span>
+          <svg *ngIf="exportingFormat !== 'xlsx'" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+        </span>
+        <span class="et-text">
+          <span class="et-title">{{ exportingFormat === 'xlsx' ? ('products.exporting' | translate) : ('products.export_xlsx_btn' | translate) }}</span>
+          <span class="et-sub">{{ 'import_products.xlsx_sub' | translate }}</span>
+        </span>
+        <svg class="et-chev" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+
+      <button type="button" class="export-tile" [disabled]="exportingFormat !== null" (click)="exportProducts('pdf')" [title]="'products.export_pdf_hint' | translate">
+        <span class="et-icon">
+          <span *ngIf="exportingFormat === 'pdf'" class="spinner"></span>
+          <svg *ngIf="exportingFormat !== 'pdf'" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="9" y1="14" x2="15" y2="14" />
+            <line x1="9" y1="17.5" x2="13" y2="17.5" />
+          </svg>
+        </span>
+        <span class="et-text">
+          <span class="et-title">{{ exportingFormat === 'pdf' ? ('products.exporting' | translate) : ('products.export_pdf_btn' | translate) }}</span>
+          <span class="et-sub">{{ 'products.export_pdf_hint' | translate }}</span>
+        </span>
+        <svg class="et-chev" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
     </div>
-  </div>
+  </section>
+
 </div>
