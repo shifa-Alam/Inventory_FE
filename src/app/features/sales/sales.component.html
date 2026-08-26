@@ -54,6 +54,16 @@
               role="combobox" aria-controls="custDdList" aria-expanded="true" aria-autocomplete="list"
               [attr.aria-activedescendant]="ddIndex >= 0 ? 'dd-opt-' + ddIndex : null"
               [placeholder]="'sales.search_name_ph' | translate" autocomplete="off" />
+            <!-- Pinned quick-pick: one tap books the sale against a shared
+                 "Walk-in Customer" record instead of searching/creating one
+                 per cash sale. mousedown.preventDefault for the same reason
+                 as the list below — keep focus in the search input. -->
+            <button type="button" class="cust-dd-walkin" (mousedown)="$event.preventDefault()" (click)="pickWalkIn()">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z" />
+              </svg>
+              {{ 'sales.walk_in' | translate }}
+            </button>
             <!-- mousedown.preventDefault keeps focus in the search input when a
                  row is clicked. Without it the input blurs, the wrap's focusout
                  fires with a null relatedTarget (the rows are not focusable), the
@@ -206,46 +216,61 @@
       <!-- ITEMS — mobile cards (same pattern as New Purchase) -->
       <div class="mobile-items show-mobile">
         <div class="mobile-empty" *ngIf="items.length === 0">{{ 'sales.empty' | translate }}</div>
-        <div class="mobile-item-card" *ngFor="let item of items; let i = index">
-          <div class="mic-top">
-            <span class="mic-num">{{ i + 1 }}</span>
-            <span class="mic-name">{{ item.product_name }}
-              <select *ngIf="item.unitOptions?.length > 1" class="line-unit" [(ngModel)]="item.unit_id"
-                (ngModelChange)="onLineUnitChange(item)">
-                <option *ngFor="let o of item.unitOptions" [ngValue]="o.id">{{ o.name }}</option>
-              </select>
-              <small *ngIf="!(item.unitOptions?.length > 1) && item.unit_label" class="unit-tag">/ {{ item.unit_label
-                }}</small>
-            </span>
-            <span class="stock-chip">{{ item.stock }}</span>
-            <!-- MRP is on the desktop table but was missing here. It sits in the
-                 header row with the stock chip rather than as a fourth column in
-                 .mic-row below: that row is a 3-column grid holding the editable
-                 qty/rate/total, and a fourth column squeezes the rate input on a
-                 375px phone. Labelled, unlike the bare stock chip, so the two
-                 numbers can't be confused. Hidden when the product has no MRP. -->
-            <span class="mic-mrp" *ngIf="item.mrp">{{ 'sales.col_mrp' | translate }} ৳{{ item.mrp | number }}</span>
-            <button class="mic-remove" (click)="removeRow(i)">✕</button>
-          </div>
-          <div class="mic-row">
-            <div class="mic-field mic-qty">
-              <span class="mic-lbl">{{ 'sales.col_qty' | translate }}</span>
-              <div class="qty-stepper">
-                <button class="qty-btn" type="button" (click)="item.quantity = item.quantity - 1; clampQuantity(item)"
-                  [disabled]="item.quantity <= 1">−</button>
-                <input #qtyInput type="number" [(ngModel)]="item.quantity" min="1" [max]="maxUnitQty(item)"
-                  (change)="clampQuantity(item)" (keydown)="onQtyKeyDown($event)" class="qty-input" />
-                <button class="qty-btn" type="button" (click)="item.quantity = item.quantity + 1; clampQuantity(item)"
-                  [disabled]="item.quantity >= maxUnitQty(item)">+</button>
+        <div class="mic-swipe-wrap" *ngFor="let item of items; let i = index">
+          <!-- Revealed by a leftward swipe on the card above; hidden the rest
+               of the time behind overflow:hidden on the wrapper. The existing
+               ✕ button in the card header still works too — this is a mobile
+               enhancement layered underneath it, not a replacement. -->
+          <button type="button" class="mic-swipe-delete" (click)="removeRowSwiped(i)" [attr.aria-label]="'sales.remove' | translate">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+              <path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+            </svg>
+          </button>
+          <div class="mobile-item-card" [style.transform]="'translateX(' + (item._dx || 0) + 'px)'"
+            [class.mic-swiping]="swipingIndex === i && swipeDragging"
+            (touchstart)="onSwipeStart($event, i)" (touchmove)="onSwipeMove($event, item, i)"
+            (touchend)="onSwipeEnd(item, i)" (touchcancel)="onSwipeEnd(item, i)">
+            <div class="mic-top">
+              <span class="mic-num">{{ i + 1 }}</span>
+              <span class="mic-name">{{ item.product_name }}
+                <select *ngIf="item.unitOptions?.length > 1" class="line-unit" [(ngModel)]="item.unit_id"
+                  (ngModelChange)="onLineUnitChange(item)">
+                  <option *ngFor="let o of item.unitOptions" [ngValue]="o.id">{{ o.name }}</option>
+                </select>
+                <small *ngIf="!(item.unitOptions?.length > 1) && item.unit_label" class="unit-tag">/ {{ item.unit_label
+                  }}</small>
+              </span>
+              <span class="stock-chip">{{ item.stock }}</span>
+              <!-- MRP is on the desktop table but was missing here. It sits in the
+                   header row with the stock chip rather than as a fourth column in
+                   .mic-row below: that row is a 3-column grid holding the editable
+                   qty/rate/total, and a fourth column squeezes the rate input on a
+                   375px phone. Labelled, unlike the bare stock chip, so the two
+                   numbers can't be confused. Hidden when the product has no MRP. -->
+              <span class="mic-mrp" *ngIf="item.mrp">{{ 'sales.col_mrp' | translate }} ৳{{ item.mrp | number }}</span>
+              <button class="mic-remove" (click)="removeRow(i)">✕</button>
+            </div>
+            <div class="mic-row">
+              <div class="mic-field mic-qty">
+                <span class="mic-lbl">{{ 'sales.col_qty' | translate }}</span>
+                <div class="qty-stepper">
+                  <button class="qty-btn" type="button" (click)="item.quantity = item.quantity - 1; clampQuantity(item)"
+                    [disabled]="item.quantity <= 1">−</button>
+                  <input #qtyInput type="number" [(ngModel)]="item.quantity" min="1" [max]="maxUnitQty(item)"
+                    (change)="clampQuantity(item)" (keydown)="onQtyKeyDown($event)" class="qty-input" />
+                  <button class="qty-btn" type="button" (click)="item.quantity = item.quantity + 1; clampQuantity(item)"
+                    [disabled]="item.quantity >= maxUnitQty(item)">+</button>
+                </div>
               </div>
-            </div>
-            <div class="mic-field">
-              <span class="mic-lbl">{{ 'sales.col_rate' | translate }}</span>
-              <input type="number" [(ngModel)]="item.rate" min="0" class="mic-input" />
-            </div>
-            <div class="mic-field mic-total-field">
-              <span class="mic-lbl">{{ 'sales.col_total' | translate }}</span>
-              <span class="mic-rate">৳{{ item.quantity * item.rate | number }}</span>
+              <div class="mic-field">
+                <span class="mic-lbl">{{ 'sales.col_rate' | translate }}</span>
+                <input type="number" [(ngModel)]="item.rate" min="0" class="mic-input" />
+              </div>
+              <div class="mic-field mic-total-field">
+                <span class="mic-lbl">{{ 'sales.col_total' | translate }}</span>
+                <span class="mic-rate">৳{{ item.quantity * item.rate | number }}</span>
+              </div>
             </div>
           </div>
         </div>

@@ -387,6 +387,41 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onDdSearch(q: string) { this.loadDdCustomers(q); }
 
+  /**
+   * One-tap "Walk-in Customer" pick for quick cash sales.
+   *
+   * Every sale is still booked against a real customer_id (submit() enforces
+   * that, and the backend needs the FK) — this just removes the search/create
+   * friction for the common case by finding-or-creating one canonical
+   * "Walk-in Customer" record and reusing it. The name is a fixed English
+   * string regardless of UI language so switching বাংলা/English never spawns
+   * a second duplicate customer; only the button label is translated.
+   */
+  private static readonly WALK_IN_NAME = 'Walk-in Customer';
+  private walkInCustomer: any = null;
+
+  pickWalkIn() {
+    if (this.walkInCustomer) { this.pickCustomer(this.walkInCustomer); return; }
+    this.api.get(`/customers/?name=${encodeURIComponent(SalesComponent.WALK_IN_NAME)}&page=1&page_size=1`).subscribe({
+      next: (res: any) => {
+        const list = res.data ?? res;
+        if (list?.length) {
+          this.walkInCustomer = list[0];
+          this.pickCustomer(this.walkInCustomer);
+        } else {
+          this.api.post('/customers/', { name: SalesComponent.WALK_IN_NAME, phone: '', address: '', credit_limit: 0, opening_due: 0 }).subscribe({
+            next: (created: any) => {
+              this.walkInCustomer = created;
+              this.pickCustomer(created);
+            },
+            error: () => this.toast.error(this.translate.instant('sales.customer_add_failed'))
+          });
+        }
+      },
+      error: () => this.toast.error(this.translate.instant('sales.customer_add_failed'))
+    });
+  }
+
   pickCustomer(c: any | null) {
     this.selectedCustomer = c;
     this.customer_id = c ? c.id : 0;
@@ -596,6 +631,63 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   removeRow(i: number) { this.items.splice(i, 1); }
+
+  // ── Mobile: swipe-left-to-delete on item cards ────────────
+  // A committed swipe (more horizontal than vertical movement, past a small
+  // dead zone) drags the card to reveal a red delete action underneath;
+  // everything short of that — a tap on the qty stepper, a vertical scroll —
+  // passes through untouched because swipeDragging never flips true.
+  private readonly SWIPE_REVEAL = 76;
+  private swipeStartX = 0;
+  private swipeStartY = 0;
+  swipingIndex = -1;
+  swipeDragging = false;
+  openSwipeIndex = -1;
+
+  onSwipeStart(event: TouchEvent, i: number) {
+    if (event.touches.length !== 1) return;
+    // Only one card is ever open at a time — starting a new gesture elsewhere
+    // closes whichever card was left revealed.
+    if (this.openSwipeIndex !== -1 && this.openSwipeIndex !== i) {
+      const prev = this.items[this.openSwipeIndex];
+      if (prev) prev._dx = 0;
+      this.openSwipeIndex = -1;
+    }
+    this.swipingIndex = i;
+    this.swipeStartX = event.touches[0].clientX;
+    this.swipeStartY = event.touches[0].clientY;
+    this.swipeDragging = false;
+  }
+
+  onSwipeMove(event: TouchEvent, item: any, i: number) {
+    if (this.swipingIndex !== i) return;
+    const dx = event.touches[0].clientX - this.swipeStartX;
+    const dy = event.touches[0].clientY - this.swipeStartY;
+    if (!this.swipeDragging) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+      if (Math.abs(dy) >= Math.abs(dx)) { this.swipingIndex = -1; return; } // vertical scroll wins
+      this.swipeDragging = true;
+    }
+    event.preventDefault();
+    const base = this.openSwipeIndex === i ? -this.SWIPE_REVEAL : 0;
+    item._dx = Math.max(-this.SWIPE_REVEAL, Math.min(0, base + dx));
+  }
+
+  onSwipeEnd(item: any, i: number) {
+    if (this.swipingIndex !== i) return;
+    this.swipingIndex = -1;
+    if (!this.swipeDragging) return;
+    this.swipeDragging = false;
+    const open = (item._dx ?? 0) < -this.SWIPE_REVEAL * 0.4;
+    item._dx = open ? -this.SWIPE_REVEAL : 0;
+    this.openSwipeIndex = open ? i : -1;
+  }
+
+  /** Delete tapped from the revealed swipe action. */
+  removeRowSwiped(i: number) {
+    this.openSwipeIndex = -1;
+    this.removeRow(i);
+  }
 
   getTotal(): number {
     return this.items.reduce((sum, i) => sum + (i.quantity * i.rate), 0);

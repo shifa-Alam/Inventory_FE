@@ -84,6 +84,18 @@
   outline: none; box-sizing: border-box; background: var(--bg);
   color: var(--text); border-radius: 0;
 }
+.cust-dd-walkin {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; padding: 10px 12px; border: none;
+  border-bottom: 1px solid var(--border);
+  background: var(--warning-light); color: var(--warning-text, var(--text));
+  font-size: 13px; font-weight: 600; font-family: inherit;
+  cursor: pointer; text-align: left;
+  transition: background var(--transition);
+}
+.cust-dd-walkin svg { flex-shrink: 0; }
+.cust-dd-walkin:hover, .cust-dd-walkin:active { background: var(--warning-mid); }
+
 .cust-dd-list { max-height: 220px; overflow-y: auto; }
 .cust-dd-item {
   display: flex; justify-content: space-between; align-items: center;
@@ -335,12 +347,26 @@
   background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
 }
 
+.mic-swipe-wrap {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.mic-swipe-delete {
+  position: absolute; top: 0; right: 0; bottom: 0; width: 76px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--danger); color: #fff; border: none; cursor: pointer;
+}
 .mobile-item-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 10px 12px;
+  position: relative; z-index: 1;
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+  touch-action: pan-y;
 }
+.mobile-item-card.mic-swiping { transition: none; }
 .mic-top {
   display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
 }
@@ -586,6 +612,7 @@ button:disabled {
   .left-col { padding-bottom: 76px; }
 
   /* Rounder, softer item cards on mobile */
+  .mic-swipe-wrap { border-radius: 16px; }
   .mobile-item-card { border-radius: 16px; padding: 14px; box-shadow: var(--shadow-xs); }
   .mic-name { font-size: 14px; }
 
