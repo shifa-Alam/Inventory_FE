@@ -37,10 +37,11 @@ import { ConfirmService } from '../../services/confirm.service';
     @keyframes cmFade { from { opacity: 0; } to { opacity: 1; } }
 
     .cm-modal {
-      background: #fff; border-radius: 16px;
+      background: var(--surface); border-radius: 16px;
       padding: 28px 24px 20px;
       width: 100%; max-width: 340px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.18);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
       text-align: center;
       animation: cmSlide .18s ease;
     }
@@ -48,15 +49,15 @@ import { ConfirmService } from '../../services/confirm.service';
 
     .cm-icon {
       width: 52px; height: 52px; border-radius: 50%;
-      background: #fef2f2; display: flex; align-items: center; justify-content: center;
+      background: var(--primary-light); display: flex; align-items: center; justify-content: center;
       margin: 0 auto 14px;
     }
-    .cm-icon svg { stroke: #ef4444; }
-    .cm-icon-danger { background: #fef2f2; }
-    .cm-icon-danger svg { stroke: #ef4444; }
+    .cm-icon svg { stroke: var(--primary); }
+    .cm-icon-danger { background: var(--danger-light); }
+    .cm-icon-danger svg { stroke: var(--danger); }
 
     .cm-msg {
-      font-size: 14px; font-weight: 500; color: #1e293b;
+      font-size: 14px; font-weight: 500; color: var(--text);
       line-height: 1.5; margin-bottom: 20px;
     }
 
@@ -67,12 +68,13 @@ import { ConfirmService } from '../../services/confirm.service';
     .cm-btn {
       flex: 1; padding: 10px 0; border: none; border-radius: 10px;
       font-size: 13.5px; font-weight: 600; cursor: pointer;
-      font-family: inherit; transition: opacity .15s;
+      font-family: inherit; transition: opacity .15s, transform .1s;
     }
-    .cm-btn:hover { opacity: .85; }
-    .cm-cancel  { background: #f1f5f9; color: #64748b; }
-    .cm-danger  { background: #ef4444; color: #fff; }
-    .cm-primary { background: #6366f1; color: #fff; }
+    .cm-btn:hover   { opacity: .85; }
+    .cm-btn:active  { transform: scale(0.97); }
+    .cm-cancel  { background: var(--bg-alt); color: var(--text-muted); }
+    .cm-danger  { background: var(--danger); color: #fff; }
+    .cm-primary { background: var(--primary); color: #fff; }
   `]
 })
 export class ConfirmModalComponent {
