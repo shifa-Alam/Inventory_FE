@@ -34,27 +34,31 @@ export class ImportProductsComponent implements OnDestroy {
   ];
   private readonly TEMPLATE_EXAMPLE = ['Egg', '8901234', 'Grocery', '8', '10', '12', '24', '100'];
 
-  exporting = false;
+  /** null when idle; the format currently downloading otherwise — drives
+   *  which of the two export buttons shows its own spinner. */
+  exportingFormat: 'xlsx' | 'pdf' | null = null;
 
   constructor(private api: ApiService, private toast: ToastService, private translate: TranslateService) {}
 
-  /** Downloads every active product as an .xlsx workbook, one sheet per
-   *  category, in the same shape /products/import expects — so it can be
-   *  edited and fed straight back in. */
-  exportProducts() {
-    this.exporting = true;
-    this.api.getBlob('/products/export').subscribe({
+  /** Downloads every active product either as an .xlsx workbook (one sheet
+   *  per category, in the same shape /products/import expects — so it can
+   *  be edited and fed straight back in) or as a printable PDF price list
+   *  with the shop's own letterhead. */
+  exportProducts(format: 'xlsx' | 'pdf') {
+    this.exportingFormat = format;
+    const filename = format === 'pdf' ? 'products_price_list.pdf' : 'products_export.xlsx';
+    this.api.getBlob(`/products/export?format=${format}`).subscribe({
       next: (blob: Blob) => {
-        this.exporting = false;
+        this.exportingFormat = null;
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'products_export.xlsx';
+        a.download = filename;
         a.click();
         URL.revokeObjectURL(url);
       },
       error: () => {
-        this.exporting = false;
+        this.exportingFormat = null;
         this.toast.error(this.translate.instant('products.export_failed'));
       },
     });

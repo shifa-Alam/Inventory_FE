@@ -16,9 +16,16 @@
   display: flex;
   min-height: 100vh;
   font-family: 'Inter', 'SolaimanLipi', 'Segoe UI', system-ui, sans-serif;
+  /* A four-colour mesh — brand blue and the logo's green anchoring two
+     corners, a soft violet and teal filling the other two — so the page
+     reads as a deliberate gradient wash rather than white-with-a-hint-of-
+     tint. The card's own opaque white keeps the form perfectly readable
+     regardless of how saturated this gets. */
   background:
-    radial-gradient(circle at 12% 15%, rgba(2, 82, 179, 0.07), transparent 42%),
-    radial-gradient(circle at 88% 85%, rgba(145, 202, 71, 0.06), transparent 42%),
+    radial-gradient(circle at 12% 12%, rgba(2, 82, 179, 0.30), transparent 50%),
+    radial-gradient(circle at 88% 10%, rgba(145, 202, 71, 0.24), transparent 50%),
+    radial-gradient(circle at 15% 90%, rgba(124, 58, 237, 0.22), transparent 50%),
+    radial-gradient(circle at 90% 92%, rgba(6, 182, 212, 0.22), transparent 50%),
     #fbfcfe;
 }
 
@@ -409,20 +416,19 @@
     min-height: 100dvh;
     position: relative;
     overflow: hidden;
-    /* Sampled from the logo artwork's own background (public/snovaPOS_2.png —
-       #fefefe over the whole outer frame, fully opaque, no alpha channel), so
-       the page and the logo are literally the same colour.
-
-       The two ambient glow blobs that used to live here were removed, not just
-       recoloured. They were the actual reason the logo looked pasted on: the
-       blurred indigo/violet tint landed on the page but could not land on the
-       logo's opaque white rectangle, so its edges showed as a hard seam right
-       under the brand. A tinted page and an untintable logo cannot both exist
-       here — the uniform background wins, since the blobs were barely visible
-       (0.10 / 0.08 alpha behind a 90px blur) and cost the brand its clean
-       entrance. Desktop is untouched: its .glow g1/g2/g3 set sits on the dark
-       hero panel, where nothing overlays it with an opaque white image. */
-    background: #fefefe;
+    /* A colourful mesh now lives here too (matching the desktop shell), which
+       reopens the seam problem an earlier pass removed: the logo PNG
+       (public/snovaPOS_2.png) carries its own opaque near-white background
+       rectangle, so a tinted page used to show a hard edge right at the
+       logo's border. Fixed properly this time — .m-logo-chip below gives the
+       logo an intentional white backdrop of its own, so it reads as a framed
+       mark sitting on the colour, not as a sprite that almost matches it. */
+    background:
+      radial-gradient(circle at 15% 8%, rgba(2, 82, 179, 0.20), transparent 48%),
+      radial-gradient(circle at 88% 12%, rgba(145, 202, 71, 0.16), transparent 48%),
+      radial-gradient(circle at 12% 92%, rgba(124, 58, 237, 0.14), transparent 48%),
+      radial-gradient(circle at 90% 90%, rgba(6, 182, 212, 0.14), transparent 48%),
+      #fbfcfe;
     font-family: 'Inter', 'SolaimanLipi', 'Segoe UI', system-ui, sans-serif;
     padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
   }
@@ -449,6 +455,18 @@
     text-align: center;
     margin-bottom: 36px;
     animation: m-in 0.5s cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  /* Gives the logo its own soft white backdrop so its edges are a deliberate
+     frame against the colourful page, not an accidental near-match. */
+  .m-brand img {
+    background: #fff;
+    border-radius: 26px;
+    padding: 10px;
+    box-shadow:
+      0 1px 2px rgba(2, 82, 179, 0.05),
+      0 16px 40px -14px rgba(2, 82, 179, 0.28),
+      0 0 0 1px rgba(2, 82, 179, 0.06);
   }
 
   .m-logo {

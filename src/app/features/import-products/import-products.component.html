@@ -15,11 +15,18 @@
         <p class="export-title">{{ 'products.export_btn' | translate }}</p>
         <p class="fd-hint">{{ 'products.export_hint' | translate }}</p>
       </div>
-      <button class="btn-ghost" [disabled]="exporting" (click)="exportProducts()">
-        <span *ngIf="exporting" class="spinner"></span>
-        <svg *ngIf="!exporting" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        {{ exporting ? ('products.exporting' | translate) : ('products.export_btn' | translate) }}
-      </button>
+      <div class="export-actions">
+        <button class="btn-ghost" [disabled]="exportingFormat !== null" (click)="exportProducts('xlsx')">
+          <span *ngIf="exportingFormat === 'xlsx'" class="spinner"></span>
+          <svg *ngIf="exportingFormat !== 'xlsx'" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          {{ exportingFormat === 'xlsx' ? ('products.exporting' | translate) : ('products.export_xlsx_btn' | translate) }}
+        </button>
+        <button class="btn-ghost" [disabled]="exportingFormat !== null" (click)="exportProducts('pdf')" [title]="'products.export_pdf_hint' | translate">
+          <span *ngIf="exportingFormat === 'pdf'" class="spinner"></span>
+          <svg *ngIf="exportingFormat !== 'pdf'" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          {{ exportingFormat === 'pdf' ? ('products.exporting' | translate) : ('products.export_pdf_btn' | translate) }}
+        </button>
+      </div>
     </div>
   </div>
 
