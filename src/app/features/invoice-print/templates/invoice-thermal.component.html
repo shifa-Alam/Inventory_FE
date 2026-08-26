@@ -18,9 +18,19 @@
       <span>{{ 'invoice.invoice_no' | translate }}</span>
       <span class="th-b">{{ invoice?.invoice_no }}</span>
     </div>
+    <!-- Always the actual sale timestamp, never delivery_date — that field
+         carries no real time of its own, so falling back to it here (like the
+         other templates do for their date-only display) printed a fake
+         "00:00" instead of when the sale actually happened. -->
     <div class="th-meta-row">
-      <span>{{ invoice?.delivery_date ? 'Delivery' : ('invoice.date' | translate) }}</span>
-      <span>{{ (invoice?.delivery_date || invoice?.created_at) | date:'dd/MM/yyyy HH:mm' }}</span>
+      <span>{{ 'invoice.date' | translate }}</span>
+      <span>{{ invoice?.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+    </div>
+    <!-- B2C is walk-in retail — nothing is "delivered" later, so the date
+         only makes sense for B2B (wholesale/delivery) invoices. -->
+    <div class="th-meta-row" *ngIf="invoice?.delivery_date && settings.business_type === 'B2B'">
+      <span>{{ 'invoice.delivery_date' | translate }}</span>
+      <span>{{ invoice?.delivery_date | date:'dd/MM/yyyy' }}</span>
     </div>
     <ng-container *ngIf="settings.options.show_customer">
       <div class="th-meta-row">
@@ -75,6 +85,12 @@
       <span>{{ 'invoice.savings' | translate }}</span>
       <span>{{ savings | invMoney:settings:false }}</span>
     </div>
+    <!-- Discounts granted later, while collecting a due payment — never folded
+         into Net Total above, so listed here on their own. -->
+    <div class="th-t-row" *ngFor="let adj of invoice?.adjustments">
+      <span>{{ 'invoice.collection_discount' | translate }} ({{ adj.date | date:'dd/MM' }})</span>
+      <span>−{{ adj.amount | invMoney:settings:false }}</span>
+    </div>
     <ng-container *ngIf="settings.options.show_paid_due">
       <div class="th-t-row">
         <span>{{ 'invoice.paid' | translate }}</span>
@@ -102,7 +118,7 @@
 
   <!-- ── Footer ── -->
   <div class="th-footer">
-    <div class="th-thanks">{{ settings.footer_note || ('invoice.thank_you' | translate) }}</div>
+    <div class="th-thanks">{{ settings.settings.receipt_footer || settings.footer_note || ('invoice.thank_you' | translate) }}</div>
     <div class="th-line" *ngIf="settings.options.show_footer_contact && settings.phone">{{ settings.phone }}</div>
     <div class="th-line" *ngIf="settings.options.show_footer_contact && settings.email">{{ settings.email }}</div>
   </div>

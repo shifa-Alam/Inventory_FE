@@ -261,6 +261,15 @@ html, body {
   font-weight: 400;
 }
 
+/* Two-or-more buttons grouped on the right of a .page-header — e.g. an
+   "Export" ghost button beside the primary "Add" action. */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    CARD
 ═══════════════════════════════════════════════════════════════ */
@@ -1104,13 +1113,19 @@ td input[type="number"] {
   .page { padding: 12px 12px 80px; }
 
   .page-header {
-    flex-direction: row; align-items: center; gap: 8px; margin-bottom: 12px;
+    /* flex-wrap so a title + multiple actions that can't share a row (e.g.
+       Products: title + Export + Add New Product) drop to a clean second
+       row instead of overflowing or squeezing unpredictably. */
+    flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px;
     position: sticky; top: 0; z-index: 10;
     background: var(--bg); padding: 10px 12px; margin-left: -12px; margin-right: -12px;
     border-bottom: 1px solid var(--border);
   }
   .page-header h2 { font-size: 15px; }
   .page-header .sub { display: none; }
+  /* When it wraps, the action buttons stay grouped and right-aligned on
+     their own row — never centered, never one button per line. */
+  .page-header .header-actions { flex: 1 1 100%; justify-content: flex-end; }
 
   .summary-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .summary-chip { flex: none; min-width: 0; padding: 10px 12px; border-radius: var(--radius); }

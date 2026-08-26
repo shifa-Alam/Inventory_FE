@@ -1,5 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 
 // The platform system_admin may only reach Users and Tenants.
@@ -21,17 +23,9 @@ const MANAGER_ONLY = [
 // which is the owner's business and not the floor manager's.
 const ADMIN_ONLY = ['/profit-loss'];
 
-export const authGuard: CanActivateFn = (_route, state) => {
-  const auth   = inject(AuthService);
-  const router = inject(Router);
-
-  if (!auth.isSessionValid()) {
-    router.navigate(['/login']);
-    return false;
-  }
-
-  const path = state.url.split('?')[0];
-
+/** Role-based route gates, run once the session is known to be valid
+ *  (either it already was, or a refresh just re-established it). */
+function checkRoleGates(auth: AuthService, router: Router, path: string): boolean {
   // Role-based route restriction for system_admin — any other path is denied
   // and bounced to Users (its landing page). Mirrors the backend 403 guard.
   if (auth.isSystemAdmin()) {
@@ -63,4 +57,28 @@ export const authGuard: CanActivateFn = (_route, state) => {
   }
 
   return true;
+}
+
+export const authGuard: CanActivateFn = (_route, state) => {
+  const auth   = inject(AuthService);
+  const router = inject(Router);
+  const path   = state.url.split('?')[0];
+
+  if (auth.isSessionValid()) {
+    return checkRoleGates(auth, router, path);
+  }
+
+  // The access token (1hr life) looks expired, but the refresh token (7-day
+  // life) may still be good — exactly the case the HTTP interceptor already
+  // handles silently for API calls. A route navigation deserves the same
+  // chance before being bounced to login: without this, every user gets
+  // logged out on the dot every ~60 minutes, on the very next click, even
+  // though their session was perfectly renewable.
+  return auth.refresh().pipe(
+    map(() => checkRoleGates(auth, router, path)),
+    catchError(() => {
+      router.navigate(['/login']);
+      return of(false);
+    }),
+  ) as Observable<boolean>;
 };

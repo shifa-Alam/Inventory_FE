@@ -84,8 +84,30 @@
           </svg>
           <span class="nav-label">{{ 'nav.new_sale' | translate }}</span>
         </a>
+        <!-- Pinned alongside Dashboard/New Sale: the two things looked up
+             constantly during a shift, not just at the start of one. Having
+             to open SELL to find Sales History, or open the (now-removed)
+             Catalog to find Products, was a click tax on the most common
+             lookups in the app. -->
+        <a routerLink="/sales" routerLinkActive="active" class="nav-pinned" [title]="'nav.sales_history' | translate" (click)="closeSidebar()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="5" y="2" width="14" height="20" rx="2" />
+            <line x1="9" y1="7" x2="15" y2="7" />
+            <line x1="9" y1="11" x2="15" y2="11" />
+            <line x1="9" y1="15" x2="13" y2="15" />
+          </svg>
+          <span class="nav-label">{{ 'nav.sales_history' | translate }}</span>
+        </a>
+        <a routerLink="/products" routerLinkActive="active" class="nav-pinned" [title]="'nav.products' | translate" (click)="closeSidebar()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
+            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+          </svg>
+          <span class="nav-label">{{ 'nav.products' | translate }}</span>
+        </a>
 
-        <!-- ── SELL ── the counter's work: what was sold, what came back, who bought it -->
+        <!-- ── SELL ── the counter's work: what came back, who bought it.
+             Sales History is pinned above, not repeated here. -->
         <div class="nav-section">
           <button type="button" class="nav-sec-btn"
                   [class.open]="isSectionShown('sell')"
@@ -97,15 +119,6 @@
             <svg class="chev" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
           <div class="nav-sub" [class.flyout]="sidebarCollapsed" *ngIf="isSectionShown('sell')">
-            <a routerLink="/sales" routerLinkActive="active" class="nav-child" (click)="closeSidebar()">
-              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <rect x="5" y="2" width="14" height="20" rx="2" />
-                <line x1="9" y1="7" x2="15" y2="7" />
-                <line x1="9" y1="11" x2="15" y2="11" />
-                <line x1="9" y1="15" x2="13" y2="15" />
-              </svg>
-              {{ 'nav.sales_history' | translate }}
-            </a>
             <a *ngIf="canManage" routerLink="/sale-return" routerLinkActive="active" class="nav-child" (click)="closeSidebar()">
               <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <polyline points="1 4 1 10 7 10" />
@@ -224,61 +237,20 @@
           </div>
         </div>
 
-        <!-- ── CATALOG ── what the shop sells, as definitions rather than
-             quantities. Ungated: a cashier needs to look a product up. -->
-        <div class="nav-section">
-          <button type="button" class="nav-sec-btn"
-                  [class.open]="isSectionShown('catalog')"
-                  [class.here]="isSectionActive('catalog') && !isSectionOpen('catalog')"
-                  [attr.aria-expanded]="isSectionOpen('catalog')"
-                  (click)="toggleSection('catalog')" [title]="'nav.catalog' | translate">
-            <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
-            <span class="sec-label">{{ 'nav.catalog' | translate }}</span>
-            <svg class="chev" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-          <div class="nav-sub" [class.flyout]="sidebarCollapsed" *ngIf="isSectionShown('catalog')">
-            <a routerLink="/products" routerLinkActive="active" class="nav-child" (click)="closeSidebar()">
-              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
-                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
-              </svg>
-              {{ 'nav.products' | translate }}
-            </a>
-            <a *ngIf="canManage" routerLink="/categories" routerLinkActive="active" class="nav-child" (click)="closeSidebar()">
-              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path
-                  d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18" />
-              </svg>
-              {{ 'nav.categories' | translate }}
-            </a>
-            <a *ngIf="canManage" routerLink="/units" routerLinkActive="active" class="nav-child" (click)="closeSidebar()">
-              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                <polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" />
-              </svg>
-              {{ 'nav.units' | translate }}
-            </a>
-            <a *ngIf="canManage" routerLink="/products/import" routerLinkActive="active" class="nav-child" (click)="closeSidebar()">
-              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
-              </svg>
-              {{ 'nav.import_products' | translate }}
-            </a>
-          </div>
-        </div>
-
-        <!-- ── MONEY ── every movement of cash, in one place. Customer Payment
-             and Shift stay open to cashiers; the rest are manager-only, matching
-             the guard exactly so nothing shown here can be blocked on click. -->
+        <!-- ── MONEY & REPORTS ── every movement of cash, plus the read-on-a-
+             schedule numbers, in one place — was two sections, merged since
+             both are "how is the business doing", just at different cadences.
+             Customer Payment and Shift stay open to cashiers; the rest are
+             manager-only, matching the guard exactly so nothing shown here
+             can be blocked on click. -->
         <div class="nav-section">
           <button type="button" class="nav-sec-btn"
                   [class.open]="isSectionShown('money')"
                   [class.here]="isSectionActive('money') && !isSectionOpen('money')"
                   [attr.aria-expanded]="isSectionOpen('money')"
-                  (click)="toggleSection('money')" [title]="'nav.money' | translate">
+                  (click)="toggleSection('money')" [title]="'nav.money_reports' | translate">
             <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            <span class="sec-label">{{ 'nav.money' | translate }}</span>
+            <span class="sec-label">{{ 'nav.money_reports' | translate }}</span>
             <svg class="chev" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
           <div class="nav-sub" [class.flyout]="sidebarCollapsed" *ngIf="isSectionShown('money')">
@@ -320,22 +292,10 @@
               </svg>
               {{ 'nav.shift' | translate }}
             </a>
-          </div>
-        </div>
-
-        <!-- ── REPORTS ── read on a schedule, not during a task. Profit & Loss
-             is owner-only: it exposes margin on every line the shop sells. -->
-        <div class="nav-section" *ngIf="canManage">
-          <button type="button" class="nav-sec-btn"
-                  [class.open]="isSectionShown('reports')"
-                  [class.here]="isSectionActive('reports') && !isSectionOpen('reports')"
-                  [attr.aria-expanded]="isSectionOpen('reports')"
-                  (click)="toggleSection('reports')" [title]="'nav.reports' | translate">
-            <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 13l4-4 4 4 5-5"/></svg>
-            <span class="sec-label">{{ 'nav.reports' | translate }}</span>
-            <svg class="chev" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-          <div class="nav-sub" [class.flyout]="sidebarCollapsed" *ngIf="isSectionShown('reports')">
+            <!-- Reports, folded in here: read on a schedule rather than
+                 during a task, but still "how is the business doing".
+                 Profit & Loss stays owner-only — it exposes margin on every
+                 line the shop sells. -->
             <a *ngIf="auth.isAdmin()" routerLink="/profit-loss" routerLinkActive="active" class="nav-child" (click)="closeSidebar()">
               <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <line x1="12" y1="1" x2="12" y2="23" />
@@ -343,14 +303,14 @@
               </svg>
               {{ 'nav.profit_loss' | translate }}
             </a>
-            <a routerLink="/aging" routerLinkActive="active" class="nav-child" (click)="closeSidebar()">
+            <a *ngIf="canManage" routerLink="/aging" routerLinkActive="active" class="nav-child" (click)="closeSidebar()">
               <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M3 3v18h18" />
                 <path d="M7 13l4-4 4 4 5-5" />
               </svg>
               {{ 'nav.aging' | translate }}
             </a>
-            <a routerLink="/operator-summary" routerLinkActive="active" class="nav-child" (click)="closeSidebar()">
+            <a *ngIf="canManage" routerLink="/operator-summary" routerLinkActive="active" class="nav-child" (click)="closeSidebar()">
               <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                 <circle cx="9" cy="7" r="4" />
@@ -383,6 +343,31 @@
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
               </svg>
               {{ 'nav.business_settings' | translate }}
+            </a>
+            <!-- Folded in from the old Catalog section: Products itself is
+                 pinned above (looked up constantly), so what's left here is
+                 occasional configuration — the same cadence as the rest of
+                 Setup. -->
+            <a *ngIf="canManage" routerLink="/categories" routerLinkActive="active" class="nav-child" (click)="closeSidebar()">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18" />
+              </svg>
+              {{ 'nav.categories' | translate }}
+            </a>
+            <a *ngIf="canManage" routerLink="/units" routerLinkActive="active" class="nav-child" (click)="closeSidebar()">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" />
+              </svg>
+              {{ 'nav.units' | translate }}
+            </a>
+            <a *ngIf="canManage" routerLink="/products/import" routerLinkActive="active" class="nav-child" (click)="closeSidebar()">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              {{ 'nav.import_products' | translate }}
             </a>
             <a *ngIf="canManage" routerLink="/notifications" routerLinkActive="active" class="nav-child" (click)="closeSidebar()">
               <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">

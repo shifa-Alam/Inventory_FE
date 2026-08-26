@@ -19,10 +19,29 @@ export class DashboardComponent implements OnInit {
   today = new Date();
   trendDays = 7;             // sales-trend window: 7 / 30 / 90
 
+  /** Everyone gets the same dashboard, but the deep financial/report sections
+   *  (stat strip, inventory/financial mini-grids, chart, P&L, breakdowns,
+   *  recent sales) start collapsed — the headline KPI row is enough for a
+   *  daily glance. One toggle, remembered per browser, not per role. */
+  detailsOpen = false;
+  private static readonly DETAILS_KEY = 'dashboard.detailsOpen';
+
   constructor(private api: ApiService, public router: Router) {}
 
   ngOnInit() {
+    this.restoreDetailsOpen();
     this.load();
+  }
+
+  toggleDetails(): void {
+    this.detailsOpen = !this.detailsOpen;
+    try { localStorage.setItem(DashboardComponent.DETAILS_KEY, this.detailsOpen ? '1' : '0'); }
+    catch { /* private mode / quota — toggle still works, it just forgets */ }
+  }
+
+  private restoreDetailsOpen(): void {
+    try { this.detailsOpen = localStorage.getItem(DashboardComponent.DETAILS_KEY) === '1'; }
+    catch { /* same as above */ }
   }
 
   load() {

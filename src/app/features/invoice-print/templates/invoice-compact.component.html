@@ -75,6 +75,11 @@
     <div class="cpt-t-row" *ngIf="settings.options.show_savings && savings > 0">
       <span>{{ 'invoice.savings' | translate }}</span><span>{{ savings | invMoney:settings }}</span>
     </div>
+    <!-- Discounts granted later, while collecting a due payment — never
+         folded into Net Total above, so listed here on their own. -->
+    <div class="cpt-t-row" *ngFor="let adj of invoice?.adjustments">
+      <span>{{ 'invoice.collection_discount' | translate }} ({{ adj.date | date:'dd/MM' }})</span><span>− {{ adj.amount | invMoney:settings }}</span>
+    </div>
     <ng-container *ngIf="settings.options.show_paid_due">
       <div class="cpt-t-row">
         <span>{{ 'invoice.paid' | translate }}</span><span>− {{ invoice?.paid_amount | invMoney:settings }}</span>
@@ -103,7 +108,7 @@
       <div class="cpt-sig-label">{{ 'invoice.customer_sig' | translate }}</div>
     </div>
     <div class="cpt-note">
-      {{ settings.footer_note || ('invoice.thank_you' | translate) }}
+      {{ settings.settings.receipt_footer || settings.footer_note || ('invoice.thank_you' | translate) }}
       <div class="cpt-contact" *ngIf="settings.options.show_footer_contact">
         <span *ngIf="settings.phone">{{ settings.phone }}</span>
         <span *ngIf="settings.email">{{ settings.email }}</span>

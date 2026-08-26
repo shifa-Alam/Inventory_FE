@@ -9,6 +9,7 @@ import { debounceTime, switchMap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { localDateStr } from '../../shared/utils/date.utils';
+import { TenantSettingsService } from '../../core/services/tenant-settings.service';
 
 @Component({
   selector: 'app-sales',
@@ -78,7 +79,13 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
   // Mobile checkout bottom sheet (UI state only)
   sheetOpen = false;
 
-  constructor(private api: ApiService, private toast: ToastService, private router: Router, private translate: TranslateService) { }
+  constructor(
+    private api: ApiService,
+    private toast: ToastService,
+    private router: Router,
+    private translate: TranslateService,
+    private tenantSettings: TenantSettingsService
+  ) { }
 
   ngOnInit() {
     this.loadDdCustomers('');
@@ -647,7 +654,13 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.selectedCustomer = null;
         this.customer_id = 0;
         this.clearPhone();
-        this.router.navigate(['/invoice', res.id], { queryParams: { print: '1' } });
+        // "Auto-print after sale" — the toggle was previously ignored and every
+        // sale navigated with ?print=1 unconditionally, so it fired regardless
+        // of the setting.
+        this.tenantSettings.getSettings().subscribe({
+          next: (s) => this.goToInvoice(res.id, s.options.auto_print),
+          error: () => this.goToInvoice(res.id, false),
+        });
       },
       error: (err) => {
         this.saving = false;
@@ -655,5 +668,9 @@ export class SalesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.toast.error(err?.error?.detail || this.translate.instant('sales.submit_failed'));
       }
     });
+  }
+
+  private goToInvoice(id: number, autoPrint: boolean): void {
+    this.router.navigate(['/invoice', id], autoPrint ? { queryParams: { print: '1' } } : {});
   }
 }

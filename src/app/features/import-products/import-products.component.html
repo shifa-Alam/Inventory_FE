@@ -8,12 +8,28 @@
     <button class="btn-ghost" (click)="downloadTemplate()">⬇ {{ 'import_products.download_template' | translate }}</button>
   </div>
 
+  <!-- Export card -->
+  <div class="card export-card">
+    <div class="export-row">
+      <div>
+        <p class="export-title">{{ 'products.export_btn' | translate }}</p>
+        <p class="fd-hint">{{ 'products.export_hint' | translate }}</p>
+      </div>
+      <button class="btn-ghost" [disabled]="exporting" (click)="exportProducts()">
+        <span *ngIf="exporting" class="spinner"></span>
+        <svg *ngIf="!exporting" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        {{ exporting ? ('products.exporting' | translate) : ('products.export_btn' | translate) }}
+      </button>
+    </div>
+  </div>
+
   <!-- Upload card -->
   <div class="card">
     <label class="file-drop" [class.has-file]="file">
       <input type="file" accept=".csv,.xlsx,.xls" (change)="onFile($event)" hidden />
       <span class="fd-icon">📄</span>
       <span class="fd-text">{{ file ? file.name : ('import_products.choose_file' | translate) }}</span>
+      <span class="fd-hint" *ngIf="file">{{ formatBytes(file.size) }}</span>
       <span class="fd-hint" *ngIf="!file">{{ 'import_products.columns_hint' | translate }}</span>
     </label>
 
@@ -23,18 +39,31 @@
       </button>
       <button class="btn-ghost" *ngIf="file || report" [disabled]="importing" (click)="reset()">{{ 'common.clear' | translate }}</button>
     </div>
+
+    <div class="progress-wrap" *ngIf="phase">
+      <div class="progress-track">
+        <div class="progress-fill" [class.indeterminate]="phase === 'processing'"
+             [style.width.%]="phase === 'uploading' ? uploadPercent : null"></div>
+      </div>
+      <p class="progress-label">
+        {{ (phase === 'uploading' ? 'import_products.uploading' : 'import_products.processing') | translate }}
+        <span *ngIf="phase === 'uploading'">{{ uploadPercent }}% · {{ formatBytes(uploadedBytes) }} / {{ formatBytes(totalBytes) }}</span>
+        <span class="elapsed">· {{ 'import_products.elapsed' | translate: { s: elapsedSeconds } }}</span>
+      </p>
+    </div>
   </div>
 
   <!-- Result report -->
   <div class="card report" *ngIf="report">
     <div class="summary">
       <div class="stat ok"><span class="num">{{ report.created }}</span><span>{{ 'import_products.created' | translate }}</span></div>
+      <div class="stat ok" *ngIf="report.updated > 0"><span class="num">{{ report.updated }}</span><span>{{ 'import_products.updated' | translate }}</span></div>
       <div class="stat warn"><span class="num">{{ report.skipped }}</span><span>{{ 'import_products.skipped' | translate }}</span></div>
       <div class="stat bad"><span class="num">{{ report.failed }}</span><span>{{ 'import_products.failed' | translate }}</span></div>
       <div class="stat"><span class="num">{{ report.total }}</span><span>{{ 'import_products.rows' | translate }}</span></div>
     </div>
 
-    <p class="all-good" *ngIf="problemRows.length === 0 && report.created > 0">
+    <p class="all-good" *ngIf="problemRows.length === 0 && (report.created > 0 || report.updated > 0)">
       ✅ {{ 'import_products.all_good' | translate }}
     </p>
 
@@ -42,10 +71,11 @@
       <p class="problem-title">{{ 'import_products.problem_title' | translate }}</p>
       <table>
         <thead>
-          <tr><th>{{ 'import_products.col_row' | translate }}</th><th>{{ 'common.name' | translate }}</th><th>{{ 'common.status' | translate }}</th><th>{{ 'import_products.col_reason' | translate }}</th></tr>
+          <tr><th *ngIf="hasSheetInfo">{{ 'import_products.col_sheet' | translate }}</th><th>{{ 'import_products.col_row' | translate }}</th><th>{{ 'common.name' | translate }}</th><th>{{ 'common.status' | translate }}</th><th>{{ 'import_products.col_reason' | translate }}</th></tr>
         </thead>
         <tbody>
           <tr *ngFor="let r of problemRows">
+            <td class="muted" *ngIf="hasSheetInfo">{{ r.sheet || '—' }}</td>
             <td class="muted">{{ r.row }}</td>
             <td>{{ r.name || '—' }}</td>
             <td><span class="badge" [class.warn]="r.status === 'skipped'" [class.bad]="r.status === 'error'">{{ r.status }}</span></td>

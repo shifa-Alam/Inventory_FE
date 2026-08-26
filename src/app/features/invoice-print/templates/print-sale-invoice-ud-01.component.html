@@ -136,6 +136,12 @@
         <td>{{ 'invoice.net_total' | translate }}</td>
         <td class="r">{{ invoice?.total_amount | invMoney:settings }}</td>
       </tr>
+      <!-- Discounts granted later, while collecting a due payment — never
+           folded into Net Total above, so listed here on their own. -->
+      <tr *ngFor="let adj of invoice?.adjustments">
+        <td>{{ 'invoice.collection_discount' | translate }} ({{ adj.date | date:'dd/MM' }})</td>
+        <td class="r">− {{ adj.amount | invMoney:settings }}</td>
+      </tr>
       <tr *ngIf="settings.options.show_paid_due">
         <td>{{ 'invoice.paid' | translate }}</td>
         <td class="r">− {{ invoice?.paid_amount | invMoney:settings }}</td>

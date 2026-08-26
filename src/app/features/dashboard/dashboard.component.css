@@ -18,6 +18,14 @@
 .loading-text { color: var(--text-muted); font-size: .9rem; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ── Details toggle (declutter: same dashboard for every role, the
+   deep numbers just start folded) ────────────────────────────── */
+.details-toggle { margin-bottom: 16px; }
+.details-toggle svg { transition: transform .15s ease; }
+.details-toggle svg.rot { transform: rotate(180deg); }
+.details-wrap { animation: details-in .15s ease; }
+@keyframes details-in { from { opacity: 0; } to { opacity: 1; } }
+
 /* ── Generic card ──────────────────────────────────────────────── */
 .card {
   background: var(--surface); border-radius: 16px; padding: 20px 24px;
@@ -266,6 +274,12 @@
 .pnl-divider {
   height: 1px; background: var(--border); margin: 4px 0;
 }
+/* Net Profit is accrual — it counts a credit sale in full immediately, cash
+   collected or not. This footnote makes that gap explicit right where the
+   reader's eye lands, instead of the headline number quietly overstating
+   what's actually in hand. */
+.pnl-note { display: flex; justify-content: space-between; padding: 2px 0 6px; font-size: .74rem; font-style: italic; color: var(--warning); }
+.pnl-note b { font-weight: 700; font-style: normal; }
 .pnl-divider.final-divider { background: var(--border-strong); height: 2px; }
 
 /* Expense breakdown card */
@@ -312,16 +326,38 @@
   .page { padding: 0 0 80px; }
 
   .page-header {
-    padding: 16px 16px 12px;
+    /* 14px left/right, matching the app topbar's own inset (see
+       .topbar { padding: 0 14px } in layout.component.css) — everything
+       below in this file lines up to that same 14px. align-items:center so
+       the title and the Refresh button sit on one visual line instead of
+       both pinned to the top of a row that's taller than either of them. */
+    padding: 16px 14px 12px;
+    align-items: center;
     background: var(--surface);
     position: sticky; top: 0; z-index: 10;
     box-shadow: 0 1px 0 var(--border);
-    margin-bottom: 12px;
+    /* Resets the global .page-header rule's -12px left/right margin
+       (styles.css, ≤640px) — that rule bleeds the header to the screen
+       edge to compensate for .page's own 12px padding on OTHER pages, but
+       Dashboard's .page has no side padding at all (each row pads itself
+       instead), so the same margin here shoved the whole header 12px past
+       the left edge no matter what padding was added on top of it. */
+    margin: 0 0 12px;
   }
   .page-header h2 { font-size: 1.15rem; }
   .page-header .sub { font-size: .72rem; }
 
-  .kpi-row { grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 12px; margin-bottom: 12px; }
+  /* These sit directly under .page, which drops its own side padding on
+     mobile (see above) so the sticky header and the 14px-padded rows below
+     can span edge-to-edge — everything in between needs its own 14px or it
+     ends up flush against the screen instead. */
+  .insights-strip { padding: 0 14px; margin-bottom: 12px; gap: 6px; }
+  .insight-pill { font-size: 12px; padding: 7px 12px; }
+  .details-toggle { margin: 0 14px 14px; }
+  .stat-strip { padding: 0 14px; margin-bottom: 12px; }
+  .mini-grid  { padding: 0 14px; margin-bottom: 12px; }
+
+  .kpi-row { grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 14px; margin-bottom: 12px; }
   .kpi-card { padding: 14px 14px; border-radius: 14px; }
   .kpi-val  { font-size: 1.15rem; }
   .kpi-lbl  { font-size: .68rem; }
@@ -329,19 +365,19 @@
   .kpi-icon { width: 26px; height: 26px; }
   .trend-badge, .rate-badge, .margin-badge, .warn-badge, .low-badge { font-size: .6rem; padding: 1px 5px; }
 
-  .chart-card { margin: 0 12px 12px; border-radius: 14px; padding: 16px; }
+  .chart-card { margin: 0 14px 12px; border-radius: 14px; padding: 16px; }
   .chart-cols { height: 140px; gap: 4px; }
   .bar-amount-lbl { display: none; }
   .bar-day { font-size: .58rem; }
 
-  .mid-row { grid-template-columns: 1fr; gap: 10px; padding: 0 12px; margin-bottom: 12px; }
+  .mid-row { grid-template-columns: 1fr; gap: 10px; padding: 0 14px; margin-bottom: 12px; }
   .card { border-radius: 14px; padding: 16px; }
   .card-ttl { font-size: .88rem; }
 
-  .slow-card { margin: 0 12px 12px; border-radius: 14px; padding: 16px; }
+  .slow-card { margin: 0 14px 12px; border-radius: 14px; padding: 16px; }
   .slow-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
 
-  .recent-card { margin: 0 12px 12px; border-radius: 14px; padding: 16px; }
+  .recent-card { margin: 0 14px 12px; border-radius: 14px; padding: 16px; }
   .db-table thead { display: none; }
   .db-table tbody tr {
     display: flex; flex-wrap: wrap;
@@ -375,14 +411,18 @@
   background: var(--surface); border: 1px solid var(--border);
 }
 .insight-pill .ins-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.ins-positive { border-color: #bbf7d0; background: #f0fdf4; color: #15803d; }
-.ins-positive .ins-dot { background: #22c55e; }
-.ins-warning  { border-color: #fde68a; background: #fffbeb; color: #b45309; }
-.ins-warning .ins-dot { background: #f59e0b; }
-.ins-danger   { border-color: #fecaca; background: #fef2f2; color: #b91c1c; }
-.ins-danger .ins-dot { background: #ef4444; }
-.ins-info     { border-color: #bfdbfe; background: #eff6ff; color: #1d4ed8; }
-.ins-info .ins-dot { background: #3b82f6; }
+/* Theme-aware tokens (same ones .badge-* / .alert-* already use elsewhere) —
+   these flip automatically under body.dark, unlike the hardcoded light-only
+   hex values this used to have, which is what made these pills wash out and
+   go badly illegible in dark mode. */
+.ins-positive { border-color: var(--success-mid); background: var(--success-light); color: var(--success-text); }
+.ins-positive .ins-dot { background: var(--success); }
+.ins-warning  { border-color: var(--warning-mid); background: var(--warning-light); color: var(--warning-text); }
+.ins-warning .ins-dot { background: var(--warning); }
+.ins-danger   { border-color: var(--danger-mid); background: var(--danger-light); color: var(--danger-text); }
+.ins-danger .ins-dot { background: var(--danger); }
+.ins-info     { border-color: var(--info-mid); background: var(--info-light); color: var(--info-text); }
+.ins-info .ins-dot { background: var(--info); }
 
 /* Executive stat strip */
 .stat-strip {

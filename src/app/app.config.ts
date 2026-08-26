@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withPreloading, PreloadAllModules } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -12,7 +12,9 @@ import { errorInterceptor } from './core/interceptors/error.interceptor';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
+    // Lazy chunks still load on first navigation, but the rest are quietly
+    // preloaded in the background right after so later navigations feel instant.
+    provideRouter(routes, withPreloading(PreloadAllModules)),
     provideAnimationsAsync(),
     // authInterceptor: attaches CSRF + silently refreshes on 401.
     // errorInterceptor: toasts a proper message for every other failed request

@@ -1,8 +1,9 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild, Type } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, Type, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, Location, NgComponentOutlet } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import html2pdf from 'html2pdf.js';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ApiService } from '../../core/services/api.service';
 import { TenantSettingsService, TenantInvoiceSettings, DEFAULT_INVOICE_SETTINGS } from '../../core/services/tenant-settings.service';
 import { PrintLanguageService } from '../../core/services/print-language.service';
@@ -29,22 +30,34 @@ export class InvoicePrintComponent implements OnInit, OnDestroy {
 
   private autoPrint = false;
   private autoPrinted = false;
-  /** App UI language before this print view overrode it; restored on leave. */
-  private prevLang: string | null = null;
+  private destroyRef = inject(DestroyRef);
+  /** App UI language before this print view overrode it; restored on leave.
+   *  Captured synchronously in the constructor — never from the async
+   *  settings response — so a slow request or an early navigation-away can
+   *  never leave this null and skip the restore (see ngOnDestroy). */
+  private readonly prevLang: string;
 
   constructor(
     private location: Location,
     private route: ActivatedRoute,
     private api: ApiService,
     private tenantSettings: TenantSettingsService,
-    private printLang: PrintLanguageService
-  ) {}
+    private printLang: PrintLanguageService,
+    translate: TranslateService
+  ) {
+    this.prevLang = translate.currentLang() ?? 'en';
+  }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     this.autoPrint = this.route.snapshot.queryParamMap.get('print') === '1';
 
-    this.tenantSettings.getSettings().subscribe({
+    // takeUntilDestroyed: without it, a settings response that arrives after
+    // the user has already navigated away would still switch the app's global
+    // language on a component that's gone — ngOnDestroy already ran, so
+    // nothing would ever restore it, leaving the whole app stuck in the
+    // document's print language.
+    this.tenantSettings.getSettings().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (s) => {
         this.settings = s;
         // Resolve a bespoke template from the tenant's code (e.g. 'at_01').
@@ -56,7 +69,7 @@ export class InvoicePrintComponent implements OnInit, OnDestroy {
     });
 
     if (id) {
-      this.api.get(`/sales/${id}`).subscribe({
+      this.api.get(`/sales/${id}`).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (res: any) => {
           this.invoice = res;
           this.loading = false;
@@ -74,19 +87,21 @@ export class InvoicePrintComponent implements OnInit, OnDestroy {
   /** Print documents in the tenant's configured language (en/bn/bilingual),
    *  independent of the app UI language; the UI language is restored on leave. */
   private applyDocLanguage(s: TenantInvoiceSettings) {
-    this.printLang.applyForView(s.options.print_language).then((prev) => {
-      if (this.prevLang === null) this.prevLang = prev;
-    });
+    this.printLang.applyForView(s.options.print_language);
   }
 
   ngOnDestroy() {
-    if (this.prevLang) this.printLang.restore(this.prevLang);
+    this.printLang.restore(this.prevLang);
   }
 
   /** Auto-print only once, after BOTH the invoice and tenant settings are ready. */
   private maybeAutoPrint() {
     if (!this.autoPrint || this.autoPrinted || !this.invoice || !this.settings) return;
     this.autoPrinted = true;
+    // Strip ?print=1 from the address bar right away — otherwise a plain page
+    // reload (or hitting back/forward) re-runs this exact flow and pops the
+    // print dialog again, long after the sale it belonged to is done.
+    this.location.replaceState(window.location.pathname);
     setTimeout(() => window.print(), 1200);
   }
 

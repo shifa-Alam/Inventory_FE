@@ -64,13 +64,22 @@ export class LayoutComponent {
     //  * Stock Ledger moved out of reports into INVENTORY. It is not something
     //    you read on a schedule — it is where you go when a stock figure looks
     //    wrong, which is a stock task.
-    sell:      ['/sales', '/sale-return', '/customers'],
+    // '/sales' and '/products' are pinned above the sections (see the
+    // template), not owned by any collapsible one.
+    sell:      ['/sale-return', '/customers'],
     buy:       ['/purchase', '/purchases', '/purchase-return', '/suppliers'],
     inventory: ['/stock', '/stock-count', '/stock-ledger', '/product-waste'],
-    catalog:   ['/products', '/products/import', '/categories', '/units'],
-    money:     ['/customer-payment', '/supplier-payment', '/expenses', '/payment-ledger', '/shift'],
-    reports:   ['/profit-loss', '/aging', '/operator-summary'],
-    setup:     ['/settings', '/notifications', '/users', '/tenants'],
+    // Money and Reports merged into one section — seven sections was too
+    // many folders to search through for one that only opens on click
+    // anyway, and both are "how is the business doing" reading, just at
+    // different cadences (payments daily, reports weekly).
+    money:     ['/customer-payment', '/supplier-payment', '/expenses', '/payment-ledger', '/shift',
+                '/profit-loss', '/aging', '/operator-summary'],
+    // Catalog folded into Setup: Products (the item people actually look
+    // up) is pinned above, so what is left here — Categories, Units, Import
+    // — is occasional configuration, the same cadence as the rest of Setup.
+    setup:     ['/settings', '/notifications', '/users', '/tenants',
+                '/categories', '/units', '/products/import'],
   };
 
   /** Routes flattened longest-first, so the most specific one wins. Without

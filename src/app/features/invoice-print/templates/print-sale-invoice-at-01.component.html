@@ -90,6 +90,12 @@
         ('invoice.subtotal' | translate) }}</span>
       <span class="t-val">৳&thinsp;{{ invoice?.total_amount | number }}</span>
     </div>
+    <!-- Discounts granted later, while collecting a due payment — never
+         folded into Net Total above, so listed here on their own. -->
+    <div class="t-row" *ngFor="let adj of invoice?.adjustments">
+      <span class="t-label">{{ 'invoice.collection_discount' | translate }} ({{ adj.date | date:'dd/MM' }})</span>
+      <span class="t-val">−&thinsp;৳&thinsp;{{ adj.amount | number }}</span>
+    </div>
     <div class="t-row t-paid">
       <span class="t-label">{{ 'invoice.paid' | translate }}</span>
       <span class="t-val">−&thinsp;৳&thinsp;{{ invoice?.paid_amount | number }}</span>

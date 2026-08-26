@@ -6,39 +6,52 @@
   background: #fff;
   border: 1px solid #e2e8f0;
   box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 20px 60px rgba(0,0,0,0.12);
-  color: #000;
-  padding: 14px 12px;
+  color: #111;
+  padding: 16px 14px;
   font-family: 'Courier New', Courier, 'SolaimanLipi', monospace;
   font-size: 11px;
-  line-height: 1.35;
+  line-height: 1.45;
 }
 
 /* ─── Head ───────────────────────────────────────────────────── */
 .th-head { text-align: center; }
-.th-logo { width: 44px; height: 44px; object-fit: contain; margin-bottom: 4px; }
-.th-shop { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-.th-line { font-size: 10px; margin-top: 1px; }
+.th-logo { width: 46px; height: 46px; object-fit: contain; margin-bottom: 6px; }
+.th-shop { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+.th-line { font-size: 10.5px; color: #555; margin-top: 2px; }
 
 /* ─── Separator ──────────────────────────────────────────────── */
-.th-dash { border-top: 1px dashed #000; margin: 8px 0; }
+.th-dash { border-top: 1px dashed #999; margin: 10px 0; }
 
 /* ─── Meta ───────────────────────────────────────────────────── */
-.th-meta-row { display: flex; justify-content: space-between; gap: 8px; font-size: 10px; }
-.th-b { font-weight: 700; }
+/* Labels sit a shade lighter than values on screen/PDF for a calmer read —
+   @media print below forces everything back to solid black, since a real
+   thermal head can't reproduce gray, so the printed slip is unaffected. */
+.th-meta-row { display: flex; justify-content: space-between; gap: 8px; font-size: 10.5px; padding: 1px 0; color: #444; }
+.th-b { font-weight: 700; color: #000; }
 
 /* ─── Items ──────────────────────────────────────────────────── */
-.th-item { margin-bottom: 5px; }
-.th-item-name { font-size: 11px; font-weight: 700; }
-.th-item-calc { display: flex; justify-content: space-between; font-size: 10px; padding-left: 12px; }
+.th-item { margin-bottom: 7px; }
+.th-item-name { font-size: 11px; font-weight: 700; color: #111; }
+.th-item-calc { display: flex; justify-content: space-between; font-size: 10.5px; padding-left: 12px; margin-top: 1px; color: #444; }
 
 /* ─── Totals ─────────────────────────────────────────────────── */
-.th-t-row { display: flex; justify-content: space-between; font-size: 10.5px; padding: 1px 0; }
-.th-t-total { font-size: 12px; font-weight: 700; border-top: 1px solid #000; margin-top: 3px; padding-top: 3px; }
-.th-t-due   { font-size: 13px; font-weight: 700; }
+.th-t-row { display: flex; justify-content: space-between; font-size: 10.5px; padding: 2px 0; color: #444; }
+.th-t-total { font-size: 13px; font-weight: 700; color: #000; border-top: 1px solid #000; margin-top: 4px; padding-top: 5px; }
+.th-t-due   { font-size: 13.5px; font-weight: 700; color: #000; }
 
 /* ─── Footer ─────────────────────────────────────────────────── */
 .th-footer { text-align: center; }
-.th-thanks { font-size: 10px; font-style: italic; }
+.th-thanks {
+  font-size: 12px;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: 0.5px;
+  margin: 6px 0 4px;
+}
+/* Plain hyphens, not unicode glyphs — this line also has to survive an
+   actual 80mm thermal printer's limited monospace font, not just the screen. */
+.th-thanks::before, .th-thanks::after { content: '- '; }
+.th-thanks::after { content: ' -'; }
 
 /* ─── Print (80mm roll) ──────────────────────────────────────── */
 @media print {

@@ -50,6 +50,7 @@ export class PaymentLedgerComponent implements OnInit {
     { value: 'SALE_PAYMENT', key: 'payment_ledger.type_sale_payment' },
     { value: 'DUE_PAYMENT',  key: 'payment_ledger.type_due_payment' },
     { value: 'DISCOUNT',     key: 'payment_ledger.type_discount' },
+    { value: 'DUE_DISCOUNT', key: 'payment_ledger.type_due_discount' },
     { value: 'RETURN',       key: 'payment_ledger.type_return' },
   ];
 
@@ -155,6 +156,7 @@ export class PaymentLedgerComponent implements OnInit {
       SALE_PAYMENT: 'payment_ledger.type_sale_payment',
       DUE_PAYMENT:  'payment_ledger.type_due_payment',
       DISCOUNT:     'payment_ledger.type_discount',
+      DUE_DISCOUNT: 'payment_ledger.type_due_discount',
       RETURN:       'payment_ledger.type_return',
     };
     return map[type] ?? type;
@@ -165,6 +167,7 @@ export class PaymentLedgerComponent implements OnInit {
       SALE_PAYMENT: 'badge-success',
       DUE_PAYMENT:  'badge-primary',
       DISCOUNT:     'badge-warn',
+      DUE_DISCOUNT: 'badge-warn',
       RETURN:       'badge-danger',
     };
     return map[type] ?? '';

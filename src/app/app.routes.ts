@@ -1,82 +1,57 @@
 import { Routes } from '@angular/router';
-import { DashboardComponent } from './features/dashboard/dashboard.component';
-import { LoginComponent } from './features/login/login.component';
-import { ProductsComponent } from './features/products/products.component';
-import { ImportProductsComponent } from './features/import-products/import-products.component';
 import { LayoutComponent } from './layout/layout.component';
-import { SuppliersComponent } from './features/suppliers/suppliers.component';
-import { CategoriesComponent } from './features/categories/categories.component';
-import { UnitsComponent } from './features/units/units.component';
-import { SalesComponent } from './features/sales/sales.component';
-import { CustomersComponent } from './features/customers/customers.component';
-import { PurchaseComponent } from './features/purchase/purchase.component';
-import { SalesListComponent } from './features/sales-list/sales-list.component';
-import { InvoicePrintComponent } from './features/invoice-print/invoice-print.component';
-import { PurchaseHistoryComponent } from './features/purchase-history/purchase-history.component';
-import { PurchaseViewComponent } from './features/purchase-view/purchase-view.component';
-import { StockDashboardComponent } from './features/stock-dashboard/stock-dashboard.component';
-import { SaleReturnComponent } from './features/sale-return/sale-return.component';
-import { ProductWasteComponent } from './features/product-waste/product-waste.component';
-import { StockCountComponent } from './features/stock-count/stock-count.component';
-import { PurchaseReturnComponent } from './features/purchase-return/purchase-return.component';
-import { StockLedgerComponent } from './features/stock-ledger/stock-ledger.component';
-import { UsersComponent } from './features/users/users.component';
-import { CustomerPaymentComponent } from './features/customer-payment/customer-payment.component';
-import { SupplierPaymentComponent } from './features/supplier-payment/supplier-payment.component';
-import { PaymentLedgerComponent } from './features/payment-ledger/payment-ledger.component';
-import { OperatorSummaryComponent } from './features/operator-summary/operator-summary.component';
-import { TenantsComponent } from './features/tenants/tenants.component';
-import { ExpensesComponent } from './features/expenses/expenses.component';
-import { ShiftComponent } from './features/shift/shift.component';
-import { AgingComponent } from './features/aging/aging.component';
-import { ProfitLossComponent } from './features/profit-loss/profit-loss.component';
-import { NotificationSettingsComponent } from './features/notification-settings/notification-settings.component';
-import { TenantSettingsComponent } from './features/tenant-settings/tenant-settings.component';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 
+// Every leaf route is lazy: each feature component ships in its own chunk,
+// fetched only when that route is visited, instead of all ~30 screens
+// weighing down the initial bundle.
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
 
-    { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
+    {
+        path: 'login',
+        canActivate: [guestGuard],
+        loadComponent: () => import('./features/login/login.component').then(m => m.LoginComponent),
+    },
 
     {
         path: '',
         component: LayoutComponent,
         canActivate: [authGuard],
         children: [
-            { path: 'dashboard', component: DashboardComponent },
-            { path: 'categories', component: CategoriesComponent },
-            { path: 'units', component: UnitsComponent },
-            { path: 'products', component: ProductsComponent },
-            { path: 'products/import', component: ImportProductsComponent },
-            { path: 'billing', component: SalesComponent },
-            { path: 'customers', component: CustomersComponent },
-            { path: 'purchase', component: PurchaseComponent },
-            { path: 'purchases', component: PurchaseHistoryComponent },
-            { path: 'purchase/:id', component: PurchaseViewComponent },
-            { path: 'sales', component: SalesListComponent },
-            { path: 'invoice-print', component: InvoicePrintComponent },
-            { path: 'invoice/:id', component: InvoicePrintComponent },
-            { path: 'suppliers', component: SuppliersComponent },
-            { path: 'stock', component: StockDashboardComponent },
-            { path: 'sale-return', component: SaleReturnComponent },
-            { path: 'product-waste', component: ProductWasteComponent },
-            { path: 'stock-count', component: StockCountComponent },
-            { path: 'purchase-return', component: PurchaseReturnComponent },
-            { path: 'stock-ledger', component: StockLedgerComponent },
-            { path: 'users', component: UsersComponent },
-            { path: 'customer-payment', component: CustomerPaymentComponent },
-            { path: 'supplier-payment', component: SupplierPaymentComponent },
-            { path: 'payment-ledger', component: PaymentLedgerComponent },
-            { path: 'operator-summary', component: OperatorSummaryComponent },
-            { path: 'tenants', component: TenantsComponent },
-            { path: 'expenses', component: ExpensesComponent },
-            { path: 'shift', component: ShiftComponent },
-            { path: 'aging', component: AgingComponent },
-            { path: 'profit-loss', component: ProfitLossComponent },
-            { path: 'notifications', component: NotificationSettingsComponent },
-            { path: 'settings', component: TenantSettingsComponent }
+            { path: 'dashboard', loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
+            { path: 'categories', loadComponent: () => import('./features/categories/categories.component').then(m => m.CategoriesComponent) },
+            { path: 'units', loadComponent: () => import('./features/units/units.component').then(m => m.UnitsComponent) },
+            { path: 'products', loadComponent: () => import('./features/products/products.component').then(m => m.ProductsComponent) },
+            { path: 'products/import', loadComponent: () => import('./features/import-products/import-products.component').then(m => m.ImportProductsComponent) },
+            { path: 'billing', loadComponent: () => import('./features/sales/sales.component').then(m => m.SalesComponent) },
+            { path: 'customers', loadComponent: () => import('./features/customers/customers.component').then(m => m.CustomersComponent) },
+            { path: 'purchase', loadComponent: () => import('./features/purchase/purchase.component').then(m => m.PurchaseComponent) },
+            { path: 'purchases', loadComponent: () => import('./features/purchase-history/purchase-history.component').then(m => m.PurchaseHistoryComponent) },
+            { path: 'purchase/:id', loadComponent: () => import('./features/purchase-view/purchase-view.component').then(m => m.PurchaseViewComponent) },
+            { path: 'sales', loadComponent: () => import('./features/sales-list/sales-list.component').then(m => m.SalesListComponent) },
+            { path: 'invoice-print', loadComponent: () => import('./features/invoice-print/invoice-print.component').then(m => m.InvoicePrintComponent) },
+            { path: 'invoice/:id', loadComponent: () => import('./features/invoice-print/invoice-print.component').then(m => m.InvoicePrintComponent) },
+            { path: 'suppliers', loadComponent: () => import('./features/suppliers/suppliers.component').then(m => m.SuppliersComponent) },
+            { path: 'stock', loadComponent: () => import('./features/stock-dashboard/stock-dashboard.component').then(m => m.StockDashboardComponent) },
+            { path: 'sale-return', loadComponent: () => import('./features/sale-return/sale-return.component').then(m => m.SaleReturnComponent) },
+            { path: 'product-waste', loadComponent: () => import('./features/product-waste/product-waste.component').then(m => m.ProductWasteComponent) },
+            { path: 'stock-count', loadComponent: () => import('./features/stock-count/stock-count.component').then(m => m.StockCountComponent) },
+            { path: 'purchase-return', loadComponent: () => import('./features/purchase-return/purchase-return.component').then(m => m.PurchaseReturnComponent) },
+            { path: 'stock-ledger', loadComponent: () => import('./features/stock-ledger/stock-ledger.component').then(m => m.StockLedgerComponent) },
+            { path: 'users', loadComponent: () => import('./features/users/users.component').then(m => m.UsersComponent) },
+            { path: 'customer-payment', loadComponent: () => import('./features/customer-payment/customer-payment.component').then(m => m.CustomerPaymentComponent) },
+            { path: 'supplier-payment', loadComponent: () => import('./features/supplier-payment/supplier-payment.component').then(m => m.SupplierPaymentComponent) },
+            { path: 'payment-ledger', loadComponent: () => import('./features/payment-ledger/payment-ledger.component').then(m => m.PaymentLedgerComponent) },
+            { path: 'operator-summary', loadComponent: () => import('./features/operator-summary/operator-summary.component').then(m => m.OperatorSummaryComponent) },
+            { path: 'tenants', loadComponent: () => import('./features/tenants/tenants.component').then(m => m.TenantsComponent) },
+            { path: 'expenses', loadComponent: () => import('./features/expenses/expenses.component').then(m => m.ExpensesComponent) },
+            { path: 'shift', loadComponent: () => import('./features/shift/shift.component').then(m => m.ShiftComponent) },
+            { path: 'aging', loadComponent: () => import('./features/aging/aging.component').then(m => m.AgingComponent) },
+            { path: 'profit-loss', loadComponent: () => import('./features/profit-loss/profit-loss.component').then(m => m.ProfitLossComponent) },
+            { path: 'notifications', loadComponent: () => import('./features/notification-settings/notification-settings.component').then(m => m.NotificationSettingsComponent) },
+            { path: 'settings', loadComponent: () => import('./features/tenant-settings/tenant-settings.component').then(m => m.TenantSettingsComponent) },
         ]
     },
 

@@ -5,6 +5,7 @@ import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { PaginatorComponent } from '../../shared/paginator/paginator.component';
 import { TranslatePipe } from '@ngx-translate/core';
+import { skipErrorToast } from '../../core/interceptors/error.interceptor';
 
 @Component({
   selector: 'app-shift',
@@ -42,7 +43,9 @@ export class ShiftComponent implements OnInit {
 
   loadCurrent(): void {
     this.loadingCurrent = true;
-    this.api.get('/shifts/current').subscribe({
+    // 404 here just means no shift is open right now — a normal state at the
+    // start of a day, not a failure, so it must not toast an error.
+    this.api.get('/shifts/current', undefined, skipErrorToast()).subscribe({
       next: (res: any) => { this.current = res; this.loadingCurrent = false; },
       error: () => { this.current = null; this.loadingCurrent = false; }
     });

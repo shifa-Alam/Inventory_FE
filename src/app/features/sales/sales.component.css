@@ -362,9 +362,12 @@
   white-space: nowrap; flex-shrink: 0;
 }
 .mic-remove {
-  padding: 3px 7px; font-size: 12px; font-weight: 700;
+  /* Removes a line from an active sale — a mis-tap here is costly, so the hit
+     area is closer to the app's usual 40px+ touch target even though the
+     visible glyph stays small. */
+  padding: 8px 11px; min-height: 34px; font-size: 12px; font-weight: 700;
   background: var(--danger-light, #fef2f2); color: var(--danger, #dc2626);
-  border: 1px solid var(--danger-mid, #fecaca); border-radius: 5px; cursor: pointer;
+  border: 1px solid var(--danger-mid, #fecaca); border-radius: 6px; cursor: pointer;
   flex-shrink: 0;
 }
 .mic-row { display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: 10px; align-items: end; }

@@ -124,7 +124,16 @@
           </header>
           <table>
             <tbody>
-              <tr><td>{{ 'profit_loss.sales' | translate }}</td>
+              <!-- Only shown when a payment-time discount actually happened this
+                   period — otherwise gross_sales == sales and the extra rows
+                   would just be noise. -->
+              <ng-container *ngIf="data.collection_discounts > 0">
+                <tr><td>{{ 'profit_loss.gross_sales' | translate }}</td>
+                    <td class="amt">{{ data.gross_sales | number:'1.0-2' }}</td></tr>
+                <tr class="ded"><td>{{ 'profit_loss.less_collection_discounts' | translate }}</td>
+                    <td class="amt">({{ data.collection_discounts | number:'1.0-2' }})</td></tr>
+              </ng-container>
+              <tr [class.sum]="data.collection_discounts > 0"><td>{{ 'profit_loss.sales' | translate }}</td>
                   <td class="amt">{{ data.sales | number:'1.0-2' }}</td></tr>
               <tr class="ded"><td>{{ 'profit_loss.less_returns' | translate }}</td>
                   <td class="amt">({{ data.returns | number:'1.0-2' }})</td></tr>
@@ -151,6 +160,12 @@
                 <td>{{ 'profit_loss.net_profit' | translate }}</td>
                 <td class="amt">{{ data.net_profit | number:'1.0-2' }}
                   <small>{{ data.net_profit_margin }}%</small></td></tr>
+              <!-- Net Profit is accrual: a credit sale counts in full the
+                   moment it happens, whether or not the cash arrived. This
+                   makes explicit how much of it is still just paper. -->
+              <tr class="uncollected-note" *ngIf="(data.uncollected_sales ?? 0) > 0">
+                <td>{{ 'profit_loss.uncollected_note' | translate }}</td>
+                <td class="amt">৳{{ data.uncollected_sales | number:'1.0-2' }}</td></tr>
             </tbody>
           </table>
         </section>

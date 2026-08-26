@@ -22,12 +22,26 @@
   <ng-container *ngIf="!loading">
 
     <!-- ── Smart Insights ───────────────────────────────────── -->
+    <!-- Each line ships a translation key + params (see api response) instead
+         of ready-made English text, so it renders in whatever language the
+         app is set to rather than always showing English. -->
     <div class="insights-strip" *ngIf="(data.smart_insights ?? []).length">
       <div class="insight-pill" *ngFor="let ins of data.smart_insights" [ngClass]="insightClass(ins.type)">
-        <span class="ins-dot"></span>{{ ins.text }}
+        <span class="ins-dot"></span>{{ ('dashboard.insights.' + ins.key) | translate: ins.params }}
       </div>
     </div>
 
+    <!-- Everyone sees the same dashboard; the deep numbers just start folded
+         away so a daily glance isn't a wall of figures. One toggle, not a
+         role split — the headline KPI row below always stays visible. -->
+    <button type="button" class="btn btn-ghost btn-sm details-toggle" (click)="toggleDetails()">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" [class.rot]="detailsOpen">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+      {{ (detailsOpen ? 'dashboard.hide_details' : 'dashboard.show_details') | translate }}
+    </button>
+
+    <div class="details-wrap" *ngIf="detailsOpen">
     <!-- ── Executive summary (extended KPIs) ────────────────── -->
     <div class="stat-strip">
       <div class="stat-chip"><span class="sc-lbl">{{ 'dashboard.this_week' | translate }}</span><span class="sc-val">৳{{ fmt(data.week_sales ?? 0) }}</span></div>
@@ -56,6 +70,8 @@
       <div class="mini-card" *ngIf="(data.negative_stock ?? 0) > 0"><span class="mini-val danger">{{ data.negative_stock }}</span><span class="mini-lbl">{{ 'dashboard.negative_stock' | translate }}</span></div>
       <div class="mini-card"><span class="mini-val">৳{{ fmt(data.stock_value ?? 0) }}</span><span class="mini-lbl">{{ 'dashboard.inventory_cost' | translate }}</span></div>
       <div class="mini-card"><span class="mini-val">৳{{ fmt(data.inventory_retail_value ?? 0) }}</span><span class="mini-lbl">{{ 'dashboard.inventory_retail' | translate }}</span></div>
+    </div>
+
     </div>
 
     <!-- ── ROW 1: KPI cards (4 × 2) ─────────────────────────── -->
@@ -179,6 +195,7 @@
 
     </div>
 
+    <div class="details-wrap" *ngIf="detailsOpen">
     <!-- ── ROW 2: Chart ──────────────────────────────────────── -->
     <div class="chart-card card">
       <div class="card-head">
@@ -276,6 +293,16 @@
           </div>
         </div>
 
+        <!-- Only shown when a payment-time discount actually happened this
+             month — otherwise gross_sales == sales and this is just noise. -->
+        <div class="pnl-line" *ngIf="(data.month_collection_discounts ?? 0) > 0">
+          <span class="pnl-lbl">{{ 'dashboard.gross_sales_label' | translate }}</span>
+          <span class="pnl-val">৳{{ fmt(data.month_gross_sales ?? 0) }}</span>
+        </div>
+        <div class="pnl-line deduct" *ngIf="(data.month_collection_discounts ?? 0) > 0">
+          <span class="pnl-lbl">− {{ 'dashboard.collection_discount_label' | translate }}</span>
+          <span class="pnl-val cost">৳{{ fmt(data.month_collection_discounts ?? 0) }}</span>
+        </div>
         <div class="pnl-line">
           <span class="pnl-lbl">{{ 'dashboard.revenue_label' | translate }}</span>
           <span class="pnl-val revenue">৳{{ fmt(data.month_sales ?? 0) }}</span>
@@ -315,6 +342,13 @@
             {{ netProfitPositive ? '+' : '' }}৳{{ fmt(data.net_profit ?? 0) }}
             <span class="pct-tag net-pct">{{ data.net_profit_margin ?? 0 | number:'1.0-1' }}%</span>
           </span>
+        </div>
+        <!-- Net Profit is accrual: a credit sale counts in full the moment it
+             happens, whether or not the cash arrived. This makes explicit how
+             much of it is still just paper. -->
+        <div class="pnl-note" *ngIf="(data.month_uncollected_sales ?? 0) > 0">
+          <span>{{ 'dashboard.uncollected_note' | translate }}</span>
+          <b>৳{{ fmt(data.month_uncollected_sales ?? 0) }}</b>
         </div>
       </div>
 
@@ -534,6 +568,7 @@
         </tbody>
       </table>
       <div class="empty-note" *ngIf="!data.recent_sales?.length">{{ 'dashboard.no_recent_sales' | translate }}</div>
+    </div>
     </div>
 
   </ng-container>
