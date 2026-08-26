@@ -1265,15 +1265,35 @@ td input[type="number"] {
    Token-driven: inherits light/dark themes automatically.
 ═══════════════════════════════════════════════════════════════ */
 
-/* NOTE: no entrance animation on .page.
-   Animating opacity OR transform on the page container turns it into a
-   stacking context / containing block for its position:fixed children,
-   which traps modals & bottom-sheets (which must sit above the mobile
-   bottom-nav, z-index 200) inside the content area. That is exactly how
-   the tenants form's Save/Update button ended up hidden behind the
-   bottom-nav on mobile. Pages therefore render instantly. */
+/* Route transition: a plain opacity fade on the routed component's host,
+   applied here (global, unscoped) rather than in layout.component.css —
+   Angular appends an _ngcontent-* attribute to that component's own scoped
+   selectors, but router-outlet's routed components are instantiated by the
+   Router at runtime, outside layout's template compilation, so they never
+   carry it; a scoped rule there can never match them.
+
+   opacity ONLY, never transform/filter/perspective/contain: those are what
+   create a new containing block for position:fixed descendants, which is
+   exactly what previously trapped modals & bottom-sheets (must sit above
+   the mobile bottom-nav, z-index 200) inside the content area — the tenants
+   form's Save/Update button ended up hidden behind the bottom-nav that way.
+   opacity alone creates a stacking context, not a containing block, so a
+   position:fixed child still lays out against the viewport correctly;
+   verified directly against Sales' fixed checkout bar and a confirm modal
+   before shipping this. */
+@keyframes route-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@media (max-width: 1024px) {
+  .content > *:not(router-outlet) {
+    animation: route-fade-in 0.22s ease-out;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * { transition-duration: 0.01ms !important; }
+  .content > *:not(router-outlet) { animation: none; }
 }
 
 /* ── Tables: sticky headers, row hover, aligned numbers ───────── */

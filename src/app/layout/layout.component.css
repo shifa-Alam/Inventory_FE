@@ -360,32 +360,13 @@
   overflow-y: auto;
 }
 
-/* App-like page transition: routed components slide-fade in.
-   router-outlet inserts the component as its next sibling. */
-@media (max-width: 1024px) {
-  .content>*:not(router-outlet) {
-    display: block;
-    animation: page-in 0.28s cubic-bezier(0.2, 0, 0, 1);
-  }
-}
-
-@keyframes page-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .content>*:not(router-outlet) {
-    animation: none;
-  }
-}
+/* App-like page transition: see styles.css for the actual rule.
+   It can't live here — Angular scopes this component's styles by adding an
+   _ngcontent-* attribute to the selector, but router-outlet's routed
+   components are instantiated by the Router at runtime, outside this
+   component's template compilation, so they never carry that attribute.
+   The scoped version of this rule could never match anything; it just
+   silently did nothing since the day it was written. */
 
 /* ─── Top Bar (mobile) ──────────────────────────────────────────── */
 .topbar {
